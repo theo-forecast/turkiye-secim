@@ -1,0 +1,1213 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Türkiye Seçim Hesaplama</title> 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Variables for consistent color palette */
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --accent-color: #e67e22;
+      --light-bg: #f0f2f5;
+      --mid-bg: #cfd8dc;
+      --white: #fff;
+      --text-color: #333; 
+      --border-color: #ddd;
+      --hover-bg: #f1f1f1;
+    }
+
+    /* Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, var(--light-bg), var(--mid-bg));
+      color: var(--text-color);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    /* Main container for overall results & inputs */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto 40px auto;
+      background: var(--white);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3, h4 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    p {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.1em;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table thead {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+    table th, table td {
+      padding: 12px 10px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+    table tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+    table tbody tr:hover {
+      background-color: var(--hover-bg);
+    }
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px rgba(44,62,80,0.5);
+    }
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+    label {
+      font-size: 1.1em;
+      margin-right: 10px;
+    }
+    button {
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: 12px 25px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      margin: 10px 0;
+    }
+    button:hover {
+      background-color: var(--secondary-color);
+      transform: scale(1.02);
+    }
+    .results-section {
+      margin-top: 30px;
+    }
+    #secondRoundDiv {
+      margin-top: 20px;
+      padding: 20px;
+      border: 2px dashed var(--accent-color);
+      text-align: center;
+      display: none;
+      border-radius: 8px;
+      background-color: #fff8f2;
+    }
+    @media (max-width: 768px) {
+      table th, table td {
+        padding: 8px;
+      }
+      button {
+        width: 100%;
+      }
+    }
+    /* Province container (separate from main container) */
+    .province-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #provinceFilter input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      transition: border-color 0.3s ease;
+    }
+    #provinceFilter input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    #provinceResults {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    #provinceResults .province-block {
+      border: 1px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: #fafafa;
+      transition: transform 0.3s ease;
+    } 
+    #provinceResults .province-block:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head> 
+<body>
+  <!-- Main Container: Overall results and inputs -->
+  <div class="container" id="mainContainer">
+    <h1>Türkiye Seçim Hesaplama</h1>
+    <p>
+      Her partinin ulusal oy oranını girin (sayıların toplamı 100 olmak zorunda değildir). Bu değerler, parlamento sandalye tahsisi ve parti desteğinin cumhurbaşkanı adaylarına dağıtımı için temel olarak kullanılan düzeltilmiş ulusal yüzdelere dönüştürülür.
+    </p>
+    <!-- Parliamentary Input Form -->
+    <form id="swingometerForm">
+      <table>
+        <thead>
+          <tr>
+            <th>Parti</th>
+            <th>Ulusal Oy Oranı</th>
+            <th>Barajı Geçmeden Milletvekil Hesabına Katılanlar<sup>*</sup></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Generated by JavaScript -->
+        </tbody>
+      </table>
+      <!-- First Round Presidential Candidate Support Section -->
+      <h2>Aday Parti Desteği (1. Tur)</h2>
+      <p>
+        Her aday için, her partinin oylarının yüzde kaçını aldığını girin (örneğin, 100, %100 anlamına gelir). Son satıra (<strong>Sandığa Gitmeyen</strong>) her parti için oy kullanmayan yüzdelik oranı girin.
+      </p>
+      <table id="presidentialTable">
+        <thead>
+          <tr id="presidentialTableHeader">
+            <!-- Header built dynamically -->
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Candidate rows and final Sandığa Gitmeyen row generated by JavaScript -->
+        </tbody>
+      </table>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <button type="button" onclick="addCandidate()">Aday Ekle</button>
+      </div>
+      
+      <!-- Second Round Support Section -->
+      <div id="secondRoundDiv">
+        <h2>İkinci Tur Destek Girişi</h2>
+        <p>
+          Hiçbir aday ilk turda %50'ye ulaşamadı. Lütfen aşağıdaki en iyi iki aday için yeni parti destek yüzdelerini girin (yeni bir Sandığa Gitmeyen satırı ile birlikte). Bitirdiğinizde, tekrar "Tüm Sonuçları Hesapla" düğmesine tıklayın.
+        </p>
+        <table id="secondRoundTable">
+          <thead>
+            <tr id="secondRoundTableHeader">
+              <!-- Header built dynamically -->
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows generated dynamically -->
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <label for="threshold">Baraj (%)</label>
+        <input type="number" id="threshold" value="10" step="0.1" style="width: 80px;">
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <button type="button" onclick="calculateWrapper()">Tüm Sonuçları Hesapla</button>
+      </div>
+      <p style="font-size: 0.9em; margin-top: 10px; text-align: center;">
+        <sup>*</sup> Bu kutuyu işaretlemek, barajdan bağımsız olarak doğrudan nitelendirme sağlar.
+      </p>
+    </form>
+    
+    <!-- Overall National Results -->
+    <div id="results" class="results-section"></div>
+  </div>
+
+  <!-- Province Container: Separated from the main box -->
+  <div class="province-container" id="provinceContainer">
+    <h2>İl Bazlı Sonuçlar</h2>
+    <!-- Province Filter Input -->
+    <div id="provinceFilter">
+      <input type="text" placeholder="İl Filtresi (isteğe bağlı)">
+    </div>
+    <!-- Province Results Grid -->
+    <div id="provinceResults">
+      <!-- Province boxes will be inserted here by JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    /***********************************************
+     * GLOBAL DATA
+     ***********************************************/
+    const parties = ["CHP","AKP","MHP","İYİP","DEM","YRP","ZP","BBP","TİP","OTH"];
+    const provinces = [
+  {
+    name: "Adana",
+    mpCount: 15,
+    ratios: { "CHP": 1.13, "AKP": 0.86, "MHP": 1.10, "İYİP": 1.11, "DEM": 1.10, "YRP": 0.63, "ZP": 0.94, "BBP": 0.93, "TİP": 1.33, "OTH": 0.82 }
+  },
+  {
+    name: "Adıyaman",
+    mpCount: 5,
+    ratios: { "CHP": 0.50, "AKP": 1.49, "MHP": 0.41, "İYİP": 0.61, "DEM": 1.37, "YRP": 1.70, "ZP": 0.27, "BBP": 1.01, "TİP": 0.00, "OTH": 0.72 }
+  },
+  {
+    name: "Afyonkarahisar",
+    mpCount: 6,
+    ratios: { "CHP": 0.73, "AKP": 1.25, "MHP": 1.62, "İYİP": 1.28, "DEM": 0.04, "YRP": 1.05, "ZP": 1.00, "BBP": 1.11, "TİP": 0.12, "OTH": 0.63 }
+  },
+  {
+    name: "Ağrı",
+    mpCount: 4,
+    ratios: { "CHP": 0.42, "AKP": 0.70, "MHP": 0.23, "İYİP": 0.17, "DEM": 6.37, "YRP": 0.70, "ZP": 0.00, "BBP": 0.29, "TİP": 0.00, "OTH": 1.09 }
+  },
+  {
+    name: "Aksaray",
+    mpCount: 4,
+    ratios: { "CHP": 0.48, "AKP": 1.24, "MHP": 2.11, "İYİP": 1.35, "DEM": 0.07, "YRP": 0.91, "ZP": 0.59, "BBP": 2.15, "TİP": 0.15, "OTH": 0.75 }
+  },
+  {
+    name: "Amasya",
+    mpCount: 3,
+    ratios: { "CHP": 1.18, "AKP": 1.12, "MHP": 1.69, "İYİP": 0.73, "DEM": 0.04, "YRP": 0.63, "ZP": 0.66, "BBP": 0.84, "TİP": 0.21, "OTH": 0.74 }
+  },
+  {
+    name: "Ankara 1, Bölge",
+    mpCount: 13,
+    ratios: { "CHP": 1.66, "AKP": 0.69, "MHP": 0.81, "İYİP": 1.34, "DEM": 0.45, "YRP": 0.69, "ZP": 1.34, "BBP": 0.88, "TİP": 0.00, "OTH": 1.01 }
+  },
+  {
+    name: "Ankara 2, Bölge",
+    mpCount: 11,
+    ratios: { "CHP": 0.81, "AKP": 1.18, "MHP": 1.20, "İYİP": 1.19, "DEM": 0.25, "YRP": 1.23, "ZP": 1.54, "BBP": 1.43, "TİP": 0.66, "OTH": 0.94 }
+  },
+  {
+    name: "Ankara 3, Bölge",
+    mpCount: 12,
+    ratios: { "CHP": 1.10, "AKP": 0.90, "MHP": 1.08, "İYİP": 1.43, "DEM": 0.28, "YRP": 0.97, "ZP": 1.63, "BBP": 1.61, "TİP": 1.43, "OTH": 0.99 }
+  },
+  {
+    name: "Antalya",
+    mpCount: 17,
+    ratios: { "CHP": 1.28, "AKP": 0.81, "MHP": 0.99, "İYİP": 1.17, "DEM": 0.54, "YRP": 0.44, "ZP": 1.26, "BBP": 0.67, "TİP": 2.69, "OTH": 1.35 }
+  },
+  {
+    name: "Ardahan",
+    mpCount: 2,
+    ratios: { "CHP": 1.18, "AKP": 0.98, "MHP": 0.30, "İYİP": 0.49, "DEM": 2.48, "YRP": 0.35, "ZP": 0.46, "BBP": 0.35, "TİP": 0.00, "OTH": 1.48 }
+  },
+  {
+    name: "Artvin",
+    mpCount: 2,
+    ratios: { "CHP": 1.18, "AKP": 1.05, "MHP": 0.96, "İYİP": 1.35, "DEM": 0.10, "YRP": 0.83, "ZP": 0.52, "BBP": 0.39, "TİP": 0.88, "OTH": 1.56 }
+  },
+  {
+    name: "Aydın",
+    mpCount: 8,
+    ratios: { "CHP": 1.41, "AKP": 0.80, "MHP": 0.85, "İYİP": 1.33, "DEM": 0.82, "YRP": 0.25, "ZP": 0.99, "BBP": 0.87, "TİP": 0.00, "OTH": 1.26 }
+  },
+  {
+    name: "Balıkesir",
+    mpCount: 9,
+    ratios: { "CHP": 1.24, "AKP": 0.97, "MHP": 0.81, "İYİP": 1.51, "DEM": 0.23, "YRP": 0.73, "ZP": 0.92, "BBP": 0.69, "TİP": 0.71, "OTH": 1.22 }
+  },
+  {
+    name: "Bartın",
+    mpCount: 2,
+    ratios: { "CHP": 0.99, "AKP": 1.03, "MHP": 2.37, "İYİP": 0.68, "DEM": 0.04, "YRP": 0.62, "ZP": 0.64, "BBP": 0.46, "TİP": 0.00, "OTH": 1.72 }
+  },
+  {
+    name: "Batman",
+    mpCount: 5,
+    ratios: { "CHP": 0.24, "AKP": 0.81, "MHP": 0.11, "İYİP": 0.19, "DEM": 6.75, "YRP": 0.37, "ZP": 0.00, "BBP": 0.31, "TİP": 0.00, "OTH": 0.73 }
+  },
+  {
+    name: "Bayburt",
+    mpCount: 1,
+    ratios: { "CHP": 0.28, "AKP": 1.71, "MHP": 1.67, "İYİP": 0.95, "DEM": 0.05, "YRP": 1.05, "ZP": 0.60, "BBP": 0.74, "TİP": 0.11, "OTH": 0.58 }
+  },
+  {
+    name: "Bilecik",
+    mpCount: 2,
+    ratios: { "CHP": 1.05, "AKP": 1.05, "MHP": 1.03, "İYİP": 1.26, "DEM": 0.30, "YRP": 1.16, "ZP": 1.00, "BBP": 0.88, "TİP": 0.48, "OTH": 1.32 }
+  },
+  {
+    name: "Bingöl",
+    mpCount: 3,
+    ratios: { "CHP": 0.20, "AKP": 1.10, "MHP": 1.35, "İYİP": 0.20, "DEM": 2.78, "YRP": 3.55, "ZP": 0.00, "BBP": 0.55, "TİP": 0.00, "OTH": 0.90 }
+  },
+  {
+    name: "Bitlis",
+    mpCount: 3,
+    ratios: { "CHP": 0.24, "AKP": 1.05, "MHP": 0.36, "İYİP": 0.73, "DEM": 4.65, "YRP": 0.74, "ZP": 0.00, "BBP": 0.33, "TİP": 0.00, "OTH": 1.26 }
+  },
+  {
+    name: "Bolu",
+    mpCount: 3,
+    ratios: { "CHP": 0.86, "AKP": 1.04, "MHP": 2.35, "İYİP": 0.76, "DEM": 0.09, "YRP": 1.14, "ZP": 0.85, "BBP": 0.77, "TİP": 0.32, "OTH": 1.25 }
+  },
+  {
+    name: "Burdur",
+    mpCount: 3,
+    ratios: { "CHP": 1.23, "AKP": 1.03, "MHP": 1.41, "İYİP": 1.18, "DEM": 0.07, "YRP": 0.42, "ZP": 0.63, "BBP": 0.70, "TİP": 0.00, "OTH": 1.18 }
+  },
+  {
+    name: "Bursa 1, Bölge",
+    mpCount: 10,
+    ratios: { "CHP": 1.07, "AKP": 1.01, "MHP": 0.79, "İYİP": 1.40, "DEM": 0.35, "YRP": 1.11, "ZP": 1.69, "BBP": 0.84, "TİP": 0.78, "OTH": 1.31 }
+  },
+  {
+    name: "Bursa 2, Bölge",
+    mpCount: 10,
+    ratios: { "CHP": 0.84, "AKP": 1.20, "MHP": 0.91, "İYİP": 1.04, "DEM": 0.64, "YRP": 1.43, "ZP": 1.58, "BBP": 0.69, "TİP": 0.00, "OTH": 1.26 }
+  },
+  {
+    name: "Çanakkale",
+    mpCount: 4,
+    ratios: { "CHP": 1.40, "AKP": 0.90, "MHP": 0.65, "İYİP": 1.69, "DEM": 0.22, "YRP": 0.34, "ZP": 0.89, "BBP": 0.44, "TİP": 0.72, "OTH": 1.30 }
+  },
+  {
+    name: "Çankırı",
+    mpCount: 2,
+    ratios: { "CHP": 0.24, "AKP": 1.19, "MHP": 3.14, "İYİP": 1.23, "DEM": 0.03, "YRP": 1.06, "ZP": 0.68, "BBP": 1.03, "TİP": 0.14, "OTH": 0.83 }
+  },
+  {
+    name: "Çorum",
+    mpCount: 4,
+    ratios: { "CHP": 0.87, "AKP": 1.13, "MHP": 2.03, "İYİP": 0.92, "DEM": 0.05, "YRP": 1.16, "ZP": 0.67, "BBP": 0.79, "TİP": 0.20, "OTH": 0.89 }
+  },
+  {
+    name: "Denizli",
+    mpCount: 7,
+    ratios: { "CHP": 1.26, "AKP": 0.95, "MHP": 0.83, "İYİP": 1.45, "DEM": 0.27, "YRP": 0.47, "ZP": 1.15, "BBP": 1.47, "TİP": 0.58, "OTH": 1.14 }
+  },
+  {
+    name: "Diyarbakır",
+    mpCount: 12,
+    ratios: { "CHP": 0.30, "AKP": 0.64, "MHP": 0.11, "İYİP": 0.23, "DEM": 7.13, "YRP": 0.55, "ZP": 0.00, "BBP": 0.21, "TİP": 0.00, "OTH": 0.83 }
+  },
+  {
+    name: "Düzce",
+    mpCount: 3,
+    ratios: { "CHP": 0.62, "AKP": 1.41, "MHP": 1.63, "İYİP": 0.71, "DEM": 0.11, "YRP": 1.37, "ZP": 0.96, "BBP": 0.92, "TİP": 0.25, "OTH": 1.32 }
+  },
+  {
+    name: "Edirne",
+    mpCount: 4,
+    ratios: { "CHP": 1.56, "AKP": 0.65, "MHP": 0.76, "İYİP": 2.12, "DEM": 0.20, "YRP": 0.23, "ZP": 0.66, "BBP": 0.23, "TİP": 0.61, "OTH": 1.33 }
+  },
+  {
+    name: "Elazığ",
+    mpCount: 5,
+    ratios: { "CHP": 0.81, "AKP": 1.14, "MHP": 1.14, "İYİP": 0.24, "DEM": 0.80, "YRP": 1.29, "ZP": 0.24, "BBP": 0.40, "TİP": 0.00, "OTH": 0.46 }
+  },
+  {
+    name: "Erzincan",
+    mpCount: 2,
+    ratios: { "CHP": 1.27, "AKP": 1.09, "MHP": 1.99, "İYİP": 0.41, "DEM": 0.12, "YRP": 0.51, "ZP": 0.42, "BBP": 0.37, "TİP": 0.14, "OTH": 0.47 }
+  },
+  {
+    name: "Erzurum",
+    mpCount: 6,
+    ratios: { "CHP": 0.25, "AKP": 1.22, "MHP": 1.68, "İYİP": 0.98, "DEM": 1.13, "YRP": 1.76, "ZP": 1.06, "BBP": 1.79, "TİP": 0.00, "OTH": 0.70 }
+  },
+  {
+    name: "Eskişehir",
+    mpCount: 6,
+    ratios: { "CHP": 1.35, "AKP": 0.93, "MHP": 0.72, "İYİP": 1.43, "DEM": 0.22, "YRP": 0.50, "ZP": 1.34, "BBP": 1.12, "TİP": 0.94, "OTH": 1.01 }
+  },
+  {
+    name: "Gaziantep",
+    mpCount: 14,
+    ratios: { "CHP": 0.80, "AKP": 1.27, "MHP": 0.96, "İYİP": 0.55, "DEM": 1.03, "YRP": 1.46, "ZP": 1.46, "BBP": 0.70, "TİP": 0.00, "OTH": 0.93 }
+  },
+  {
+    name: "Giresun",
+    mpCount: 4,
+    ratios: { "CHP": 0.81, "AKP": 1.22, "MHP": 1.57, "İYİP": 1.31, "DEM": 0.03, "YRP": 0.87, "ZP": 0.68, "BBP": 0.59, "TİP": 0.25, "OTH": 0.93 }
+  },
+  {
+    name: "Gümüşhane",
+    mpCount: 2,
+    ratios: { "CHP": 0.28, "AKP": 1.34, "MHP": 2.66, "İYİP": 1.19, "DEM": 0.03, "YRP": 0.94, "ZP": 0.48, "BBP": 0.84, "TİP": 0.15, "OTH": 0.79 }
+  },
+  {
+    name: "Hakkari",
+    mpCount: 3,
+    ratios: { "CHP": 0.19, "AKP": 0.56, "MHP": 0.27, "İYİP": 0.20, "DEM": 7.30, "YRP": 0.70, "ZP": 0.00, "BBP": 0.30, "TİP": 0.00, "OTH": 1.13 }
+  },
+  {
+    name: "Hatay",
+    mpCount: 11,
+    ratios: { "CHP": 1.13, "AKP": 0.95, "MHP": 1.22, "İYİP": 0.83, "DEM": 0.34, "YRP": 0.65, "ZP": 0.59, "BBP": 0.91, "TİP": 5.11, "OTH": 0.64 }
+  },
+  {
+    name: "Iğdır",
+    mpCount: 2,
+    ratios: { "CHP": 0.23, "AKP": 0.99, "MHP": 0.45, "İYİP": 0.67, "DEM": 5.09, "YRP": 0.16, "ZP": 0.00, "BBP": 0.20, "TİP": 0.00, "OTH": 0.98 }
+  },
+  {
+    name: "Isparta",
+    mpCount: 4,
+    ratios: { "CHP": 0.87, "AKP": 0.91, "MHP": 2.06, "İYİP": 1.69, "DEM": 0.08, "YRP": 0.64, "ZP": 0.86, "BBP": 0.54, "TİP": 0.18, "OTH": 0.98 }
+  },
+  {
+    name: "İstanbul 1, Bölge",
+    mpCount: 35,
+    ratios: { "CHP": 1.26, "AKP": 0.97, "MHP": 0.60, "İYİP": 0.80, "DEM": 0.71, "YRP": 1.05, "ZP": 1.20, "BBP": 1.02, "TİP": 2.73, "OTH": 0.95 }
+  },
+  {
+    name: "İstanbul 2, Bölge",
+    mpCount: 27,
+    ratios: { "CHP": 1.05, "AKP": 1.08, "MHP": 0.56, "İYİP": 0.88, "DEM": 0.84, "YRP": 1.37, "ZP": 1.27, "BBP": 0.71, "TİP": 2.16, "OTH": 1.00 }
+  },
+  {
+    name: "İstanbul 3, Bölge",
+    mpCount: 36,
+    ratios: { "CHP": 1.04, "AKP": 1.01, "MHP": 0.65, "İYİP": 0.83, "DEM": 1.22, "YRP": 1.11, "ZP": 1.29, "BBP": 0.70, "TİP": 2.18, "OTH": 0.91 }
+  },
+  {
+    name: "İzmir 1, Bölge",
+    mpCount: 14,
+    ratios: { "CHP": 1.67, "AKP": 0.70, "MHP": 0.46, "İYİP": 1.23, "DEM": 1.03, "YRP": 0.29, "ZP": 1.03, "BBP": 0.48, "TİP": 0.00, "OTH": 1.38 }
+  },
+  {
+    name: "İzmir 2, Bölge",
+    mpCount: 14,
+    ratios: { "CHP": 1.59, "AKP": 0.69, "MHP": 0.56, "İYİP": 1.13, "DEM": 0.67, "YRP": 0.33, "ZP": 1.05, "BBP": 0.45, "TİP": 3.20, "OTH": 1.28 }
+  },
+  {
+    name: "Kahramanmaraş",
+    mpCount: 8,
+    ratios: { "CHP": 0.63, "AKP": 1.35, "MHP": 1.62, "İYİP": 0.72, "DEM": 0.13, "YRP": 1.94, "ZP": 0.76, "BBP": 1.60, "TİP": 0.00, "OTH": 0.92 }
+  },
+  {
+    name: "Karabük",
+    mpCount: 3,
+    ratios: { "CHP": 0.86, "AKP": 1.06, "MHP": 1.60, "İYİP": 1.00, "DEM": 0.04, "YRP": 2.95, "ZP": 0.93, "BBP": 0.43, "TİP": 0.19, "OTH": 1.33 }
+  },
+  {
+    name: "Karaman",
+    mpCount: 3,
+    ratios: { "CHP": 0.75, "AKP": 1.16, "MHP": 1.82, "İYİP": 1.12, "DEM": 0.06, "YRP": 0.80, "ZP": 0.83, "BBP": 2.73, "TİP": 0.16, "OTH": 1.11 }
+  },
+  {
+    name: "Kars",
+    mpCount: 3,
+    ratios: { "CHP": 0.64, "AKP": 0.71, "MHP": 0.96, "İYİP": 1.54, "DEM": 3.24, "YRP": 0.69, "ZP": 0.00, "BBP": 0.60, "TİP": 0.00, "OTH": 1.17 }
+  },
+  {
+    name: "Kastamonu",
+    mpCount: 3,
+    ratios: { "CHP": 0.85, "AKP": 1.29, "MHP": 1.51, "İYİP": 0.78, "DEM": 0.02, "YRP": 1.44, "ZP": 0.78, "BBP": 0.92, "TİP": 0.00, "OTH": 1.27 }
+  },
+  {
+    name: "Kayseri",
+    mpCount: 10,
+    ratios: { "CHP": 0.67, "AKP": 1.15, "MHP": 1.92, "İYİP": 1.03, "DEM": 0.09, "YRP": 1.24, "ZP": 1.44, "BBP": 1.94, "TİP": 0.22, "OTH": 0.71 }
+  },
+  {
+    name: "Kırıkkale",
+    mpCount: 3,
+    ratios: { "CHP": 1.05, "AKP": 0.99, "MHP": 2.14, "İYİP": 1.04, "DEM": 0.03, "YRP": 0.64, "ZP": 0.68, "BBP": 0.66, "TİP": 0.00, "OTH": 0.66 }
+  },
+  {
+    name: "Kırklareli",
+    mpCount: 3,
+    ratios: { "CHP": 1.81, "AKP": 0.70, "MHP": 0.46, "İYİP": 1.57, "DEM": 0.19, "YRP": 0.23, "ZP": 0.69, "BBP": 0.50, "TİP": 1.02, "OTH": 1.20 }
+  },
+  {
+    name: "Kırşehir",
+    mpCount: 2,
+    ratios: { "CHP": 1.16, "AKP": 1.09, "MHP": 1.49, "İYİP": 0.74, "DEM": 0.28, "YRP": 0.56, "ZP": 0.86, "BBP": 1.01, "TİP": 0.23, "OTH": 0.97 }
+  },
+  {
+    name: "Kilis",
+    mpCount: 2,
+    ratios: { "CHP": 0.79, "AKP": 1.11, "MHP": 2.71, "İYİP": 0.59, "DEM": 0.10, "YRP": 0.83, "ZP": 0.84, "BBP": 0.44, "TİP": 0.00, "OTH": 0.77 }
+  },
+  {
+    name: "Kocaeli",
+    mpCount: 14,
+    ratios: { "CHP": 0.94, "AKP": 1.12, "MHP": 0.83, "İYİP": 0.98, "DEM": 0.64, "YRP": 2.06, "ZP": 1.40, "BBP": 1.14, "TİP": 0.00, "OTH": 1.17 }
+  },
+  {
+    name: "Konya",
+    mpCount: 15,
+    ratios: { "CHP": 0.53, "AKP": 1.36, "MHP": 1.44, "İYİP": 0.89, "DEM": 0.29, "YRP": 1.82, "ZP": 1.32, "BBP": 2.07, "TİP": 0.19, "OTH": 0.85 }
+  },
+  {
+    name: "Kütahya",
+    mpCount: 5,
+    ratios: { "CHP": 0.65, "AKP": 1.32, "MHP": 1.31, "İYİP": 1.08, "DEM": 0.03, "YRP": 2.53, "ZP": 0.76, "BBP": 1.20, "TİP": 0.15, "OTH": 1.00 }
+  },
+  {
+    name: "Malatya",
+    mpCount: 6,
+    ratios: { "CHP": 0.85, "AKP": 1.28, "MHP": 1.29, "İYİP": 0.40, "DEM": 0.34, "YRP": 3.31, "ZP": 0.50, "BBP": 1.37, "TİP": 0.00, "OTH": 0.56 }
+  },
+  {
+    name: "Manisa",
+    mpCount: 10,
+    ratios: { "CHP": 1.16, "AKP": 0.88, "MHP": 1.41, "İYİP": 1.14, "DEM": 0.64, "YRP": 0.54, "ZP": 0.99, "BBP": 1.35, "TİP": 0.00, "OTH": 1.16 }
+  },
+  {
+    name: "Mardin",
+    mpCount: 6,
+    ratios: { "CHP": 0.26, "AKP": 0.70, "MHP": 0.32, "İYİP": 0.11, "DEM": 6.39, "YRP": 0.39, "ZP": 0.21, "BBP": 0.15, "TİP": 0.00, "OTH": 0.66 }
+  },
+  {
+    name: "Mersin",
+    mpCount: 13,
+    ratios: { "CHP": 1.22, "AKP": 0.69, "MHP": 1.19, "İYİP": 1.22, "DEM": 1.52, "YRP": 0.31, "ZP": 0.81, "BBP": 0.45, "TİP": 1.16, "OTH": 0.83 }
+  },
+  {
+    name: "Muğla",
+    mpCount: 7,
+    ratios: { "CHP": 1.49, "AKP": 0.68, "MHP": 0.61, "İYİP": 1.76, "DEM": 0.38, "YRP": 0.21, "ZP": 0.74, "BBP": 0.28, "TİP": 3.33, "OTH": 1.29 }
+  },
+  {
+    name: "Muş",
+    mpCount: 3,
+    ratios: { "CHP": 0.28, "AKP": 0.58, "MHP": 0.95, "İYİP": 0.57, "DEM": 5.87, "YRP": 1.00, "ZP": 0.00, "BBP": 0.36, "TİP": 0.00, "OTH": 1.07 }
+  },
+  {
+    name: "Nevşehir",
+    mpCount: 3,
+    ratios: { "CHP": 0.68, "AKP": 1.11, "MHP": 2.05, "İYİP": 1.63, "DEM": 0.05, "YRP": 0.71, "ZP": 0.57, "BBP": 0.91, "TİP": 0.22, "OTH": 0.70 }
+  },
+  {
+    name: "Niğde",
+    mpCount: 3,
+    ratios: { "CHP": 0.95, "AKP": 0.95, "MHP": 2.26, "İYİP": 1.26, "DEM": 0.05, "YRP": 0.93, "ZP": 0.65, "BBP": 0.56, "TİP": 0.12, "OTH": 0.77 }
+  },
+  {
+    name: "Ordu",
+    mpCount: 6,
+    ratios: { "CHP": 0.95, "AKP": 1.28, "MHP": 1.27, "İYİP": 1.01, "DEM": 0.02, "YRP": 0.81, "ZP": 0.62, "BBP": 0.83, "TİP": 0.20, "OTH": 1.14 }
+  },
+  {
+    name: "Osmaniye",
+    mpCount: 4,
+    ratios: { "CHP": 0.67, "AKP": 0.92, "MHP": 2.88, "İYİP": 1.30, "DEM": 0.23, "YRP": 0.69, "ZP": 0.76, "BBP": 0.57, "TİP": 0.16, "OTH": 0.64 }
+  },
+  {
+    name: "Rize",
+    mpCount: 3,
+    ratios: { "CHP": 0.61, "AKP": 1.53, "MHP": 1.30, "İYİP": 0.61, "DEM": 0.03, "YRP": 1.81, "ZP": 0.77, "BBP": 1.61, "TİP": 0.17, "OTH": 1.28 }
+  },
+  {
+    name: "Sakarya",
+    mpCount: 8,
+    ratios: { "CHP": 0.63, "AKP": 1.34, "MHP": 1.20, "İYİP": 1.13, "DEM": 0.17, "YRP": 1.78, "ZP": 1.18, "BBP": 0.93, "TİP": 0.30, "OTH": 1.13 }
+  },
+  {
+    name: "Samsun",
+    mpCount: 9,
+    ratios: { "CHP": 0.77, "AKP": 1.20, "MHP": 1.43, "İYİP": 1.24, "DEM": 0.03, "YRP": 1.42, "ZP": 0.97, "BBP": 1.40, "TİP": 0.36, "OTH": 1.06 }
+  },
+  {
+    name: "Siirt",
+    mpCount: 3,
+    ratios: { "CHP": 0.28, "AKP": 1.01, "MHP": 0.36, "İYİP": 0.14, "DEM": 5.45, "YRP": 0.41, "ZP": 0.00, "BBP": 0.28, "TİP": 0.00, "OTH": 0.86 }
+  },
+  {
+    name: "Sinop",
+    mpCount: 2,
+    ratios: { "CHP": 1.01, "AKP": 1.20, "MHP": 0.90, "İYİP": 0.97, "DEM": 0.04, "YRP": 0.79, "ZP": 0.66, "BBP": 4.56, "TİP": 0.44, "OTH": 1.53 }
+  },
+  {
+    name: "Sivas",
+    mpCount: 5,
+    ratios: { "CHP": 0.63, "AKP": 1.14, "MHP": 1.82, "İYİP": 0.75, "DEM": 0.05, "YRP": 1.22, "ZP": 0.80, "BBP": 10.37, "TİP": 0.22, "OTH": 0.52 }
+  },
+  {
+    name: "Şanlıurfa",
+    mpCount: 14,
+    ratios: { "CHP": 0.30, "AKP": 1.22, "MHP": 0.93, "İYİP": 0.47, "DEM": 2.88, "YRP": 1.04, "ZP": 0.00, "BBP": 0.44, "TİP": 0.00, "OTH": 0.65 }
+  },
+  {
+    name: "Şırnak",
+    mpCount: 4,
+    ratios: { "CHP": 0.32, "AKP": 0.59, "MHP": 0.22, "İYİP": 0.11, "DEM": 7.34, "YRP": 0.20, "ZP": 0.50, "BBP": 0.14, "TİP": 0.00, "OTH": 0.72 }
+  },
+  {
+    name: "Tekirdağ",
+    mpCount: 8,
+    ratios: { "CHP": 1.44, "AKP": 0.86, "MHP": 0.63, "İYİP": 1.15, "DEM": 0.69, "YRP": 0.56, "ZP": 1.02, "BBP": 0.54, "TİP": 0.91, "OTH": 1.23 }
+  },
+  {
+    name: "Tokat",
+    mpCount: 5,
+    ratios: { "CHP": 0.81, "AKP": 1.05, "MHP": 2.23, "İYİP": 1.14, "DEM": 0.03, "YRP": 0.82, "ZP": 0.62, "BBP": 2.90, "TİP": 0.18, "OTH": 0.56 }
+  },
+  {
+    name: "Trabzon",
+    mpCount: 6,
+    ratios: { "CHP": 0.70, "AKP": 1.36, "MHP": 1.08, "İYİP": 1.25, "DEM": 0.03, "YRP": 1.61, "ZP": 0.82, "BBP": 1.57, "TİP": 0.15, "OTH": 0.80 }
+  },
+  {
+    name: "Tunceli",
+    mpCount: 1,
+    ratios: { "CHP": 1.28, "AKP": 0.35, "MHP": 0.54, "İYİP": 0.22, "DEM": 5.00, "YRP": 0.34, "ZP": 0.00, "BBP": 0.30, "TİP": 0.00, "OTH": 1.27 }
+  },
+  {
+    name: "Uşak",
+    mpCount: 3,
+    ratios: { "CHP": 1.15, "AKP": 1.01, "MHP": 0.93, "İYİP": 1.81, "DEM": 0.15, "YRP": 0.50, "ZP": 0.72, "BBP": 0.66, "TİP": 0.20, "OTH": 1.10 }
+  },
+  {
+    name: "Van",
+    mpCount: 8,
+    ratios: { "CHP": 0.25, "AKP": 0.72, "MHP": 0.48, "İYİP": 0.20, "DEM": 6.18, "YRP": 1.11, "ZP": 0.34, "BBP": 0.85, "TİP": 0.00, "OTH": 0.84 }
+  },
+  {
+    name: "Yalova",
+    mpCount: 3,
+    ratios: { "CHP": 1.14, "AKP": 0.96, "MHP": 1.13, "İYİP": 0.98, "DEM": 0.64, "YRP": 0.75, "ZP": 1.02, "BBP": 0.65, "TİP": 0.59, "OTH": 1.94 }
+  },
+  {
+    name: "Yozgat",
+    mpCount: 4,
+    ratios: { "CHP": 0.56, "AKP": 1.23, "MHP": 2.33, "İYİP": 0.96, "DEM": 0.04, "YRP": 1.55, "ZP": 0.58, "BBP": 1.67, "TİP": 0.11, "OTH": 0.75 }
+  },
+  {
+    name: "Zonguldak",
+    mpCount: 5,
+    ratios: { "CHP": 1.27, "AKP": 1.13, "MHP": 0.83, "İYİP": 1.03, "DEM": 0.04, "YRP": 0.89, "ZP": 0.80, "BBP": 0.87, "TİP": 0.26, "OTH": 1.43 }
+  }
+    ];
+        
+    let isSecondRound = false; // global flag
+    let topTwoCandidates = []; // names from first round
+    let normalizedNational = {}; // stored globally
+
+    // Global variables for first‑round presidential calculations.
+    let provinceResults = [];
+    let overallHTML = "";
+    let overallPresHTML = "";
+    let candidateResults = [];
+    // Store the first‑round “Sandığa Gitmeyen” values.
+    let firstRoundSandigaValues = [];
+
+    /***********************************************
+     * HELPER FUNCTIONS
+     ***********************************************/
+    // Convert an input value to a fraction (if >1, assume percentage).
+    function getFraction(val) {
+      return (val > 1) ? Math.min(val,100)/100 : val;
+    }
+    
+    // Compute the effective candidate fraction.
+    // For example, if candidateInput is 98 and sandigaInput is 1:
+    // effective = (98/100) * ((100-1)/100) = 0.98 * 0.99 = 0.9702.
+    function effectiveFraction(candidateInput, sandigaInput) {
+      let cand = Math.min(candidateInput, 100);
+      return (cand / 100) * ((100 - sandigaInput) / 100);
+    }
+    
+    /***********************************************
+     * INITIALIZATION: Build Input Tables (generated via JavaScript)
+     ***********************************************/
+    window.onload = function() {
+      // Build Parliamentary Table
+      const swingTbody = document.querySelector("form#swingometerForm tbody");
+      parties.forEach(party => {
+        const row = document.createElement("tr");
+        const cellParty = document.createElement("td");
+        cellParty.textContent = party;
+        row.appendChild(cellParty);
+        const cellInput = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "number";
+        input.id = "input_" + party;
+        input.value = "0";
+        input.step = "any";
+        cellInput.appendChild(input);
+        row.appendChild(cellInput);
+        const cellCheckbox = document.createElement("td");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = "qualify_" + party;
+        if(party==="OTH") { checkbox.disabled = true; checkbox.checked = false; }
+        cellCheckbox.appendChild(checkbox);
+        row.appendChild(cellCheckbox);
+        swingTbody.appendChild(row);
+      });
+      
+      // Build First Round Presidential Table Header
+      const presHeader = document.getElementById("presidentialTableHeader");
+      presHeader.innerHTML = "";
+      let th = document.createElement("th");
+      th.textContent = "Candidate";
+      presHeader.appendChild(th);
+      parties.forEach(party => {
+        let th = document.createElement("th");
+        th.textContent = party;
+        presHeader.appendChild(th);
+      });
+      
+      // Populate with Default Candidates (First Round)
+      const presTbody = document.querySelector("#presidentialTable tbody");
+      presTbody.innerHTML = "";
+      const defaultCandidates = ["Imamoğlu","Erdoğan","Erbakan","İYİ/ZP","DEM"];
+      defaultCandidates.forEach(candidateName => {
+        let row = document.createElement("tr");
+        let cell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "text";
+        input.value = candidateName;
+        cell.appendChild(input);
+        row.appendChild(cell);
+        parties.forEach(() => {
+          let cell = document.createElement("td");
+          let input = document.createElement("input");
+          input.type = "number";
+          input.value = "0";
+          input.step = "any";
+          cell.appendChild(input);
+          row.appendChild(cell);
+        });
+        presTbody.appendChild(row);
+      });
+      
+      // Add final row for "Sandığa Gitmeyen" (First Round)
+      let sandigaRow = document.createElement("tr");
+      sandigaRow.id = "sandigaRow";
+      let labelCell = document.createElement("td");
+      labelCell.textContent = "Sandığa Gitmeyen";
+      sandigaRow.appendChild(labelCell);
+      parties.forEach(() => {
+        let cell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = "0";
+        input.step = "any";
+        cell.appendChild(input);
+        sandigaRow.appendChild(cell);
+      });
+      presTbody.appendChild(sandigaRow);
+      
+      // Hide the second round section initially.
+      document.getElementById("secondRoundDiv").style.display = "none";
+    };
+    
+    /***********************************************
+     * Create Second Round Table (Keeping First Round Inputs)
+     ***********************************************/
+    function createSecondRoundTable(candidates) {
+      const srHeader = document.getElementById("secondRoundTableHeader");
+      srHeader.innerHTML = "";
+      let th = document.createElement("th");
+      th.textContent = "Candidate";
+      srHeader.appendChild(th);
+      parties.forEach(party => {
+        let th = document.createElement("th");
+        th.textContent = party;
+        srHeader.appendChild(th);
+      });
+      const srTbody = document.querySelector("#secondRoundTable tbody");
+      srTbody.innerHTML = "";
+      candidates.forEach(candidateName => {
+        let row = document.createElement("tr");
+        let cell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "text";
+        input.value = candidateName;
+        cell.appendChild(input);
+        row.appendChild(cell);
+        parties.forEach(() => {
+          let cell = document.createElement("td");
+          let input = document.createElement("input");
+          input.type = "number";
+          input.value = "0";
+          input.step = "any";
+          cell.appendChild(input);
+          row.appendChild(cell);
+        });
+        srTbody.appendChild(row);
+      });
+      // Add final row for "Sandığa Gitmeyen" (Second Round)
+      let srSandigaRow = document.createElement("tr");
+      srSandigaRow.id = "srSandigaRow";
+      let labelCell = document.createElement("td");
+      labelCell.textContent = "Sandığa Gitmeyen";
+      srSandigaRow.appendChild(labelCell);
+      parties.forEach(() => {
+        let cell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = "0";
+        input.step = "any";
+        cell.appendChild(input);
+        srSandigaRow.appendChild(cell);
+      });
+      srTbody.appendChild(srSandigaRow);
+      
+      // Show the second round section.
+      document.getElementById("secondRoundDiv").style.display = "block";
+    }
+       
+    /***********************************************
+     * Build Province Combined Results Block (for 1st Round)
+     * (Used only when second round has not yet been run.)
+     ***********************************************/
+    function buildProvinceCombinedResults(provinceResultsArr, candidateResultsArr, sandigaValues, roundLabel) {
+      roundLabel = roundLabel || "Presidential Results";
+      let provinceHTML = "";
+      provinces.forEach(province => {
+        provinceHTML += `<div class="province-block"><h3>${province.name} (MPs: ${province.mpCount})</h3>`;
+        let provResult = provinceResultsArr.find(pr => pr.province === province.name);
+        provinceHTML += "<table><thead><tr><th>Party</th><th>Local Vote %</th><th>MPs Allocated</th></tr></thead><tbody>";
+        parties.forEach(party => {
+          provinceHTML += `<tr><td>${party}</td><td>${provResult.localPercentages[party].toFixed(2)}%</td><td>${provResult.seatsAllocated[party]}</td></tr>`;
+        });
+        provinceHTML += "</tbody></table>";
+        
+        provinceHTML += `<h4>${roundLabel} Presidential Results in ${province.name}</h4>`;
+        provinceHTML += "<table><thead><tr><th>Candidate</th><th>Vote %</th></tr></thead><tbody>";
+        candidateResultsArr.forEach(candidate => {
+          let provTotal = candidateResultsArr.reduce((sum, cand) => sum + (cand.presVotes[province.name] || 0), 0);
+          let perc = provTotal > 0 ? ((candidate.presVotes[province.name] || 0) / provTotal * 100) : 0;
+          provinceHTML += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
+        });
+        provinceHTML += "</tbody></table></div>";
+      });
+      return provinceHTML;
+    }
+    
+    /***********************************************
+     * NEW: Build Combined Province Results Block
+     * This function builds a single province block that shows:
+     *  - The parliamentary (MP) results,
+     *  - 1st Round Presidential Results,
+     *  - 2nd Round Presidential Results (if available).
+     ***********************************************/
+    function buildCombinedProvinceResults(provinceResultsArr, candidateResults1, candidateResults2, sandigaValues1, sandigaValues2) {
+      let html = "";
+      provinces.forEach(province => {
+        html += `<div class="province-block"><h3>${province.name} (MPs: ${province.mpCount})</h3>`;
+        let provResult = provinceResultsArr.find(pr => pr.province === province.name);
+        html += "<table><thead><tr><th>Party</th><th>Local Vote %</th><th>MPs Allocated</th></tr></thead><tbody>";
+        parties.forEach(party => {
+          html += `<tr><td>${party}</td><td>${provResult.localPercentages[party].toFixed(2)}%</td><td>${provResult.seatsAllocated[party]}</td></tr>`;
+        });
+        html += "</tbody></table>";
+        
+        // 1st Round Results
+        html += `<h4>1st Round Presidential Results in ${province.name}</h4>`;
+        html += "<table><thead><tr><th>Candidate</th><th>Vote %</th></tr></thead><tbody>";
+        let totalVotes1 = candidateResults1.reduce((sum, cand) => sum + (cand.presVotes[province.name] || 0), 0);
+        candidateResults1.forEach(candidate => {
+          let vote = candidate.presVotes[province.name] || 0;
+          let perc = totalVotes1 > 0 ? (vote / totalVotes1 * 100) : 0;
+          html += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
+        });
+        html += "</tbody></table>";
+        
+        // 2nd Round Results (if available)
+        if(candidateResults2) {
+          html += `<h4>2nd Round Presidential Results in ${province.name}</h4>`;
+          html += "<table><thead><tr><th>Candidate</th><th>Vote %</th></tr></thead><tbody>";
+          let totalVotes2 = candidateResults2.reduce((sum, cand) => sum + (cand.presVotes[province.name] || 0), 0);
+          candidateResults2.forEach(candidate => {
+            let vote = candidate.presVotes[province.name] || 0;
+            let perc = totalVotes2 > 0 ? (vote / totalVotes2 * 100) : 0;
+            html += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
+          });
+          html += "</tbody></table>";
+        }
+        html += "</div>";
+      });
+      return html;
+    }
+    
+    /***********************************************
+     * Revised First Round Presidential Calculation
+     * Overall national candidate votes are computed using:
+     *    effective = candidate_input/100 * ((100 - sandığa_input)/100)
+     ***********************************************/
+    function calculateSwingometer() {
+      // --- Parliamentary Calculation (unchanged) ---
+      let nationalInputs = {};
+      let totalInput = 0;
+      parties.forEach(party => {
+        let val = parseFloat(document.getElementById("input_" + party).value);
+        if(isNaN(val)) { val = 0; }
+        nationalInputs[party] = val;
+        totalInput += val;
+      });
+      if(totalInput === 0) { alert("Please enter some vote share values for the parties."); return; }
+      parties.forEach(party => { normalizedNational[party] = nationalInputs[party] / totalInput; });
+      let thresholdPercent = parseFloat(document.getElementById("threshold").value);
+      if(isNaN(thresholdPercent)) { thresholdPercent = 10; }
+      
+      let overallSeats = {};
+      parties.forEach(party => { overallSeats[party] = 0; });
+      
+      provinceResults = [];
+      provinces.forEach(province => {
+        let computedVotes = {};
+        parties.forEach(party => { computedVotes[party] = normalizedNational[party] * province.ratios[party]; });
+        let sumComputed = parties.reduce((sum, party) => sum + computedVotes[party], 0);
+        let localPercentages = {};
+        parties.forEach(party => { localPercentages[party] = sumComputed > 0 ? (computedVotes[party] / sumComputed) * 100 : 0; });
+        let computedVotesForSeats = {};
+        parties.forEach(party => {
+          if(party==="OTH") { computedVotesForSeats[party] = 0; }
+          else {
+            const qualifyCheckbox = document.getElementById("qualify_" + party);
+            const forceQualify = qualifyCheckbox ? qualifyCheckbox.checked : false;
+            computedVotesForSeats[party] = (forceQualify || (normalizedNational[party]*100 >= thresholdPercent))
+              ? computedVotes[party] : 0;
+          }
+        });
+        let seatsAllocated = {};
+        parties.forEach(party => { seatsAllocated[party] = 0; });
+        for(let i = 0; i < province.mpCount; i++){
+          let maxQ = -1, winParty = null;
+          parties.forEach(party => {
+            let quotient = computedVotesForSeats[party] / (seatsAllocated[party] + 1);
+            if(quotient > maxQ) { maxQ = quotient; winParty = party; }
+          });
+          if(winParty) { seatsAllocated[winParty]++; }
+        }
+        parties.forEach(party => { overallSeats[party] += seatsAllocated[party]; });
+        provinceResults.push({
+          province: province.name,
+          mpCount: province.mpCount,
+          computedVotes: computedVotes,
+          localPercentages: localPercentages,
+          seatsAllocated: seatsAllocated
+        });
+      });
+      
+      // Build Overall National Parliamentary Results Table
+      let overallPercentages = {};
+      parties.forEach(party => { overallPercentages[party] = normalizedNational[party] * 100; });
+      overallHTML = "<h2>Overall National Parliamentary Results</h2><table><thead><tr><th>Party</th><th>National Vote % (Input)</th><th>MPs Allocated</th></tr></thead><tbody>";
+      parties.forEach(party => {
+        overallHTML += `<tr><td>${party}</td><td>${overallPercentages[party].toFixed(2)}%</td><td>${overallSeats[party]}</td></tr>`;
+      });
+      overallHTML += "</tbody></table>";
+      
+      // --- Revised First Round Presidential Calculation ---
+      // Build candidateResults from the table (excluding the "Sandığa Gitmeyen" row)
+      const presTbody = document.querySelector("#presidentialTable tbody");
+      const candidateRows = Array.from(presTbody.getElementsByTagName("tr")).filter(row => row.id !== "sandigaRow");
+      candidateResults = [];
+      candidateRows.forEach(row => {
+        const cells = row.getElementsByTagName("td");
+        let name = cells[0].querySelector("input").value.trim();
+        if(!name) { name = "Candidate"; }
+        let supportArray = [];
+        for(let j = 1; j < cells.length; j++){
+          let val = parseFloat(cells[j].querySelector("input").value);
+          if(isNaN(val)) { val = 0; }
+          supportArray.push(val);
+        }
+        candidateResults.push({ candidate: name, support: supportArray, totalVotes: 0, presVotes: {} });
+      });
+      
+      // Get "Sandığa Gitmeyen" values (one per party)
+      let sandigaRowElem = document.getElementById("sandigaRow");
+      const sandigaCells = sandigaRowElem.getElementsByTagName("td");
+      let sandigaValues = [];
+      for(let j = 1; j < sandigaCells.length; j++){
+        let val = parseFloat(sandigaCells[j].querySelector("input").value);
+        if(isNaN(val)) { val = 0; }
+        sandigaValues.push(val);
+      }
+      firstRoundSandigaValues = sandigaValues;
+      
+      // Overall National Presidential Calculation:
+      candidateResults.forEach(candidate => { candidate.totalVotes = 0; });
+      for (let i = 0; i < parties.length; i++){
+        candidateResults.forEach(candidate => {
+          let eff = effectiveFraction(candidate.support[i], sandigaValues[i]);
+          candidate.totalVotes += normalizedNational[parties[i]] * eff;
+        });
+      }
+      
+      // Province Breakdown Calculation for 1st Round:
+      let sumRatios = {};
+      parties.forEach(party => {
+        sumRatios[party] = provinces.reduce((sum, province) => sum + province.ratios[party], 0);
+      });
+      candidateResults.forEach(candidate => {
+        candidate.presVotes = {};
+        provinces.forEach(province => {
+          candidate.presVotes[province.name] = 0;
+        });
+      });
+      provinces.forEach(province => {
+        parties.forEach((party, i) => {
+          let weight = (sumRatios[party] > 0) ? province.ratios[party] / sumRatios[party] : 0;
+          candidateResults.forEach(candidate => {
+            let eff = effectiveFraction(candidate.support[i], sandigaValues[i]);
+            candidate.presVotes[province.name] += normalizedNational[party] * weight * eff;
+          });
+        });
+      });
+      
+      let totalAll = candidateResults.reduce((sum, cand) => sum + cand.totalVotes, 0);
+      overallPresHTML = "<h2>Overall National Presidential Results (1st Round)</h2><table><thead><tr><th>Candidate</th><th>National Vote %</th></tr></thead><tbody>";
+      candidateResults.forEach(candidate => {
+        let perc = totalAll > 0 ? (candidate.totalVotes / totalAll * 100) : 0;
+        overallPresHTML += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
+      });
+      overallPresHTML += "</tbody></table>";
+      
+      let resultsDiv = document.getElementById("results");
+      let provinceHTML = buildProvinceCombinedResults(provinceResults, candidateResults, sandigaValues, "1st Round");
+      
+      if(totalAll > 0 && candidateResults.some(candidate => (candidate.totalVotes / totalAll * 100) > 50)) {
+        resultsDiv.innerHTML = overallHTML + overallPresHTML;
+      } else {
+        candidateResults.sort((a, b) => b.totalVotes - a.totalVotes);
+        topTwoCandidates = candidateResults.slice(0, 2).map(c => c.candidate);
+        resultsDiv.innerHTML = overallHTML + overallPresHTML +
+          "<h2>No candidate reached 50% in the first round.</h2>" +
+          "<p>Please enter second round party support values for the top two candidates below.</p>";
+        createSecondRoundTable(topTwoCandidates);
+      }
+      document.getElementById("provinceResults").innerHTML = provinceHTML;
+      isSecondRound = !candidateResults.some(candidate => totalAll > 0 && (candidate.totalVotes / totalAll * 100) > 50);
+    }
+    
+    /***********************************************
+     * SECOND ROUND CALCULATION (Including Province Breakdown)
+     * Uses the same effectiveFraction formula.
+     ***********************************************/
+    function calculateSecondRound() {
+      const srTbody = document.querySelector("#secondRoundTable tbody");
+      const candidateRows = Array.from(srTbody.getElementsByTagName("tr")).filter(row => row.id !== "srSandigaRow");
+      let srCandidateResults = [];
+      candidateRows.forEach(row => {
+        const cells = row.getElementsByTagName("td");
+        let name = cells[0].querySelector("input").value.trim();
+        if(!name) { name = "Candidate"; }
+        let supportArray = [];
+        for(let j = 1; j < cells.length; j++){
+          let val = parseFloat(cells[j].querySelector("input").value);
+          if(isNaN(val)) { val = 0; }
+          supportArray.push(val);
+        }
+        srCandidateResults.push({ candidate: name, support: supportArray, totalVotes: 0, presVotes: {} });
+      });
+      let srSandigaRow = document.getElementById("srSandigaRow");
+      const srSandigaCells = srSandigaRow.getElementsByTagName("td");
+      let srSandigaValues = [];
+      for(let j = 1; j < srSandigaCells.length; j++){
+        let val = parseFloat(srSandigaCells[j].querySelector("input").value);
+        if(isNaN(val)) { val = 0; }
+        srSandigaValues.push(val);
+      }
+      // Overall second round national calculation
+      srCandidateResults.forEach(candidate => { candidate.totalVotes = 0; });
+      for (let i = 0; i < parties.length; i++){
+        srCandidateResults.forEach(candidate => {
+          let eff = effectiveFraction(candidate.support[i], srSandigaValues[i]);
+          candidate.totalVotes += normalizedNational[parties[i]] * eff;
+        });
+      }
+      
+      // Province breakdown for second round
+      let sumRatios = {};
+      parties.forEach(party => {
+        sumRatios[party] = provinces.reduce((sum, province) => sum + province.ratios[party], 0);
+      });
+      srCandidateResults.forEach(candidate => {
+        candidate.presVotes = {};
+        provinces.forEach(province => {
+          candidate.presVotes[province.name] = 0;
+        });
+      });
+      provinces.forEach(province => {
+        parties.forEach((party, i) => {
+          let weight = (sumRatios[party] > 0) ? province.ratios[party] / sumRatios[party] : 0;
+          srCandidateResults.forEach(candidate => {
+            let eff = effectiveFraction(candidate.support[i], srSandigaValues[i]);
+            candidate.presVotes[province.name] += normalizedNational[party] * weight * eff;
+          });
+        });
+      });
+      
+      let totalAllSR = srCandidateResults.reduce((sum, cand) => sum + cand.totalVotes, 0);
+      let overallSRPresHTML = "<h2>Overall Second Round Presidential Results</h2><table><thead><tr><th>Candidate</th><th>National Vote %</th></tr></thead><tbody>";
+      srCandidateResults.forEach(candidate => {
+        let perc = totalAllSR > 0 ? (candidate.totalVotes / totalAllSR * 100) : 0;
+        overallSRPresHTML += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
+      });
+      overallSRPresHTML += "</tbody></table>";
+      
+      // Build combined province results: parliamentary results (unchanged),
+      // plus first round presidential results and second round results.
+      let combinedProvinceHTML = buildCombinedProvinceResults(provinceResults, candidateResults, srCandidateResults, firstRoundSandigaValues, srSandigaValues);
+      
+      let resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = overallHTML + overallPresHTML + overallSRPresHTML;
+      document.getElementById("provinceResults").innerHTML = combinedProvinceHTML;
+      
+    }
+    
+    /***********************************************
+     * Calculate Button Handler Wrapper
+     ***********************************************/
+    function calculateWrapper() {
+      if(!isSecondRound) {
+        calculateSwingometer();
+      } else {
+        calculateSecondRound();
+      }
+    }
+    
+    /***********************************************
+     * Add Candidate Row (First Round) 
+     ***********************************************/
+    function addCandidate() {
+      const presTbody = document.querySelector("#presidentialTable tbody");
+      const sandigaRow = document.getElementById("sandigaRow");
+      let newRow = document.createElement("tr");
+      let cell = document.createElement("td");
+      let input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Candidate Name";
+      cell.appendChild(input);
+      newRow.appendChild(cell);
+      parties.forEach(() => {
+        let cell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "number";
+        input.value = "0";
+        input.step = "any";
+        cell.appendChild(input);
+        newRow.appendChild(cell);
+      });
+      presTbody.insertBefore(newRow, document.getElementById("sandigaRow"));
+    }
+  </script>
+</body>
+</html>
