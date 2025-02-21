@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=2">
   <title>Türkiye Seçim Hesaplama</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
     }
     .container {
         width: 100%;
-        padding: 10px;
+        padding: 0px;
     }
 }   
     :root {
@@ -197,6 +197,67 @@
       text-align: center;
       margin: 20px;
     }
+    
+      /* Container Styling */
+  #turkeyMap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px; /* Adjust max width */
+    margin: 20px auto;
+  }
+
+  /* SVG Styling */
+  #turkeyMapSVG {
+    width: 100%;
+    max-width: 100%; /* Prevents excessive size */
+    height: auto;
+  }
+
+  /* Responsive Styling */
+  @media screen and (max-width: 768px) {
+    #turkeyMap {
+      max-width: 100%;
+      margin: 10px auto;
+    }
+    #turkeyMapSVG {
+      max-width: 100%;
+    }
+  }
+  
+    /* Table Container */
+  #presidentialTable {
+    width: 100%;
+    max-width: 1200px; /* Prevents excessive width */
+    margin: 20px auto;
+    border-collapse: collapse;
+    text-align: center;
+  }
+
+  /* Table Header */
+  #presidentialTableHeader {
+    background-color: #00000; /* Light background for visibility */
+    font-weight: bold;
+  }
+
+  /* Table Cells */
+  #presidentialTable th, #presidentialTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+
+  /* Responsive Styling */
+  @media screen and (max-width: 768px) {
+    #presidentialTable {
+      max-width: 100%;
+    }
+
+    #presidentialTable th, #presidentialTable td {
+      padding: 8px;
+      font-size: 14px; /* Smaller text on mobile */
+    }
+  }
   </style>
 </head>
 <body>
@@ -281,7 +342,8 @@
   </div>
   
   <!-- SVG Turkey Map -->
-  <div id="turkeyMap" style="width: 100%; max-width:1000px; margin: 20px auto;">
+ <div id="turkeyMap">
+  <svg id="turkeyMapSVG" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
     <!-- You can replace the sample SVG below with your full SVG file -->
     <svg baseprofile="tiny" fill="#6f9c76" height="422" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5" version="1.2" viewbox="0 0 1000 422" width="1000" xmlns="http://www.w3.org/2000/svg">
       <g id="features">
