@@ -352,7 +352,14 @@
       z-index: 1000;
       border-radius: 8px;
       box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      
     }
+    
+#createPartyButtonContainer {
+  text-align: center; /* Centers inline elements like a button */
+}
+
+    
   </style>
 </head>
 <body>
@@ -631,9 +638,11 @@
     </form>
   </div>
   
-    <!-- Create Party Button -->
-  <button onclick="openCreatePartyModal()">Create Party</button>
-  
+<!-- Centered "Create Party" Button -->
+<div id="createPartyButtonContainer">
+  <button id="createPartyButton" onclick="openCreatePartyModal()">Create Party</button>
+</div>
+
   <!-- Create Party Modal -->
   <div id="createPartyModal">
     <h2>Create New Party</h2>
@@ -1979,3 +1988,6 @@ function reloadMap() {
      crossorigin="anonymous"></script>
 </body>
 </html>
+
+
+
