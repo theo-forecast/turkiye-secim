@@ -377,6 +377,8 @@
           <button type="button" onclick="switchElectionMode('pres1')">Presidential 1st Round</button>
           <button type="button" onclick="switchElectionMode('pres2')">Presidential 2nd Round</button>
           <button type="button" onclick="reloadMap()">Reload Map</button>
+          <button type="button" onclick="calculateSecondRoundOnly()">2nd Round Calculate</button>
+
 
         </div>
         <div id="turkeyMap">
@@ -624,20 +626,6 @@
       
       
       
-      <!-- Common Controls -->
-      <div style="text-align: center; margin: 20px 0;">
-        <label for="threshold">Baraj (%)</label>
-        <input type="number" id="threshold" value="7" step="0.1" style="width: 80px;">
-      </div>
-      <div style="text-align: center; margin-top: 20px;">
-        <button type="button" onclick="calculateWrapper()">Tüm Sonuçları Hesapla</button>
-      </div>
-      <p style="font-size: 0.9em; margin-top: 10px; text-align: center;">
-        <sup>*</sup> Bu kutuyu işaretlemek, barajdan bağımsız olarak doğrudan nitelendirme sağlar.
-      </p>
-    </form>
-  </div>
-  
 <!-- Centered "Create Party" Button -->
 <div id="createPartyButtonContainer">
   <button id="createPartyButton" onclick="openCreatePartyModal()">Create Party</button>
@@ -661,6 +649,7 @@
     <button onclick="submitNewParty()">Create Party</button>
     <button onclick="document.getElementById('createPartyModal').style.display='none'">Cancel</button>
   </div>
+
   
   <!-- Province Container -->
   <div class="province-container" id="provinceContainer">
@@ -1797,9 +1786,14 @@ function calculateSwingometer() {
  * Second Round Calculation
  ***********************************************/
 function calculateSecondRound() {
+  // FIX: Set the election mode to "pres2" so that updateMapColors() processes the second round data.
+  electionMode = "pres2";
+  
+  // Retrieve candidate rows from the second round table (excluding the "Sandığa Gitmeyen" row).
   const srTbody = document.querySelector("#secondRoundTable tbody");
   const candidateRows = Array.from(srTbody.getElementsByTagName("tr")).filter(row => row.id !== "srSandigaRow");
   let srCandidateResults = [];
+  
   candidateRows.forEach(row => {
     const cells = row.getElementsByTagName("td");
     let name = cells[0].querySelector("input").value.trim();
@@ -1812,6 +1806,8 @@ function calculateSecondRound() {
     }
     srCandidateResults.push({ candidate: name, support: supportArray, totalVotes: 0, presVotes: {} });
   });
+  
+  // Retrieve "Sandığa Gitmeyen" (non-voter) values from the second round table.
   let srSandigaRow = document.getElementById("srSandigaRow");
   const srSandigaCells = srSandigaRow.getElementsByTagName("td");
   let srSandigaValues = [];
@@ -1821,6 +1817,7 @@ function calculateSecondRound() {
     srSandigaValues.push(val);
   }
   
+  // Calculate total votes for each candidate using the effectiveFraction function.
   srCandidateResults.forEach(candidate => { candidate.totalVotes = 0; });
   for (let i = 0; i < parties.length; i++) {
     srCandidateResults.forEach(candidate => {
@@ -1829,16 +1826,19 @@ function calculateSecondRound() {
     });
   }
   
+  // Distribute votes to provinces according to party ratios.
   let sumRatios = {};
   parties.forEach(party => {
     sumRatios[party] = provinces.reduce((sum, prov) => sum + prov.ratios[party], 0);
   });
+  
   srCandidateResults.forEach(candidate => {
     candidate.presVotes = {};
     provinces.forEach(prov => {
       candidate.presVotes[prov.id] = 0;
     });
   });
+  
   provinces.forEach(prov => {
     parties.forEach((party, i) => {
       let weight = (sumRatios[party] > 0) ? prov.ratios[party] / sumRatios[party] : 0;
@@ -1849,6 +1849,7 @@ function calculateSecondRound() {
     });
   });
   
+  // Build the overall second round results HTML.
   let totalAllSR = srCandidateResults.reduce((sum, cand) => sum + cand.totalVotes, 0);
   let overallSRPresHTML = "<h2>Overall Second Round Presidential Results</h2><table><thead><tr><th>Candidate</th><th>National Vote %</th></tr></thead><tbody>";
   srCandidateResults.forEach(candidate => {
@@ -1857,24 +1858,46 @@ function calculateSecondRound() {
   });
   overallSRPresHTML += "</tbody></table>";
   
-  let combinedProvinceHTML = buildCombinedProvinceResults(provinceResults, candidateResults, srCandidateResults, firstRoundSandigaValues, srSandigaValues);
+  // Build combined province results HTML (incorporates both rounds) using the helper function.
+  let combinedProvinceHTML = buildCombinedProvinceResults(
+    provinceResults,  // first round province results
+    candidateResults, // first round candidate results
+    srCandidateResults, // second round candidate results
+    firstRoundSandigaValues,
+    srSandigaValues
+  );
+  
+  // Update the results display and save the second round candidate results.
   let resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = overallHTML + overallPresHTML + overallSRPresHTML;
   document.getElementById("provinceResults").innerHTML = combinedProvinceHTML;
   secondRoundCandidateResults = srCandidateResults;
+  
+  // Update the map colors so that the second round data is reflected.
   updateMapColors();
 }
-  
-/***********************************************
- * Calculate Button Handler
- ***********************************************/
+
+document.querySelectorAll("#secondRoundTable input").forEach(input => {
+  input.addEventListener("change", calculateWrapper);
+});
+
+
+
 function calculateWrapper() {
+  // Always recalc first round results
   calculateSwingometer();
-  if (document.getElementById("secondRoundDiv").style.display !== "none") {
+  
+  // Check if the second round section is visible using getComputedStyle
+  if (window.getComputedStyle(document.getElementById("secondRoundDiv")).display !== "none") {
+    // Explicitly set election mode to "pres2" before calculating the second round
+    electionMode = "pres2";
     calculateSecondRound();
   }
-}
   
+  // Finally, update the map colors based on the current election mode
+  updateMapColors();
+}
+
 /***********************************************
  * Add Candidate Row (First Round)
  ***********************************************/
@@ -1982,6 +2005,22 @@ function reloadMap() {
   // Simply reapply the current map coloring.
   updateMapColors();
 }
+
+/***********************************************
+ * 2nd Round Calculate Button Handler
+ ***********************************************/
+function calculateSecondRoundOnly() {
+  // Set the election mode explicitly for the second round.
+  electionMode = "pres2";
+  
+  // Calculate the second round results using the existing function.
+  calculateSecondRound();
+  
+  // Update the map to reflect the second round vote distributions.
+  updateMapColors();
+}
+
+
 
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465774414153454"
