@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1936,6 +1937,10 @@ function addCandidate() {
   presTbody.insertBefore(newRow, document.getElementById("sandigaRow"));
 }
   
+  
+  
+  
+  
 /***********************************************
  * Switch Election Mode (Map Button Handler)
  ***********************************************/
@@ -1979,7 +1984,7 @@ function submitNewParty() {
   provinces.forEach(function(prov) {
     let newRatio = 0;
     parties.forEach(function(existingParty) {
-      newRatio += baseShares[existingParty] * (prov.ratios[existingParty] || 0);
+      newRatio += (baseShares[existingParty] / 100) * (prov.ratios[existingParty] || 0);
     });
     prov.ratios[partyName] = newRatio;
   });
@@ -2014,6 +2019,7 @@ function submitNewParty() {
 }
 
 
+
 function reloadMap() {
   // Simply reapply the current map coloring.
   updateMapColors();
@@ -2040,6 +2046,3 @@ function calculateSecondRoundOnly() {
      crossorigin="anonymous"></script>
 </body>
 </html>
-
-
-
