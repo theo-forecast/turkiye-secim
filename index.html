@@ -1,392 +1,77 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=2">
-  <title>Türkiye Seçim Hesaplama</title>
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geliştirilmiş Türkiye Seçim Hesaplama</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS Variables for consistent color palette */
-    @media screen and (max-width: 768px) {
-      body {
-        font-size: 16px;
-      }
-      .container {
-        width: 100%;
-        padding: 0px;
-      }
-    }
-    
-    :root {
-      --primary-color: #2c3e50;
-      --secondary-color: #34495e;
-      --accent-color: #e67e22;
-      --light-bg: #f0f2f5;
-      --mid-bg: #cfd8dc;
-      --white: #fff;
-      --text-color: #333;
-      --border-color: #ddd;
-      --hover-bg: #f1f1f1;
-    }
-    
-    /* Reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
     body {
-      font-family: 'Roboto', sans-serif;
-      font-size: 16px;
-      background: linear-gradient(135deg, var(--light-bg), var(--mid-bg));
-      color: var(--text-color);
-      padding: 10px;
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
     }
-    
-    /* Main container styling */
-    .container {
-      max-width: 1600px;
-      margin: 0 auto 20px auto;
-      background: var(--white);
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-    }
-    
-    h1, h2, h3, h4 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-weight: 700;
-      color: var(--primary-color);
-      font-size: 1.3em;
-    }
-    
-    p {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 0.8em;
-      line-height: 1;
-    }
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-    }
-    
-    table thead {
-      background-color: var(--primary-color);
-      color: var(--white);
-    }
-    
-    table th,
-    table td {
-      padding: 6px 4px;
-      text-align: center;
-      vertical-align: middle;
-      border: 1px solid var(--border-color);
-      font-size: 1em;
-    }
-    
-    table input {
-      text-align: center;
-      font-size: 1.6em;
-      padding: 5px;
-    }
-    
-    table tbody tr:nth-child(even) {
-      background-color: #fafafa;
-    }
-    
-    table tbody tr:hover {
-      background-color: var(--hover-bg);
-    }
-    
-    /* Input Styling */
-    input[type="number"],
-    input[type="text"] {
-      width: 100%;
-      padding: 6px;
-      font-size: 0.7em;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      background-color: #fff;
-      outline: none;
-    }
-    
-    input[type="number"]:focus,
-    input[type="text"]:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 5px rgba(44,62,80,0.5);
-    }
-    
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
-    
-    input[type="checkbox"] {
-      transform: scale(1);
-      cursor: pointer;
-    }
-    
-    label {
-      font-size: 1em;
-      margin-right: 8px;
-    }
-    
-    button {
-      background-color: var(--primary-color);
-      color: var(--white);
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      font-size: 1.2m;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-      margin: 8px 0;
-    }
-    
-    button:hover {
-      background-color: var(--secondary-color);
-      transform: scale(1.02);
-    }
-    
-    .results-section {
-      margin-top: 20px;
-    }
-    
-    #secondRoundDiv {
-      margin-top: 10px;
-      padding: 10px;
-      border: 2px dashed var(--accent-color);
-      text-align: center;
-      display: none;
-      border-radius: 6px;
-      background-color: #fff8f2;
-    }
-    
-    @media (max-width: 768px) {
-      table th,
-      table td {
-        padding: 6px;
-      }
-      button {
-        width: 100%;
-      }
-    }
-    
-    /* Province container */
-    .province-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 10px;
-    }
-    
-    #provinceFilter input {
-      width: 100%;
-      padding: 10px;
-      font-size: 0.9em;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      transition: border-color 0.3s ease;
-    }
-    
-    #provinceFilter input:focus {
-      border-color: var(--primary-color);
-      outline: none;
-    }
-    
-    #provinceResults {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-    
-    #provinceResults .province-block {
-      border: 1px solid var(--primary-color);
-      border-radius: 6px;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      background: #fafafa;
-      transition: transform 0.3s ease;
-    }
-    
-    #provinceResults .province-block:hover {
-      transform: translateY(-5px);
-    }
-    
-    /* Tooltip */
     #tooltip {
       position: absolute;
       display: none;
-      background: rgba(0, 0, 0, 0.85);
-      color: #fff;
-      padding: 2px;
-      border-radius: 4px;
-      pointer-events: none;
-      font-size: 1em;
-      z-index: 100000;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-      max-width: 400px;
-      line-height: 1.5;
-    }
-    
-    /* SVG Turkey Map Styles */
-    #turkeyMap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      max-width: 1400px;
-      height: auto;
-      margin: 0 auto;
-      padding: 10px;
-      background-color: var(--white);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      position: relative;
-    }
-    
-    #turkeyMapSVG {
-      width: 100%;
-      height: auto;
-      display: block;
-      max-width: 100%;
-    }
-    
-    @media screen and (max-width: 768px) {
-      #turkeyMap {
-        max-width: 100%;
-        padding: 10px 0;
-      }
-      #turkeyMapSVG {
-        max-width: 100%;
-      }
-    }
-    
-    /* Presidential Table */
-    #presidentialTable {
-      width: 100%;
-      max-width: 1400px;
-      margin: 10px auto;
-      border-collapse: collapse;
-      text-align: center;
-    }
-    
-    #presidentialTableHeader {
-      background-color: #00000;
-      font-weight: bold;
-    }
-    
-    #presidentialTable th,
-    #presidentialTable td {
-      padding: 8px;
-      border: 1px solid #ddd;
-    }
-    
-    @media screen and (max-width: 768px) {
-      #presidentialTable {
-        max-width: 100%;
-      }
-      #presidentialTable th,
-      #presidentialTable td {
-        padding: 6px;
-        font-size: 12px;
-      }
-    }
-    
-    /* Bottom tables layout */
-    .bottom-tables {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-    
-    .table-box {
-      flex: 1 1 300px;
-      background-color: var(--white);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      min-height: 200px;
-    }
-    
-    /* Custom modifications for container widths */
-    #swingometerForm > div:first-child > div:first-child {
-      flex: 0.3 !important;
-    }
-    #swingometerForm > div:first-child > div:nth-child(2),
-    #swingometerForm > div:first-child > div:nth-child(3) {
-      flex: 1.2 !important;
-    }
-    
-    #mapOutputContainer > div:first-of-type > div:nth-child(2) {
-      flex: 0.2!important;
-    }
-    
-    /* Create Party Modal Styles */
-    #createPartyModal {
-      display: none;
-      position: fixed;
-      top: 20%;
-      left: 30%;
-      background: var(--white);
-      border: 1px solid var(--border-color);
-      padding: 20px;
       z-index: 1000;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      
+      pointer-events: none;
+      transition: opacity 0.2s;
     }
-    
-#createPartyButtonContainer {
-  text-align: center; /* Centers inline elements like a button */
-}
-
-    
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    /* Constrain results panel height and allow internal flex distribution */
+    .results-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    /* Hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
   </style>
 </head>
-<body>
-  <!-- Map and Output Container (Main Box 1) -->
-  <div class="container" id="mapOutputContainer">
-    <h1>Türkiye Seçim Hesaplama</h1>
-    <p>
-      Her partinin ulusal oy oranını girin (sayıların toplamı 100 olmak zorunda değildir). Bu değerler, parlamento sandalye tahsisi ve parti desteğinin cumhurbaşkanı adaylarına dağıtımı için temel olarak kullanılan düzeltilmiş ulusal yüzdelere dönüştürülür.
-    </p>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-      <!-- Map Box -->
-      <div style="flex: 1; min-width: 300px; border: 1px solid var(--border-color); padding: 15px;">
-        <div id="mapSwitcher" style="text-align: center; margin-bottom: 15px;">
-          <button type="button" onclick="switchElectionMode('parliamentary')">Parliamentary</button>
-          <button type="button" onclick="switchElectionMode('pres1')">Presidential 1st Round</button>
-          <button type="button" onclick="switchElectionMode('pres2')">Presidential 2nd Round</button>
-          <button type="button" onclick="reloadMap()">Reload Map</button>
-          <button type="button" onclick="calculateSecondRoundOnly()">2nd Round Calculate</button>
+<body class="bg-gray-100 text-gray-800">
 
+  <div class="container mx-auto p-4 max-w-screen-2xl">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-900">Türkiye Seçim Hesaplama</h1>
+      <p class="text-gray-600 mt-2 max-w-3xl mx-auto">
+        Partilerin ulusal oy oranlarını girerek parlamento ve cumhurbaşkanlığı seçim sonuçlarını simüle edin. Girdiğiniz değerler, sandalye dağılımı ve aday desteği için düzeltilmiş yüzdelere dönüştürülecektir.
+      </p>
+    </header>
 
-        </div>
-        <div id="turkeyMap">
-          <svg id="turkeyMapSVG" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
-            <!-- Sample SVG. Replace with your full SVG file as needed -->
-            <svg baseprofile="tiny" fill="#6f9c76" height="422" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5" version="1.2" viewbox="0 0 1000 422" width="1000" xmlns="http://www.w3.org/2000/svg">
-              <g id="features">
+    <!-- Top Section for Display (Map and Results) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Map Column -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
+            <div class="flex flex-wrap justify-center gap-2 mb-4">
+                <button class="btn-mode bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition" onclick="switchElectionMode('parliamentary')">Milletvekili</button>
+                <button class="btn-mode bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition" onclick="switchElectionMode('pres1')">CB 1. Tur</button>
+                <button class="btn-mode bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition" onclick="switchElectionMode('pres2')">CB 2. Tur</button>
+            </div>
+            <div id="turkeyMap" class="w-full h-auto aspect-video bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <svg id="turkeyMapSVG" class="w-full h-full" viewBox="0 0 1000 422" preserveAspectRatio="xMidYMid meet">
+ <g id="features">
         <path d="M889.7 82.2l-3.1 1.1-4.8 2.7-7.7 3.3-7.8 3.3-5.7 3-1.1 4.8-0.7 7.5-0.9 4.5-5.7 0.6-5.5 1.1-1.4-2.6-1.9-1.9-1.4-2.1-1-2.4-1.3-1.7-1.8-1.2-2.4-3.7-1-4.9 3-5.9 4.1-4.6 4-2 1.2-4.2-1.3-4.4-0.9-2.3-0.4-0.7-0.5-1.5-0.3-2.7-0.7-3.6 0.5 0 1-0.7 1.4-2.2 1.1-1 0.5-1.1 0.4-2.6 0.5-1 0.9-0.8 0.1 0 0.2 0 0.9-0.4 2.4-0.2 6.7 0.6 0.9 0.4-0.4 0.6-0.1 0.7-0.1 0.6-0.2 0.6-0.4 0.4-1 0.8-0.4 0.7 1.3 0.7 0.9 1 0.9 0.3 1.1-1.4 0.7-0.4 0.3 0.4 0.3 0.8 0.4 0.7 0.3 0.3 1.4 0.4 0.3 0.3 0.2 0.3 0.2 0.2 0.5 0.2 0.3 0.4 1.4 2.7 0.7 0.8 3.5 2.4 2.3 2 1.5 0.7 1.4 0.2 0 0.3-0.6 0.9-0.7 0.6-2.6 1.3 1.3 0.4 1.1-0.1 0.9 0.1 1 1.1 1.1 2.8 0.7 0.5 4.4-1.2 1.3-0.1 1.5 0.4 1.3 0.8 1.3 1.2 0.7 1.5-0.5 1.6z" id="TR75" name="Ardahan"></path>
   
   <path d="M842.7 61.7l0.7 3.6 0.3 2.7 0.5 1.5 0.4 0.7 0.9 2.3 1.3 4.4-1.2 4.2-4 2-4.1 4.6-3 5.9-2.8 0.3-2.8 0.6-3.3-0.3-3.2 0.3-1.6 0.8-1.5 1.3-0.6 2.5 0.3 2.7-1.2 2.5-1.9 1.9-0.9 2.5-0.1 2.8-2.2 3.3-4-2.3-3.8-1.1-3.7 1.1-4 2.6-4.4 1.7-3.2-2.9 0.6-5.3 1.3-2.2-0.4-2.1-1.7-0.6-5.9-0.9-3.7-2.1 0.7-2.5 4.5-5.3 1.1-0.6 1-0.9 0.4-1.3 0.7-1.3 2.6-1.7 1.3-2.9-1.4-1.6-1.9-0.9-0.5-1.1-0.6-1.1-0.9-0.6-0.9-0.9-0.9-2.1-0.4-2.5-1.3-3.3-0.1-0.2 4.1-3.3 1.2-0.4 1-0.6 0.5-0.2 1.7-0.2 0.6-0.2 0.9-0.7 0.7-1.1 0.5-1.4 0.2-1.4 0.5-0.3 2.7-2.5 0.7-1.2 5 2.2 0.7 0.1 1.4-0.1 1.2-0.6 0.3 0 0.1 0.3-0.1 0.5 0 0.5 0.2 0.4 0.6 0.2 1.4 0.2 0.6 0.2 1.9 1.7 0.6 0.3 0.4-0.3 1.9-1.6 1.5-2.1 0.7-0.5 1.9-0.8 3.4 1.3 1.7-0.5 0.6-0.4 0.7-0.1 0.7 0.1 0.7 0.4 1.4-0.5 0.8 0 0.6 0.5 0.8 0.7 1.2 0.1 2.3-0.1 8.3 3.2 0.7 0z" id="TR08" name="Artvin"></path>
@@ -549,1500 +234,685 @@
   </path>
   <path d="M685.6 103.3l0.9 0.7 1 0.1 1-0.9 0.8-1.1 2 1.2 0.7 3.7 3.2 3.3 11.1 4.5 2.8 0.3 1-0.2 0.7-0.8 0.6-2.6 1.4-1.1 3.3 2.2 2.3 3.9 1.6 9.2-0.4 9.1-1.5 3.6-0.6 2-0.2 2 1 4.2 1.8 3.9-1.8 2.7-2.1 2.2-5.3 1.3-2.6 1.3-2.7 0.2-2.8-0.2-2.8 0.3-2.9-0.3-2.8-1.4-2.9-0.9-0.8-0.8-0.7-1.1-1.8-1.1-1.8-0.7-5.2-3.1-1.4-0.3-1.4-0.3-1.4-0.6-1.3-0.8 0.4-2-1.3-1.7-0.4-2.2 0.2-2.2-0.2-2.1 0.1-2.1 1-1.3 4.8-2.6 1.4-1.2 0.3-2.3-1.1-0.3-1.3-1.3-1.3-1.1-5.6-1.4-1.3-1.6-0.1-2.2 0.3-2.8 0.1-0.5 0.5-0.7 1.4-1.5 0.9-1.7-0.6-1.9 0.6-1.6 1.5-1 1.4-1.2 1.2-0.3 0.9-0.5 0.2-0.9 0.3-0.7 5.7-0.7z" id="TR29" name="Gümüshane">
   </path>
-              </g>
-            </svg>
-          </svg>
+                    </g>
+                </svg>
+            </div>
         </div>
-      </div>
-      <!-- Output Box -->
-      <div style="flex: 1; min-width: 300px; border: 1px solid var(--border-color); padding: 15px; overflow-y: auto;">
-        <div id="results" class="results-section"></div>
-      </div>
+        <!-- Results Column -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg results-panel">
+            <div id="results" class="flex-grow flex flex-col justify-around">
+                <div class="text-center p-4 text-gray-500">Sonuçları görmek için oy oranlarını girip hesapla butonuna basın.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section for Inputs -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Parliamentary Inputs -->
+            <div>
+                <h2 class="text-2xl font-bold mb-3 text-center">Parti Oyları</h2>
+                <div id="parliamentary-inputs"></div>
+                <div class="text-center mt-4">
+                    <button onclick="openCreatePartyModal()" class="bg-green-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-green-700 transition">Parti Oluştur</button>
+                </div>
+            </div>
+            <!-- Presidential 1st Round Inputs -->
+            <div>
+                <h2 class="text-2xl font-bold mb-3 text-center">Aday Parti Desteği (1. Tur)</h2>
+                <p class="text-sm text-gray-500 mb-4 text-center">Her adayın hangi partiden ne kadar oy alacağını (%) girin. Son satırda ise her partiden sandığa gitmeyenlerin oranını belirtin.</p>
+                <div id="presidential-inputs" class="overflow-x-auto"></div>
+                <div class="text-center mt-4">
+                    <button onclick="addCandidate()" class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">Aday Ekle</button>
+                </div>
+            </div>
+            <!-- Presidential 2nd Round Inputs -->
+            <div id="secondRoundDiv" class="hidden">
+                <h2 class="text-2xl font-bold mb-3 text-center">İkinci Tur Destek Girişi</h2>
+                <p class="text-sm text-gray-500 mb-4 text-center">İlk turda %50'ye ulaşılamadı. Lütfen en yüksek oy alan iki aday için yeni parti destek yüzdelerini girin.</p>
+                <div id="second-round-inputs" class="overflow-x-auto"></div>
+            </div>
+        </div>
+        <div class="text-center mt-8">
+            <button onclick="calculateWrapper()" class="w-full max-w-sm mx-auto bg-red-600 text-white text-lg font-bold px-6 py-3 rounded-lg shadow-xl hover:bg-red-700 transition transform hover:scale-105">Tüm Sonuçları Hesapla</button>
+        </div>
     </div>
   </div>
-  
-  <!-- Inputs Container (Main Box 2) -->
-  <div class="container" id="inputContainer">
-    <form id="swingometerForm">
-      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-        <!-- Parlamento Box -->
-        <div style="flex: 1; min-width: 300px; border: 1px solid var(--border-color); padding: 15px;">
-          <h2>Parlamento</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Parti</th>
-                <th>Oy %</th>
-                <th>İttifak ile Vekil<sup>*</sup></th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Generated by JavaScript -->
-            </tbody>
-          </table>
-        </div>
-        
-        
-        
-        <!-- 1. Tur Box -->
-        <div style="flex: 1; min-width: 300px; border: 1px solid var(--border-color); padding: 15px;">
-          <h2>Aday Parti Desteği (1. Tur)</h2>
-          <p>
-            Her aday için, her partinin oylarının yüzde kaçını aldığını girin (örneğin, 100, %100 anlamına gelir). Son satıra (<strong>Sandığa Gitmeyen</strong>) her parti için oy kullanmayan yüzdelik oranı girin.
-          </p>
-          <table id="presidentialTable">
-            <thead>
-              <tr id="presidentialTableHeader">
-                <!-- Header built dynamically -->
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Candidate rows and final "Sandığa Gitmeyen" row generated by JavaScript -->
-            </tbody>
-          </table>
-          <div style="text-align: center; margin-bottom: 20px;">
-            <button type="button" onclick="addCandidate()">Aday Ekle</button>
-          </div>
-        </div>
-        <!-- 2. Tur Box -->
-        <div style="flex: 1; min-width: 300px; border: 1px solid var(--border-color); padding: 15px;">
-          <div id="secondRoundDiv">
-            <h2>İkinci Tur Destek Girişi</h2>
-            <p>
-              Hiçbir aday ilk turda %50'ye ulaşamadı. Lütfen aşağıdaki en iyi iki aday için yeni parti destek yüzdelerini girin (yeni bir "Sandığa Gitmeyen" satırı ile birlikte). Bitirdiğinizde, tekrar "Tüm Sonuçları Hesapla" düğmesine tıklayın.
-            </p>
-            <table id="secondRoundTable">
-              <thead>
-                <tr id="secondRoundTableHeader">
-                  <!-- Header built dynamically -->
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Rows generated dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      
-      
-      <!-- Common Controls -->
-      <div style="text-align: center; margin: 20px 0;">
-        <label for="threshold">Baraj (%)</label>
-        <input type="number" id="threshold" value="7" step="0.1" style="width: 80px;">
-      </div>
-      <div style="text-align: center; margin-top: 20px;">
-        <button type="button" onclick="calculateWrapper()">Tüm Sonuçları Hesapla</button>
-      </div>
-      <p style="font-size: 0.9em; margin-top: 10px; text-align: center;">
-        <sup>*</sup> Bu kutuyu işaretlemek, barajdan bağımsız olarak doğrudan nitelendirme sağlar.
-      </p>
-    </form>
-  </div>
-  
-<!-- Centered "Create Party" Button -->
-<div id="createPartyButtonContainer">
-  <button id="createPartyButton" onclick="openCreatePartyModal()">Create Party</button>
-</div>
 
   <!-- Create Party Modal -->
-  <div id="createPartyModal">
-    <h2>Create New Party</h2>
-    <label for="newPartyName">Party Name:</label>
-    <input type="text" id="newPartyName" placeholder="New Party Name"><br><br>
-    
-    <label for="newPartyColor">Select Party Color:</label>
-    <input type="color" id="newPartyColor" value="#000000"><br><br>
-    
-    <h3>Base Share from Existing Parties</h3>
-    <div id="baseShareContainer">
-      <!-- Base share inputs will be generated here -->
-    </div>
-    
-    <br>
-    <button onclick="submitNewParty()">Create Party</button>
-    <button onclick="document.getElementById('createPartyModal').style.display='none'">Cancel</button>
-  </div>
-  
-  <!-- Province Container -->
-  <div class="province-container" id="provinceContainer">
-    <h2>İl Bazlı Sonuçlar</h2>
-    <div id="provinceFilter">
-      <input type="text" placeholder="İl Filtresi (isteğe bağlı)">
-    </div>
-    <div id="provinceResults">
-      <!-- Province boxes will be generated here by JavaScript -->
+  <div id="createPartyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50 hidden">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-6">Yeni Parti Oluştur</h2>
+      <div class="space-y-4">
+        <div>
+          <label for="newPartyName" class="block text-sm font-medium text-gray-700">Parti Adı:</label>
+          <input type="text" id="newPartyName" placeholder="Yeni Parti Adı" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <div>
+          <label for="newPartyColor" class="block text-sm font-medium text-gray-700">Parti Rengi:</label>
+          <input type="color" id="newPartyColor" value="#808080" class="mt-1 block w-full h-10">
+        </div>
+        <div>
+            <h3 class="text-lg font-medium mb-2">Mevcut Partilerden Taban Payı (%)</h3>
+            <div id="baseShareContainer" class="grid grid-cols-2 gap-4 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
+        </div>
+      </div>
+      <div class="mt-8 flex justify-end gap-4">
+        <button onclick="document.getElementById('createPartyModal').classList.add('hidden')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">İptal</button>
+        <button onclick="submitNewParty()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Oluştur</button>
+      </div>
     </div>
   </div>
-  
-  
-  
-  
+
   <!-- Tooltip -->
-  <div id="tooltip"></div>
-  
-
-
+  <div id="tooltip" class="bg-gray-900 text-white text-sm rounded-lg shadow-lg p-3 opacity-90 max-w-xs"></div>
 
 <script>
-/***********************************************
- * COLOR ADJUSTMENT FUNCTIONS
- ***********************************************/
-// Convert a hex color to HSL.
-function hexToHSL(H) {
-  let r = 0, g = 0, b = 0;
-  if (H.length === 4) {
-    r = "0x" + H[1] + H[1];
-    g = "0x" + H[2] + H[2];
-    b = "0x" + H[3] + H[3];
-  } else if (H.length === 7) {
-    r = "0x" + H[1] + H[2];
-    g = "0x" + H[3] + H[4];
-    b = "0x" + H[5] + H[6];
-  }
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  let cmin = Math.min(r, g, b),
-      cmax = Math.max(r, g, b),
-      delta = cmax - cmin,
-      h = 0,
-      s = 0,
-      l = (cmax + cmin) / 2;
-  if (delta === 0)
-    h = 0;
-  else if (cmax === r)
-    h = ((g - b) / delta) % 6;
-  else if (cmax === g)
-    h = (b - r) / delta + 2;
-  else
-    h = (r - g) / delta + 4;
-  h = Math.round(h * 60);
-  if (h < 0)
-    h += 360;
-  s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-  s = +(s * 100).toFixed(1);
-  l = +(l * 100).toFixed(1);
-  return { h, s, l };
-}
-  
-// Convert an HSL object back to hex.
-function hslToHex(hsl) {
-  let { h, s, l } = hsl;
-  s /= 100;
-  l /= 100;
-  let c = (1 - Math.abs(2 * l - 1)) * s,
-      x = c * (1 - Math.abs((h / 60) % 2 - 1)),
-      m = l - c / 2,
-      r = 0, g = 0, b = 0;
-  if (0 <= h && h < 60) {
-    r = c; g = x; b = 0;
-  } else if (60 <= h && h < 120) {
-    r = x; g = c; b = 0;
-  } else if (120 <= h && h < 180) {
-    r = 0; g = c; b = x;
-  } else if (180 <= h && h < 240) {
-    r = 0; g = x; b = c;
-  } else if (240 <= h && h < 300) {
-    r = x; g = 0; b = c;
-  } else if (300 <= h && h < 360) {
-    r = c; g = 0; b = x;
-  }
-  r = Math.round((r + m) * 255);
-  g = Math.round((g + m) * 255);
-  b = Math.round((b + m) * 255);
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-  
-// Adjust the base color based on voteShare.
-// At 50%, the color is unchanged. For every 5% above or below, adjust the lightness by 5%.
-function adjustColor(baseColor, voteShare) {
-  const baseline = 50;
-  const steps = Math.round((voteShare - baseline) / 5);
-  const stepAmount = 5;
-  let hsl = hexToHSL(baseColor);
-  hsl.l = Math.min(100, Math.max(0, hsl.l - steps * stepAmount));
-  return hslToHex(hsl);
-}
-  
-/***********************************************
- * GLOBAL DATA
- ***********************************************/
-// Each province object should have an id (matching your SVG path id) and a displayName.
-const provinces = [ 
-  {
-    id: "TR01",
-    displayName: "Adana",
-    mpCount: 15,
-    ratios: { "CHP": 1.13, "AKP": 0.86, "MHP": 1.10, "İYİP": 1.11, "DEM": 1.10, "YRP": 0.63, "ZP": 0.94, "BBP": 0.93, "TİP": 1.33, "OTH": 0.82 }
-  },
-  {
-    id: "TR02",
-    displayName: "Adiyaman",
-    mpCount: 5,
-    ratios: { "CHP": 0.50, "AKP": 1.49, "MHP": 0.41, "İYİP": 0.61, "DEM": 1.37, "YRP": 1.70, "ZP": 0.27, "BBP": 1.01, "TİP": 0.00, "OTH": 0.72 }
-  },
-  {
-    id: "TR03",
-    displayName: "Afyonkarahisar",
-    mpCount: 6,
-    ratios: { "CHP": 0.73, "AKP": 1.25, "MHP": 1.62, "İYİP": 1.28, "DEM": 0.04, "YRP": 1.05, "ZP": 1.00, "BBP": 1.11, "TİP": 0.12, "OTH": 0.63 }
-  },
-  {
-    id: "TR04",
-    displayName: "Agri",
-    mpCount: 4,
-    ratios: { "CHP": 0.42, "AKP": 0.70, "MHP": 0.23, "İYİP": 0.17, "DEM": 6.37, "YRP": 0.70, "ZP": 0.00, "BBP": 0.29, "TİP": 0.00, "OTH": 1.09 }
-  },
-  {
-    id: "TR68",
-    displayName: "Aksaray",
-    mpCount: 4,
-    ratios: { "CHP": 0.48, "AKP": 1.24, "MHP": 2.11, "İYİP": 1.35, "DEM": 0.07, "YRP": 0.91, "ZP": 0.59, "BBP": 2.15, "TİP": 0.15, "OTH": 0.75 }
-  },
-  {
-    id: "TR05",
-    displayName: "Amasya",
-    mpCount: 3,
-    ratios: { "CHP": 1.18, "AKP": 1.12, "MHP": 1.69, "İYİP": 0.73, "DEM": 0.04, "YRP": 0.63, "ZP": 0.66, "BBP": 0.84, "TİP": 0.21, "OTH": 0.74 }
-  },
-  {
-    id: "TR06",
-    displayName: "Ankara",
-    mpCount: 36,
-    ratios: { "CHP": 1.19, "AKP": 0.92, "MHP": 1.03, "İYİP": 1.32, "DEM": 0.33, "YRP": 0.96, "ZP": 1.50, "BBP": 1.31, "TİP": 0.70, "OTH": 0.98 }
-  },
-  {
-    id: "TR07",
-    displayName: "Antalya",
-    mpCount: 17,
-    ratios: { "CHP": 1.28, "AKP": 0.81, "MHP": 0.99, "İYİP": 1.17, "DEM": 0.54, "YRP": 0.44, "ZP": 1.26, "BBP": 0.67, "TİP": 2.69, "OTH": 1.35 }
-  },
-  {
-    id: "TR75",
-    displayName: "Ardahan",
-    mpCount: 2,
-    ratios: { "CHP": 1.18, "AKP": 0.98, "MHP": 0.30, "İYİP": 0.49, "DEM": 2.48, "YRP": 0.35, "ZP": 0.46, "BBP": 0.35, "TİP": 0.00, "OTH": 1.48 }
-  },
-  {
-    id: "TR08",
-    displayName: "Artvin",
-    mpCount: 2,
-    ratios: { "CHP": 1.18, "AKP": 1.05, "MHP": 0.96, "İYİP": 1.35, "DEM": 0.10, "YRP": 0.83, "ZP": 0.52, "BBP": 0.39, "TİP": 0.88, "OTH": 1.56 }
-  },
-  {
-    id: "TR09",
-    displayName: "Aydin",
-    mpCount: 8,
-    ratios: { "CHP": 1.41, "AKP": 0.80, "MHP": 0.85, "İYİP": 1.33, "DEM": 0.82, "YRP": 0.25, "ZP": 0.99, "BBP": 0.87, "TİP": 0.00, "OTH": 1.26 }
-  },
-  {
-    id: "TR10",
-    displayName: "Balikesir",
-    mpCount: 9,
-    ratios: { "CHP": 1.24, "AKP": 0.97, "MHP": 0.81, "İYİP": 1.51, "DEM": 0.23, "YRP": 0.73, "ZP": 0.92, "BBP": 0.69, "TİP": 0.71, "OTH": 1.22 }
-  },
-  {
-    id: "TR74",
-    displayName: "Bartin",
-    mpCount: 2,
-    ratios: { "CHP": 0.99, "AKP": 1.03, "MHP": 2.37, "İYİP": 0.68, "DEM": 0.04, "YRP": 0.62, "ZP": 0.64, "BBP": 0.46, "TİP": 0.00, "OTH": 1.72 }
-  },
-  {
-    id: "TR72",
-    displayName: "Batman",
-    mpCount: 5,
-    ratios: { "CHP": 0.24, "AKP": 0.81, "MHP": 0.11, "İYİP": 0.19, "DEM": 6.75, "YRP": 0.37, "ZP": 0.00, "BBP": 0.31, "TİP": 0.00, "OTH": 0.73 }
-  },
-  {
-    id: "TR69",
-    displayName: "Bayburt",
-    mpCount: 1,
-    ratios: { "CHP": 0.28, "AKP": 1.71, "MHP": 1.67, "İYİP": 0.95, "DEM": 0.05, "YRP": 1.05, "ZP": 0.60, "BBP": 0.74, "TİP": 0.11, "OTH": 0.58 }
-  },
-  {
-    id: "TR11",
-    displayName: "Bilecik",
-    mpCount: 2,
-    ratios: { "CHP": 1.05, "AKP": 1.05, "MHP": 1.03, "İYİP": 1.26, "DEM": 0.30, "YRP": 1.16, "ZP": 1.00, "BBP": 0.88, "TİP": 0.48, "OTH": 1.32 }
-  },
-  {
-    id: "TR12",
-    displayName: "Bingol",
-    mpCount: 3,
-    ratios: { "CHP": 0.20, "AKP": 1.10, "MHP": 1.35, "İYİP": 0.20, "DEM": 2.78, "YRP": 3.55, "ZP": 0.00, "BBP": 0.55, "TİP": 0.00, "OTH": 0.90 }
-  },
-  {
-    id: "TR13",
-    displayName: "Bitlis",
-    mpCount: 3,
-    ratios: { "CHP": 0.24, "AKP": 1.05, "MHP": 0.36, "İYİP": 0.73, "DEM": 4.65, "YRP": 0.74, "ZP": 0.00, "BBP": 0.33, "TİP": 0.00, "OTH": 1.26 }
-  },
-  {
-    id: "TR14",
-    displayName: "Bolu",
-    mpCount: 3,
-    ratios: { "CHP": 0.86, "AKP": 1.04, "MHP": 2.35, "İYİP": 0.76, "DEM": 0.09, "YRP": 1.14, "ZP": 0.85, "BBP": 0.77, "TİP": 0.32, "OTH": 1.25 }
-  },
-  {
-    id: "TR15",
-    displayName: "Burdur",
-    mpCount: 3,
-    ratios: { "CHP": 1.23, "AKP": 1.03, "MHP": 1.41, "İYİP": 1.18, "DEM": 0.07, "YRP": 0.42, "ZP": 0.63, "BBP": 0.70, "TİP": 0.00, "OTH": 1.18 }
-  },
-  {
-    id: "TR16",
-    displayName: "Bursa",
-    mpCount: 20,
-    ratios: { "CHP": 0.95, "AKP": 1.10, "MHP": 0.85, "İYİP": 1.22, "DEM": 0.49, "YRP": 1.27, "ZP": 1.63, "BBP": 0.77, "TİP": 0.39, "OTH": 1.29 }
-  },
-  {
-    id: "TR17",
-    displayName: "Canakkale",
-    mpCount: 4,
-    ratios: { "CHP": 1.40, "AKP": 0.90, "MHP": 0.65, "İYİP": 1.69, "DEM": 0.22, "YRP": 0.34, "ZP": 0.89, "BBP": 0.44, "TİP": 0.72, "OTH": 1.30 }
-  },
-  {
-    id: "TR18",
-    displayName: "Cankiri",
-    mpCount: 2,
-    ratios: { "CHP": 0.24, "AKP": 1.19, "MHP": 3.14, "İYİP": 1.23, "DEM": 0.03, "YRP": 1.06, "ZP": 0.68, "BBP": 1.03, "TİP": 0.14, "OTH": 0.83 }
-  },
-  {
-    id: "TR19",
-    displayName: "Corum",
-    mpCount: 4,
-    ratios: { "CHP": 0.87, "AKP": 1.13, "MHP": 2.03, "İYİP": 0.92, "DEM": 0.05, "YRP": 1.16, "ZP": 0.67, "BBP": 0.79, "TİP": 0.20, "OTH": 0.89 }
-  },
-  {
-    id: "TR20",
-    displayName: "Denizli",
-    mpCount: 7,
-    ratios: { "CHP": 1.26, "AKP": 0.95, "MHP": 0.83, "İYİP": 1.45, "DEM": 0.27, "YRP": 0.47, "ZP": 1.15, "BBP": 1.47, "TİP": 0.58, "OTH": 1.14 }
-  },
-  {
-    id: "TR21",
-    displayName: "Diyarbakir",
-    mpCount: 12,
-    ratios: { "CHP": 0.30, "AKP": 0.64, "MHP": 0.11, "İYİP": 0.23, "DEM": 7.13, "YRP": 0.55, "ZP": 0.00, "BBP": 0.21, "TİP": 0.00, "OTH": 0.83 }
-  },
-  {
-    id: "TR81",
-    displayName: "Duzce",
-    mpCount: 3,
-    ratios: { "CHP": 0.62, "AKP": 1.41, "MHP": 1.63, "İYİP": 0.71, "DEM": 0.11, "YRP": 1.37, "ZP": 0.96, "BBP": 0.92, "TİP": 0.25, "OTH": 1.32 }
-  },
-  {
-    id: "TR22",
-    displayName: "Edirne",
-    mpCount: 4,
-    ratios: { "CHP": 1.56, "AKP": 0.65, "MHP": 0.76, "İYİP": 2.12, "DEM": 0.20, "YRP": 0.23, "ZP": 0.66, "BBP": 0.23, "TİP": 0.61, "OTH": 1.33 }
-  },
-  {
-    id: "TR23",
-    displayName: "Elazig",
-    mpCount: 5,
-    ratios: { "CHP": 0.81, "AKP": 1.14, "MHP": 1.14, "İYİP": 0.24, "DEM": 0.80, "YRP": 1.29, "ZP": 0.24, "BBP": 0.40, "TİP": 0.00, "OTH": 0.46 }
-  },
-  {
-    id: "TR24",
-    displayName: "Erzincan",
-    mpCount: 2,
-    ratios: { "CHP": 1.27, "AKP": 1.09, "MHP": 1.99, "İYİP": 0.41, "DEM": 0.12, "YRP": 0.51, "ZP": 0.42, "BBP": 0.37, "TİP": 0.14, "OTH": 0.47 }
-  },
-  {
-    id: "TR25",
-    displayName: "Erzurum",
-    mpCount: 6,
-    ratios: { "CHP": 0.25, "AKP": 1.22, "MHP": 1.68, "İYİP": 0.98, "DEM": 1.13, "YRP": 1.76, "ZP": 1.06, "BBP": 1.79, "TİP": 0.00, "OTH": 0.70 }
-  },
-  {
-    id: "TR26",
-    displayName: "Eskisehir",
-    mpCount: 6,
-    ratios: { "CHP": 1.35, "AKP": 0.93, "MHP": 0.72, "İYİP": 1.43, "DEM": 0.22, "YRP": 0.50, "ZP": 1.34, "BBP": 1.12, "TİP": 0.94, "OTH": 1.01 }
-  },
-  {
-    id: "TR27",
-    displayName: "Gaziantep",
-    mpCount: 14,
-    ratios: { "CHP": 0.80, "AKP": 1.27, "MHP": 0.96, "İYİP": 0.55, "DEM": 1.03, "YRP": 1.46, "ZP": 1.46, "BBP": 0.70, "TİP": 0.00, "OTH": 0.93 }
-  },
-  {
-    id: "TR28",
-    displayName: "Giresun",
-    mpCount: 4,
-    ratios: { "CHP": 0.81, "AKP": 1.22, "MHP": 1.57, "İYİP": 1.31, "DEM": 0.03, "YRP": 0.87, "ZP": 0.68, "BBP": 0.59, "TİP": 0.25, "OTH": 0.93 }
-  },
-  {
-    id: "TR29",
-    displayName: "Gümüshane",
-    mpCount: 2,
-    ratios: { "CHP": 0.28, "AKP": 1.34, "MHP": 2.66, "İYİP": 1.19, "DEM": 0.03, "YRP": 0.94, "ZP": 0.48, "BBP": 0.84, "TİP": 0.15, "OTH": 0.79 }
-  },
-  {
-    id: "TR30",
-    displayName: "Hakkari",
-    mpCount: 3,
-    ratios: { "CHP": 0.19, "AKP": 0.56, "MHP": 0.27, "İYİP": 0.20, "DEM": 7.30, "YRP": 0.70, "ZP": 0.00, "BBP": 0.30, "TİP": 0.00, "OTH": 1.13 }
-  },
-  {
-    id: "TR31",
-    displayName: "Hatay",
-    mpCount: 11,
-    ratios: { "CHP": 1.13, "AKP": 0.95, "MHP": 1.22, "İYİP": 0.83, "DEM": 0.34, "YRP": 0.65, "ZP": 0.59, "BBP": 0.91, "TİP": 5.11, "OTH": 0.64 }
-  },
-  {
-    id: "TR76",
-    name: "Igdir",
-    mpCount: 2,
-    ratios: { "CHP": 0.23, "AKP": 0.99, "MHP": 0.45, "İYİP": 0.67, "DEM": 5.09, "YRP": 0.16, "ZP": 0.00, "BBP": 0.20, "TİP": 0.00, "OTH": 0.98 }
-  },
-  {
-    id: "TR32",
-    name: "Isparta",
-    mpCount: 4,
-    ratios: { "CHP": 0.87, "AKP": 0.91, "MHP": 2.06, "İYİP": 1.69, "DEM": 0.08, "YRP": 0.64, "ZP": 0.86, "BBP": 0.54, "TİP": 0.18, "OTH": 0.98 }
-  },
-  {
-    id: "TR34",
-    displayName: "Istanbul",
-    mpCount: 98,
-    ratios: { "CHP": 1.11, "AKP": 1.02, "MHP": 0.60, "İYİP": 0.84, "DEM": 0.92, "YRP": 1.18, "ZP": 1.25, "BBP": 0.81, "TİP": 2.35, "OTH": 0.95 }
-  },
-  {
-    id: "TR35",
-    displayName: "Izmir",
-    mpCount: 28,
-    ratios: { "CHP": 1.63, "AKP": 0.70, "MHP": 0.51, "İYİP": 1.18, "DEM": 0.85, "YRP": 0.31, "ZP": 1.04, "BBP": 0.46, "TİP": 1.60, "OTH": 1.33 }
-  },
-  {
-    id: "TR46",
-    displayName: "Kahramanmaras",
-    mpCount: 8,
-    ratios: { "CHP": 0.63, "AKP": 1.35, "MHP": 1.62, "İYİP": 0.72, "DEM": 0.13, "YRP": 1.94, "ZP": 0.76, "BBP": 1.60, "TİP": 0.00, "OTH": 0.92 }
-  },
-  {
-    id: "TR78",
-    displayName: "Karabuk",
-    mpCount: 3,
-    ratios: { "CHP": 0.86, "AKP": 1.06, "MHP": 1.60, "İYİP": 1.00, "DEM": 0.04, "YRP": 2.95, "ZP": 0.93, "BBP": 0.43, "TİP": 0.19, "OTH": 1.33 }
-  },
-  {
-    id: "TR70",
-    displayName: "Karaman",
-    mpCount: 3,
-    ratios: { "CHP": 0.75, "AKP": 1.16, "MHP": 1.82, "İYİP": 1.12, "DEM": 0.06, "YRP": 0.80, "ZP": 0.83, "BBP": 2.73, "TİP": 0.16, "OTH": 1.11 }
-  },
-  {
-    id: "TR36",
-    displayName: "Kars",
-    mpCount: 3,
-    ratios: { "CHP": 0.64, "AKP": 0.71, "MHP": 0.96, "İYİP": 1.54, "DEM": 3.24, "YRP": 0.69, "ZP": 0.00, "BBP": 0.60, "TİP": 0.00, "OTH": 1.17 }
-  },
-  {
-    id: "TR37",
-    displayName: "Kastamonu",
-    mpCount: 3,
-    ratios: { "CHP": 0.85, "AKP": 1.29, "MHP": 1.51, "İYİP": 0.78, "DEM": 0.02, "YRP": 1.44, "ZP": 0.78, "BBP": 0.92, "TİP": 0.00, "OTH": 1.27 }
-  },
-  {
-    id: "TR38",
-    displayName: "Kayseri",
-    mpCount: 10,
-    ratios: { "CHP": 0.67, "AKP": 1.15, "MHP": 1.92, "İYİP": 1.03, "DEM": 0.09, "YRP": 1.24, "ZP": 1.44, "BBP": 1.94, "TİP": 0.22, "OTH": 0.71 }
-  },
-  {
-    id: "TR71",
-    displayName: "Kirikkale",
-    mpCount: 3,
-    ratios: { "CHP": 1.05, "AKP": 0.99, "MHP": 2.14, "İYİP": 1.04, "DEM": 0.03, "YRP": 0.64, "ZP": 0.68, "BBP": 0.66, "TİP": 0.00, "OTH": 0.66 }
-  },
-  {
-    id: "TR39",
-    displayName: "Kirklareli",
-    mpCount: 3,
-    ratios: { "CHP": 1.81, "AKP": 0.70, "MHP": 0.46, "İYİP": 1.57, "DEM": 0.19, "YRP": 0.23, "ZP": 0.69, "BBP": 0.50, "TİP": 1.02, "OTH": 1.20 }
-  },
-  {
-    id: "TR40",
-    displayName: "Kirşehir",
-    mpCount: 2,
-    ratios: { "CHP": 1.16, "AKP": 1.09, "MHP": 1.49, "İYİP": 0.74, "DEM": 0.28, "YRP": 0.56, "ZP": 0.86, "BBP": 1.01, "TİP": 0.23, "OTH": 0.97 }
-  },
-  {
-    id: "TR79",
-    displayName: "Kilis",
-    mpCount: 2,
-    ratios: { "CHP": 0.79, "AKP": 1.11, "MHP": 2.71, "İYİP": 0.59, "DEM": 0.10, "YRP": 0.83, "ZP": 0.84, "BBP": 0.44, "TİP": 0.00, "OTH": 0.77 }
-  },
-  {
-    id: "TR41",
-    displayName: "Kocaeli",
-    mpCount: 14,
-    ratios: { "CHP": 0.94, "AKP": 1.12, "MHP": 0.83, "İYİP": 0.98, "DEM": 0.64, "YRP": 2.06, "ZP": 1.40, "BBP": 1.14, "TİP": 0.00, "OTH": 1.17 }
-  },
-  {
-    id: "TR42",
-    displayName: "Konya",
-    mpCount: 15,
-    ratios: { "CHP": 0.53, "AKP": 1.36, "MHP": 1.44, "İYİP": 0.89, "DEM": 0.29, "YRP": 1.82, "ZP": 1.32, "BBP": 2.07, "TİP": 0.19, "OTH": 0.85 }
-  },
-  {
-    id: "TR43",
-    displayName: "Kutahya",
-    mpCount: 5,
-    ratios: { "CHP": 0.65, "AKP": 1.32, "MHP": 1.31, "İYİP": 1.08, "DEM": 0.03, "YRP": 2.53, "ZP": 0.76, "BBP": 1.20, "TİP": 0.15, "OTH": 1.00 }
-  },
-  {
-    id: "TR44",
-    displayName: "Malatya",
-    mpCount: 6,
-    ratios: { "CHP": 0.85, "AKP": 1.28, "MHP": 1.29, "İYİP": 0.40, "DEM": 0.34, "YRP": 3.31, "ZP": 0.50, "BBP": 1.37, "TİP": 0.00, "OTH": 0.56 }
-  },
-  {
-    id: "TR45",
-    name: "Manisa",
-    mpCount: 10,
-    ratios: { "CHP": 1.16, "AKP": 0.88, "MHP": 1.41, "İYİP": 1.14, "DEM": 0.64, "YRP": 0.54, "ZP": 0.99, "BBP": 1.35, "TİP": 0.00, "OTH": 1.16 }
-  },
-  {
-    id: "TR47",
-    displayName: "Mardin",
-    mpCount: 6,
-    ratios: { "CHP": 0.26, "AKP": 0.70, "MHP": 0.32, "İYİP": 0.11, "DEM": 6.39, "YRP": 0.39, "ZP": 0.21, "BBP": 0.15, "TİP": 0.00, "OTH": 0.66 }
-  },
-  {
-    id: "TR33",
-    displayName: "Mersin",
-    mpCount: 13,
-    ratios: { "CHP": 1.22, "AKP": 0.69, "MHP": 1.19, "İYİP": 1.22, "DEM": 1.52, "YRP": 0.31, "ZP": 0.81, "BBP": 0.45, "TİP": 1.16, "OTH": 0.83 }
-  },
-  {
-    id: "TR48",
-    displayName: "Mugla",
-    mpCount: 7,
-    ratios: { "CHP": 1.49, "AKP": 0.68, "MHP": 0.61, "İYİP": 1.76, "DEM": 0.38, "YRP": 0.21, "ZP": 0.74, "BBP": 0.28, "TİP": 3.33, "OTH": 1.29 }
-  },
-  {
-    id: "TR49",
-    displayName: "Mus",
-    mpCount: 3,
-    ratios: { "CHP": 0.28, "AKP": 0.58, "MHP": 0.95, "İYİP": 0.57, "DEM": 5.87, "YRP": 1.00, "ZP": 0.00, "BBP": 0.36, "TİP": 0.00, "OTH": 1.07 }
-  },
-  {
-    id: "TR50",
-    displayName: "Nevsehir",
-    mpCount: 3,
-    ratios: { "CHP": 0.68, "AKP": 1.11, "MHP": 2.05, "İYİP": 1.63, "DEM": 0.05, "YRP": 0.71, "ZP": 0.57, "BBP": 0.91, "TİP": 0.22, "OTH": 0.70 }
-  },
-  {
-    id: "TR51",
-    displayName: "Nigde",
-    mpCount: 3,
-    ratios: { "CHP": 0.95, "AKP": 0.95, "MHP": 2.26, "İYİP": 1.26, "DEM": 0.05, "YRP": 0.93, "ZP": 0.65, "BBP": 0.56, "TİP": 0.12, "OTH": 0.77 }
-  },
-  {
-    id: "TR52",
-    displayName: "Ordu",
-    mpCount: 6,
-    ratios: { "CHP": 0.95, "AKP": 1.28, "MHP": 1.27, "İYİP": 1.01, "DEM": 0.02, "YRP": 0.81, "ZP": 0.62, "BBP": 0.83, "TİP": 0.20, "OTH": 1.14 }
-  },
-  {
-    id: "TR80",
-    displayName: "Osmaniye",
-    mpCount: 4,
-    ratios: { "CHP": 0.67, "AKP": 0.92, "MHP": 2.88, "İYİP": 1.30, "DEM": 0.23, "YRP": 0.69, "ZP": 0.76, "BBP": 0.57, "TİP": 0.16, "OTH": 0.64 }
-  },
-  {
-    id: "TR53",
-    displayName: "Rize",
-    mpCount: 3,
-    ratios: { "CHP": 0.61, "AKP": 1.53, "MHP": 1.30, "İYİP": 0.61, "DEM": 0.03, "YRP": 1.81, "ZP": 0.77, "BBP": 1.61, "TİP": 0.17, "OTH": 1.28 }
-  },
-  {
-    id: "TR54",
-    displayName: "Sakarya",
-    mpCount: 8,
-    ratios: { "CHP": 0.63, "AKP": 1.34, "MHP": 1.20, "İYİP": 1.13, "DEM": 0.17, "YRP": 1.78, "ZP": 1.18, "BBP": 0.93, "TİP": 0.30, "OTH": 1.13 }
-  },
-  {
-    id: "TR55",
-    displayName: "Samsun",
-    mpCount: 9,
-    ratios: { "CHP": 0.77, "AKP": 1.20, "MHP": 1.43, "İYİP": 1.24, "DEM": 0.03, "YRP": 1.42, "ZP": 0.97, "BBP": 1.40, "TİP": 0.36, "OTH": 1.06 }
-  },
-  {
-    id: "TR56",
-    displayName: "Siirt",
-    mpCount: 3,
-    ratios: { "CHP": 0.28, "AKP": 1.01, "MHP": 0.36, "İYİP": 0.14, "DEM": 5.45, "YRP": 0.41, "ZP": 0.00, "BBP": 0.28, "TİP": 0.00, "OTH": 0.86 }
-  },
-  {
-    id: "TR57",
-    displayName: "Sinop",
-    mpCount: 2,
-    ratios: { "CHP": 1.01, "AKP": 1.20, "MHP": 0.90, "İYİP": 0.97, "DEM": 0.04, "YRP": 0.79, "ZP": 0.66, "BBP": 4.56, "TİP": 0.44, "OTH": 1.53 }
-  },
-  {
-    id: "TR58",
-    displayName: "Sivas",
-    mpCount: 5,
-    ratios: { "CHP": 0.63, "AKP": 1.14, "MHP": 1.82, "İYİP": 0.75, "DEM": 0.05, "YRP": 1.22, "ZP": 0.80, "BBP": 10.37, "TİP": 0.22, "OTH": 0.52 }
-  },
-  {
-    id: "TR63",
-    displayName: "Sanlıurfa",
-    mpCount: 14,
-    ratios: { "CHP": 0.30, "AKP": 1.22, "MHP": 0.93, "İYİP": 0.47, "DEM": 2.88, "YRP": 1.04, "ZP": 0.00, "BBP": 0.44, "TİP": 0.00, "OTH": 0.65 }
-  },
-  {
-    id: "TR73",
-    displayName: "Sirnak",
-    mpCount: 4,
-    ratios: { "CHP": 0.32, "AKP": 0.59, "MHP": 0.22, "İYİP": 0.11, "DEM": 7.34, "YRP": 0.20, "ZP": 0.50, "BBP": 0.14, "TİP": 0.00, "OTH": 0.72 }
-  },
-  {
-    id: "TR59",
-    displayName: "Tekirdag",
-    mpCount: 8,
-    ratios: { "CHP": 1.44, "AKP": 0.86, "MHP": 0.63, "İYİP": 1.15, "DEM": 0.69, "YRP": 0.56, "ZP": 1.02, "BBP": 0.54, "TİP": 0.91, "OTH": 1.23 }
-  },
-  {
-    id: "TR60",
-    displayName: "Tokat",
-    mpCount: 5,
-    ratios: { "CHP": 0.81, "AKP": 1.05, "MHP": 2.23, "İYİP": 1.14, "DEM": 0.03, "YRP": 0.82, "ZP": 0.62, "BBP": 2.90, "TİP": 0.18, "OTH": 0.56 }
-  },
-  {
-    id: "TR61",
-    displayName: "Trabzon",
-    mpCount: 6,
-    ratios: { "CHP": 0.70, "AKP": 1.36, "MHP": 1.08, "İYİP": 1.25, "DEM": 0.03, "YRP": 1.61, "ZP": 0.82, "BBP": 1.57, "TİP": 0.15, "OTH": 0.80 }
-  },
-  {
-    id: "TR62",
-    displayName: "Tunceli",
-    mpCount: 1,
-    ratios: { "CHP": 1.28, "AKP": 0.35, "MHP": 0.54, "İYİP": 0.22, "DEM": 5.00, "YRP": 0.34, "ZP": 0.00, "BBP": 0.30, "TİP": 0.00, "OTH": 1.27 }
-  },
-  {
-    id: "TR64",
-    displayName: "Usak",
-    mpCount: 3,
-    ratios: { "CHP": 1.15, "AKP": 1.01, "MHP": 0.93, "İYİP": 1.81, "DEM": 0.15, "YRP": 0.50, "ZP": 0.72, "BBP": 0.66, "TİP": 0.20, "OTH": 1.10 }
-  },
-  {
-    id: "TR65",
-    displayName: "Van",
-    mpCount: 8,
-    ratios: { "CHP": 0.25, "AKP": 0.72, "MHP": 0.48, "İYİP": 0.20, "DEM": 6.18, "YRP": 1.11, "ZP": 0.34, "BBP": 0.85, "TİP": 0.00, "OTH": 0.84 }
-  },
-  {
-    displayName: "Yalova",
-    id: "TR77",
-    mpCount: 3,
-    ratios: { "CHP": 1.14, "AKP": 0.96, "MHP": 1.13, "İYİP": 0.98, "DEM": 0.64, "YRP": 0.75, "ZP": 1.02, "BBP": 0.65, "TİP": 0.59, "OTH": 1.94 }
-  },
-  {
-    id: "TR66",
-    displayName: "Yozgat",
-    mpCount: 4,
-    ratios: { "CHP": 0.56, "AKP": 1.23, "MHP": 2.33, "İYİP": 0.96, "DEM": 0.04, "YRP": 1.55, "ZP": 0.58, "BBP": 1.67, "TİP": 0.11, "OTH": 0.75 }
-  },
-  {
-    id: "TR67",
-    displayName: "Zonguldak",
-    mpCount: 5,
-    ratios: { "CHP": 1.27, "AKP": 1.13, "MHP": 0.83, "İYİP": 1.03, "DEM": 0.04, "YRP": 0.89, "ZP": 0.80, "BBP": 0.87, "TİP": 0.26, "OTH": 1.43 }
-  }
+// --- DATA ---
+const provinces = [
+    { id: "TR01", displayName: "Adana", mpCount: 15, ratios: { "CHP": 1.13, "AKP": 0.86, "MHP": 1.10, "IYIP": 1.11, "DEM": 1.10, "YRP": 0.63, "ZP": 0.94, "BBP": 0.93, "TIP": 1.33, "OTH": 0.82 } },
+    { id: "TR02", displayName: "Adıyaman", mpCount: 5, ratios: { "CHP": 0.50, "AKP": 1.49, "MHP": 0.41, "IYIP": 0.61, "DEM": 1.37, "YRP": 1.70, "ZP": 0.27, "BBP": 1.01, "TIP": 0.00, "OTH": 0.72 } },
+    { id: "TR03", displayName: "Afyonkarahisar", mpCount: 6, ratios: { "CHP": 0.73, "AKP": 1.25, "MHP": 1.62, "IYIP": 1.28, "DEM": 0.04, "YRP": 1.05, "ZP": 1.00, "BBP": 1.11, "TIP": 0.12, "OTH": 0.63 } },
+    { id: "TR04", displayName: "Ağrı", mpCount: 4, ratios: { "CHP": 0.42, "AKP": 0.70, "MHP": 0.23, "IYIP": 0.17, "DEM": 6.37, "YRP": 0.70, "ZP": 0.00, "BBP": 0.29, "TIP": 0.00, "OTH": 1.09 } },
+    { id: "TR68", displayName: "Aksaray", mpCount: 4, ratios: { "CHP": 0.48, "AKP": 1.24, "MHP": 2.11, "IYIP": 1.35, "DEM": 0.07, "YRP": 0.91, "ZP": 0.59, "BBP": 2.15, "TIP": 0.15, "OTH": 0.75 } },
+    { id: "TR05", displayName: "Amasya", mpCount: 3, ratios: { "CHP": 1.18, "AKP": 1.12, "MHP": 1.69, "IYIP": 0.73, "DEM": 0.04, "YRP": 0.63, "ZP": 0.66, "BBP": 0.84, "TIP": 0.21, "OTH": 0.74 } },
+    { id: "TR06", displayName: "Ankara", mpCount: 36, ratios: { "CHP": 1.19, "AKP": 0.92, "MHP": 1.03, "IYIP": 1.32, "DEM": 0.33, "YRP": 0.96, "ZP": 1.50, "BBP": 1.31, "TIP": 0.70, "OTH": 0.98 } },
+    { id: "TR07", displayName: "Antalya", mpCount: 17, ratios: { "CHP": 1.28, "AKP": 0.81, "MHP": 0.99, "IYIP": 1.17, "DEM": 0.54, "YRP": 0.44, "ZP": 1.26, "BBP": 0.67, "TIP": 2.69, "OTH": 1.35 } },
+    { id: "TR75", displayName: "Ardahan", mpCount: 2, ratios: { "CHP": 1.18, "AKP": 0.98, "MHP": 0.30, "IYIP": 0.49, "DEM": 2.48, "YRP": 0.35, "ZP": 0.46, "BBP": 0.35, "TIP": 0.00, "OTH": 1.48 } },
+    { id: "TR08", displayName: "Artvin", mpCount: 2, ratios: { "CHP": 1.18, "AKP": 1.05, "MHP": 0.96, "IYIP": 1.35, "DEM": 0.10, "YRP": 0.83, "ZP": 0.52, "BBP": 0.39, "TIP": 0.88, "OTH": 1.56 } },
+    { id: "TR09", displayName: "Aydın", mpCount: 8, ratios: { "CHP": 1.41, "AKP": 0.80, "MHP": 0.85, "IYIP": 1.33, "DEM": 0.82, "YRP": 0.25, "ZP": 0.99, "BBP": 0.87, "TIP": 0.00, "OTH": 1.26 } },
+    { id: "TR10", displayName: "Balıkesir", mpCount: 9, ratios: { "CHP": 1.24, "AKP": 0.97, "MHP": 0.81, "IYIP": 1.51, "DEM": 0.23, "YRP": 0.73, "ZP": 0.92, "BBP": 0.69, "TIP": 0.71, "OTH": 1.22 } },
+    { id: "TR74", displayName: "Bartın", mpCount: 2, ratios: { "CHP": 0.99, "AKP": 1.03, "MHP": 2.37, "IYIP": 0.68, "DEM": 0.04, "YRP": 0.62, "ZP": 0.64, "BBP": 0.46, "TIP": 0.00, "OTH": 1.72 } },
+    { id: "TR72", displayName: "Batman", mpCount: 5, ratios: { "CHP": 0.24, "AKP": 0.81, "MHP": 0.11, "IYIP": 0.19, "DEM": 6.75, "YRP": 0.37, "ZP": 0.00, "BBP": 0.31, "TIP": 0.00, "OTH": 0.73 } },
+    { id: "TR69", displayName: "Bayburt", mpCount: 1, ratios: { "CHP": 0.28, "AKP": 1.71, "MHP": 1.67, "IYIP": 0.95, "DEM": 0.05, "YRP": 1.05, "ZP": 0.60, "BBP": 0.74, "TIP": 0.11, "OTH": 0.58 } },
+    { id: "TR11", displayName: "Bilecik", mpCount: 2, ratios: { "CHP": 1.05, "AKP": 1.05, "MHP": 1.03, "IYIP": 1.26, "DEM": 0.30, "YRP": 1.16, "ZP": 1.00, "BBP": 0.88, "TIP": 0.48, "OTH": 1.32 } },
+    { id: "TR12", displayName: "Bingöl", mpCount: 3, ratios: { "CHP": 0.20, "AKP": 1.10, "MHP": 1.35, "IYIP": 0.20, "DEM": 2.78, "YRP": 3.55, "ZP": 0.00, "BBP": 0.55, "TIP": 0.00, "OTH": 0.90 } },
+    { id: "TR13", displayName: "Bitlis", mpCount: 3, ratios: { "CHP": 0.24, "AKP": 1.05, "MHP": 0.36, "IYIP": 0.73, "DEM": 4.65, "YRP": 0.74, "ZP": 0.00, "BBP": 0.33, "TIP": 0.00, "OTH": 1.26 } },
+    { id: "TR14", displayName: "Bolu", mpCount: 3, ratios: { "CHP": 0.86, "AKP": 1.04, "MHP": 2.35, "IYIP": 0.76, "DEM": 0.09, "YRP": 1.14, "ZP": 0.85, "BBP": 0.77, "TIP": 0.32, "OTH": 1.25 } },
+    { id: "TR15", displayName: "Burdur", mpCount: 3, ratios: { "CHP": 1.23, "AKP": 1.03, "MHP": 1.41, "IYIP": 1.18, "DEM": 0.07, "YRP": 0.42, "ZP": 0.63, "BBP": 0.70, "TIP": 0.00, "OTH": 1.18 } },
+    { id: "TR16", displayName: "Bursa", mpCount: 20, ratios: { "CHP": 0.95, "AKP": 1.10, "MHP": 0.85, "IYIP": 1.22, "DEM": 0.49, "YRP": 1.27, "ZP": 1.63, "BBP": 0.77, "TIP": 0.39, "OTH": 1.29 } },
+    { id: "TR17", displayName: "Çanakkale", mpCount: 4, ratios: { "CHP": 1.40, "AKP": 0.90, "MHP": 0.65, "IYIP": 1.69, "DEM": 0.22, "YRP": 0.34, "ZP": 0.89, "BBP": 0.44, "TIP": 0.72, "OTH": 1.30 } },
+    { id: "TR18", displayName: "Çankırı", mpCount: 2, ratios: { "CHP": 0.24, "AKP": 1.19, "MHP": 3.14, "IYIP": 1.23, "DEM": 0.03, "YRP": 1.06, "ZP": 0.68, "BBP": 1.03, "TIP": 0.14, "OTH": 0.83 } },
+    { id: "TR19", displayName: "Çorum", mpCount: 4, ratios: { "CHP": 0.87, "AKP": 1.13, "MHP": 2.03, "IYIP": 0.92, "DEM": 0.05, "YRP": 1.16, "ZP": 0.67, "BBP": 0.79, "TIP": 0.20, "OTH": 0.89 } },
+    { id: "TR20", displayName: "Denizli", mpCount: 7, ratios: { "CHP": 1.26, "AKP": 0.95, "MHP": 0.83, "IYIP": 1.45, "DEM": 0.27, "YRP": 0.47, "ZP": 1.15, "BBP": 1.47, "TIP": 0.58, "OTH": 1.14 } },
+    { id: "TR21", displayName: "Diyarbakır", mpCount: 12, ratios: { "CHP": 0.30, "AKP": 0.64, "MHP": 0.11, "IYIP": 0.23, "DEM": 7.13, "YRP": 0.55, "ZP": 0.00, "BBP": 0.21, "TIP": 0.00, "OTH": 0.83 } },
+    { id: "TR81", displayName: "Düzce", mpCount: 3, ratios: { "CHP": 0.62, "AKP": 1.41, "MHP": 1.63, "IYIP": 0.71, "DEM": 0.11, "YRP": 1.37, "ZP": 0.96, "BBP": 0.92, "TIP": 0.25, "OTH": 1.32 } },
+    { id: "TR22", displayName: "Edirne", mpCount: 4, ratios: { "CHP": 1.56, "AKP": 0.65, "MHP": 0.76, "IYIP": 2.12, "DEM": 0.20, "YRP": 0.23, "ZP": 0.66, "BBP": 0.23, "TIP": 0.61, "OTH": 1.33 } },
+    { id: "TR23", displayName: "Elazığ", mpCount: 5, ratios: { "CHP": 0.81, "AKP": 1.14, "MHP": 1.14, "IYIP": 0.24, "DEM": 0.80, "YRP": 1.29, "ZP": 0.24, "BBP": 0.40, "TIP": 0.00, "OTH": 0.46 } },
+    { id: "TR24", displayName: "Erzincan", mpCount: 2, ratios: { "CHP": 1.27, "AKP": 1.09, "MHP": 1.99, "IYIP": 0.41, "DEM": 0.12, "YRP": 0.51, "ZP": 0.42, "BBP": 0.37, "TIP": 0.14, "OTH": 0.47 } },
+    { id: "TR25", displayName: "Erzurum", mpCount: 6, ratios: { "CHP": 0.25, "AKP": 1.22, "MHP": 1.68, "IYIP": 0.98, "DEM": 1.13, "YRP": 1.76, "ZP": 1.06, "BBP": 1.79, "TIP": 0.00, "OTH": 0.70 } },
+    { id: "TR26", displayName: "Eskişehir", mpCount: 6, ratios: { "CHP": 1.35, "AKP": 0.93, "MHP": 0.72, "IYIP": 1.43, "DEM": 0.22, "YRP": 0.50, "ZP": 1.34, "BBP": 1.12, "TIP": 0.94, "OTH": 1.01 } },
+    { id: "TR27", displayName: "Gaziantep", mpCount: 14, ratios: { "CHP": 0.80, "AKP": 1.27, "MHP": 0.96, "IYIP": 0.55, "DEM": 1.03, "YRP": 1.46, "ZP": 1.46, "BBP": 0.70, "TIP": 0.00, "OTH": 0.93 } },
+    { id: "TR28", displayName: "Giresun", mpCount: 4, ratios: { "CHP": 0.81, "AKP": 1.22, "MHP": 1.57, "IYIP": 1.31, "DEM": 0.03, "YRP": 0.87, "ZP": 0.68, "BBP": 0.59, "TIP": 0.25, "OTH": 0.93 } },
+    { id: "TR29", displayName: "Gümüşhane", mpCount: 2, ratios: { "CHP": 0.28, "AKP": 1.34, "MHP": 2.66, "IYIP": 1.19, "DEM": 0.03, "YRP": 0.94, "ZP": 0.48, "BBP": 0.84, "TIP": 0.15, "OTH": 0.79 } },
+    { id: "TR30", displayName: "Hakkâri", mpCount: 3, ratios: { "CHP": 0.19, "AKP": 0.56, "MHP": 0.27, "IYIP": 0.20, "DEM": 7.30, "YRP": 0.70, "ZP": 0.00, "BBP": 0.30, "TIP": 0.00, "OTH": 1.13 } },
+    { id: "TR31", displayName: "Hatay", mpCount: 11, ratios: { "CHP": 1.13, "AKP": 0.95, "MHP": 1.22, "IYIP": 0.83, "DEM": 0.34, "YRP": 0.65, "ZP": 0.59, "BBP": 0.91, "TIP": 5.11, "OTH": 0.64 } },
+    { id: "TR76", displayName: "Iğdır", mpCount: 2, ratios: { "CHP": 0.23, "AKP": 0.99, "MHP": 0.45, "IYIP": 0.67, "DEM": 5.09, "YRP": 0.16, "ZP": 0.00, "BBP": 0.20, "TIP": 0.00, "OTH": 0.98 } },
+    { id: "TR32", displayName: "Isparta", mpCount: 4, ratios: { "CHP": 0.87, "AKP": 0.91, "MHP": 2.06, "IYIP": 1.69, "DEM": 0.08, "YRP": 0.64, "ZP": 0.86, "BBP": 0.54, "TIP": 0.18, "OTH": 0.98 } },
+    { id: "TR34", displayName: "İstanbul", mpCount: 98, ratios: { "CHP": 1.11, "AKP": 1.02, "MHP": 0.60, "IYIP": 0.84, "DEM": 0.92, "YRP": 1.18, "ZP": 1.25, "BBP": 0.81, "TIP": 2.35, "OTH": 0.95 } },
+    { id: "TR35", displayName: "İzmir", mpCount: 28, ratios: { "CHP": 1.63, "AKP": 0.70, "MHP": 0.51, "IYIP": 1.18, "DEM": 0.85, "YRP": 0.31, "ZP": 1.04, "BBP": 0.46, "TIP": 1.60, "OTH": 1.33 } },
+    { id: "TR46", displayName: "Kahramanmaraş", mpCount: 8, ratios: { "CHP": 0.63, "AKP": 1.35, "MHP": 1.62, "IYIP": 0.72, "DEM": 0.13, "YRP": 1.94, "ZP": 0.76, "BBP": 1.60, "TIP": 0.00, "OTH": 0.92 } },
+    { id: "TR78", displayName: "Karabük", mpCount: 3, ratios: { "CHP": 0.86, "AKP": 1.06, "MHP": 1.60, "IYIP": 1.00, "DEM": 0.04, "YRP": 2.95, "ZP": 0.93, "BBP": 0.43, "TIP": 0.19, "OTH": 1.33 } },
+    { id: "TR70", displayName: "Karaman", mpCount: 3, ratios: { "CHP": 0.75, "AKP": 1.16, "MHP": 1.82, "IYIP": 1.12, "DEM": 0.06, "YRP": 0.80, "ZP": 0.83, "BBP": 2.73, "TIP": 0.16, "OTH": 1.11 } },
+    { id: "TR36", displayName: "Kars", mpCount: 3, ratios: { "CHP": 0.64, "AKP": 0.71, "MHP": 0.96, "IYIP": 1.54, "DEM": 3.24, "YRP": 0.69, "ZP": 0.00, "BBP": 0.60, "TIP": 0.00, "OTH": 1.17 } },
+    { id: "TR37", displayName: "Kastamonu", mpCount: 3, ratios: { "CHP": 0.85, "AKP": 1.29, "MHP": 1.51, "IYIP": 0.78, "DEM": 0.02, "YRP": 1.44, "ZP": 0.78, "BBP": 0.92, "TIP": 0.00, "OTH": 1.27 } },
+    { id: "TR38", displayName: "Kayseri", mpCount: 10, ratios: { "CHP": 0.67, "AKP": 1.15, "MHP": 1.92, "IYIP": 1.03, "DEM": 0.09, "YRP": 1.24, "ZP": 1.44, "BBP": 1.94, "TIP": 0.22, "OTH": 0.71 } },
+    { id: "TR71", displayName: "Kırıkkale", mpCount: 3, ratios: { "CHP": 1.05, "AKP": 0.99, "MHP": 2.14, "IYIP": 1.04, "DEM": 0.03, "YRP": 0.64, "ZP": 0.68, "BBP": 0.66, "TIP": 0.00, "OTH": 0.66 } },
+    { id: "TR39", displayName: "Kırklareli", mpCount: 3, ratios: { "CHP": 1.81, "AKP": 0.70, "MHP": 0.46, "IYIP": 1.57, "DEM": 0.19, "YRP": 0.23, "ZP": 0.69, "BBP": 0.50, "TIP": 1.02, "OTH": 1.20 } },
+    { id: "TR40", displayName: "Kırşehir", mpCount: 2, ratios: { "CHP": 1.16, "AKP": 1.09, "MHP": 1.49, "IYIP": 0.74, "DEM": 0.28, "YRP": 0.56, "ZP": 0.86, "BBP": 1.01, "TIP": 0.23, "OTH": 0.97 } },
+    { id: "TR79", displayName: "Kilis", mpCount: 2, ratios: { "CHP": 0.79, "AKP": 1.11, "MHP": 2.71, "IYIP": 0.59, "DEM": 0.10, "YRP": 0.83, "ZP": 0.84, "BBP": 0.44, "TIP": 0.00, "OTH": 0.77 } },
+    { id: "TR41", displayName: "Kocaeli", mpCount: 14, ratios: { "CHP": 0.94, "AKP": 1.12, "MHP": 0.83, "IYIP": 0.98, "DEM": 0.64, "YRP": 2.06, "ZP": 1.40, "BBP": 1.14, "TIP": 0.00, "OTH": 1.17 } },
+    { id: "TR42", displayName: "Konya", mpCount: 15, ratios: { "CHP": 0.53, "AKP": 1.36, "MHP": 1.44, "IYIP": 0.89, "DEM": 0.29, "YRP": 1.82, "ZP": 1.32, "BBP": 2.07, "TIP": 0.19, "OTH": 0.85 } },
+    { id: "TR43", displayName: "Kütahya", mpCount: 5, ratios: { "CHP": 0.65, "AKP": 1.32, "MHP": 1.31, "IYIP": 1.08, "DEM": 0.03, "YRP": 2.53, "ZP": 0.76, "BBP": 1.20, "TIP": 0.15, "OTH": 1.00 } },
+    { id: "TR44", displayName: "Malatya", mpCount: 6, ratios: { "CHP": 0.85, "AKP": 1.28, "MHP": 1.29, "IYIP": 0.40, "DEM": 0.34, "YRP": 3.31, "ZP": 0.50, "BBP": 1.37, "TIP": 0.00, "OTH": 0.56 } },
+    { id: "TR45", displayName: "Manisa", mpCount: 10, ratios: { "CHP": 1.16, "AKP": 0.88, "MHP": 1.41, "IYIP": 1.14, "DEM": 0.64, "YRP": 0.54, "ZP": 0.99, "BBP": 1.35, "TIP": 0.00, "OTH": 1.16 } },
+    { id: "TR47", displayName: "Mardin", mpCount: 6, ratios: { "CHP": 0.26, "AKP": 0.70, "MHP": 0.32, "IYIP": 0.11, "DEM": 6.39, "YRP": 0.39, "ZP": 0.21, "BBP": 0.15, "TIP": 0.00, "OTH": 0.66 } },
+    { id: "TR33", displayName: "Mersin", mpCount: 13, ratios: { "CHP": 1.22, "AKP": 0.69, "MHP": 1.19, "IYIP": 1.22, "DEM": 1.52, "YRP": 0.31, "ZP": 0.81, "BBP": 0.45, "TIP": 1.16, "OTH": 0.83 } },
+    { id: "TR48", displayName: "Muğla", mpCount: 7, ratios: { "CHP": 1.49, "AKP": 0.68, "MHP": 0.61, "IYIP": 1.76, "DEM": 0.38, "YRP": 0.21, "ZP": 0.74, "BBP": 0.28, "TIP": 3.33, "OTH": 1.29 } },
+    { id: "TR49", displayName: "Muş", mpCount: 3, ratios: { "CHP": 0.28, "AKP": 0.58, "MHP": 0.95, "IYIP": 0.57, "DEM": 5.87, "YRP": 1.00, "ZP": 0.00, "BBP": 0.36, "TIP": 0.00, "OTH": 1.07 } },
+    { id: "TR50", displayName: "Nevşehir", mpCount: 3, ratios: { "CHP": 0.68, "AKP": 1.11, "MHP": 2.05, "IYIP": 1.63, "DEM": 0.05, "YRP": 0.71, "ZP": 0.57, "BBP": 0.91, "TIP": 0.22, "OTH": 0.70 } },
+    { id: "TR51", displayName: "Niğde", mpCount: 3, ratios: { "CHP": 0.95, "AKP": 0.95, "MHP": 2.26, "IYIP": 1.26, "DEM": 0.05, "YRP": 0.93, "ZP": 0.65, "BBP": 0.56, "TIP": 0.12, "OTH": 0.77 } },
+    { id: "TR52", displayName: "Ordu", mpCount: 6, ratios: { "CHP": 0.95, "AKP": 1.28, "MHP": 1.27, "IYIP": 1.01, "DEM": 0.02, "YRP": 0.81, "ZP": 0.62, "BBP": 0.83, "TIP": 0.20, "OTH": 1.14 } },
+    { id: "TR80", displayName: "Osmaniye", mpCount: 4, ratios: { "CHP": 0.67, "AKP": 0.92, "MHP": 2.88, "IYIP": 1.30, "DEM": 0.23, "YRP": 0.69, "ZP": 0.76, "BBP": 0.57, "TIP": 0.16, "OTH": 0.64 } },
+    { id: "TR53", displayName: "Rize", mpCount: 3, ratios: { "CHP": 0.61, "AKP": 1.53, "MHP": 1.30, "IYIP": 0.61, "DEM": 0.03, "YRP": 1.81, "ZP": 0.77, "BBP": 1.61, "TIP": 0.17, "OTH": 1.28 } },
+    { id: "TR54", displayName: "Sakarya", mpCount: 8, ratios: { "CHP": 0.63, "AKP": 1.34, "MHP": 1.20, "IYIP": 1.13, "DEM": 0.17, "YRP": 1.78, "ZP": 1.18, "BBP": 0.93, "TIP": 0.30, "OTH": 1.13 } },
+    { id: "TR55", displayName: "Samsun", mpCount: 9, ratios: { "CHP": 0.77, "AKP": 1.20, "MHP": 1.43, "IYIP": 1.24, "DEM": 0.03, "YRP": 1.42, "ZP": 0.97, "BBP": 1.40, "TIP": 0.36, "OTH": 1.06 } },
+    { id: "TR56", displayName: "Siirt", mpCount: 3, ratios: { "CHP": 0.28, "AKP": 1.01, "MHP": 0.36, "IYIP": 0.14, "DEM": 5.45, "YRP": 0.41, "ZP": 0.00, "BBP": 0.28, "TIP": 0.00, "OTH": 0.86 } },
+    { id: "TR57", displayName: "Sinop", mpCount: 2, ratios: { "CHP": 1.01, "AKP": 1.20, "MHP": 0.90, "IYIP": 0.97, "DEM": 0.04, "YRP": 0.79, "ZP": 0.66, "BBP": 4.56, "TIP": 0.44, "OTH": 1.53 } },
+    { id: "TR58", displayName: "Sivas", mpCount: 5, ratios: { "CHP": 0.63, "AKP": 1.14, "MHP": 1.82, "IYIP": 0.75, "DEM": 0.05, "YRP": 1.22, "ZP": 0.80, "BBP": 10.37, "TIP": 0.22, "OTH": 0.52 } },
+    { id: "TR63", displayName: "Şanlıurfa", mpCount: 14, ratios: { "CHP": 0.30, "AKP": 1.22, "MHP": 0.93, "IYIP": 0.47, "DEM": 2.88, "YRP": 1.04, "ZP": 0.00, "BBP": 0.44, "TIP": 0.00, "OTH": 0.65 } },
+    { id: "TR73", displayName: "Şırnak", mpCount: 4, ratios: { "CHP": 0.32, "AKP": 0.59, "MHP": 0.22, "IYIP": 0.11, "DEM": 7.34, "YRP": 0.20, "ZP": 0.50, "BBP": 0.14, "TIP": 0.00, "OTH": 0.72 } },
+    { id: "TR59", displayName: "Tekirdağ", mpCount: 8, ratios: { "CHP": 1.44, "AKP": 0.86, "MHP": 0.63, "IYIP": 1.15, "DEM": 0.69, "YRP": 0.56, "ZP": 1.02, "BBP": 0.54, "TIP": 0.91, "OTH": 1.23 } },
+    { id: "TR60", displayName: "Tokat", mpCount: 5, ratios: { "CHP": 0.81, "AKP": 1.05, "MHP": 2.23, "IYIP": 1.14, "DEM": 0.03, "YRP": 0.82, "ZP": 0.62, "BBP": 2.90, "TIP": 0.18, "OTH": 0.56 } },
+    { id: "TR61", displayName: "Trabzon", mpCount: 6, ratios: { "CHP": 0.70, "AKP": 1.36, "MHP": 1.08, "IYIP": 1.25, "DEM": 0.03, "YRP": 1.61, "ZP": 0.82, "BBP": 1.57, "TIP": 0.15, "OTH": 0.80 } },
+    { id: "TR62", displayName: "Tunceli", mpCount: 1, ratios: { "CHP": 1.28, "AKP": 0.35, "MHP": 0.54, "IYIP": 0.22, "DEM": 5.00, "YRP": 0.34, "ZP": 0.00, "BBP": 0.30, "TIP": 0.00, "OTH": 1.27 } },
+    { id: "TR64", displayName: "Uşak", mpCount: 3, ratios: { "CHP": 1.15, "AKP": 1.01, "MHP": 0.93, "IYIP": 1.81, "DEM": 0.15, "YRP": 0.50, "ZP": 0.72, "BBP": 0.66, "TIP": 0.20, "OTH": 1.10 } },
+    { id: "TR65", displayName: "Van", mpCount: 8, ratios: { "CHP": 0.25, "AKP": 0.72, "MHP": 0.48, "IYIP": 0.20, "DEM": 6.18, "YRP": 1.11, "ZP": 0.34, "BBP": 0.85, "TIP": 0.00, "OTH": 0.84 } },
+    { id: "TR77", displayName: "Yalova", mpCount: 3, ratios: { "CHP": 1.14, "AKP": 0.96, "MHP": 1.13, "IYIP": 0.98, "DEM": 0.64, "YRP": 0.75, "ZP": 1.02, "BBP": 0.65, "TIP": 0.59, "OTH": 1.94 } },
+    { id: "TR66", displayName: "Yozgat", mpCount: 4, ratios: { "CHP": 0.56, "AKP": 1.23, "MHP": 2.33, "IYIP": 0.96, "DEM": 0.04, "YRP": 1.55, "ZP": 0.58, "BBP": 1.67, "TIP": 0.11, "OTH": 0.75 } },
+    { id: "TR67", displayName: "Zonguldak", mpCount: 5, ratios: { "CHP": 1.27, "AKP": 1.13, "MHP": 0.83, "IYIP": 1.03, "DEM": 0.04, "YRP": 0.89, "ZP": 0.80, "BBP": 0.87, "TIP": 0.26, "OTH": 1.43 } }
 ];
-  
-// Global parties array and party colors.
-let parties = ["CHP","AKP","MHP","İYİP","DEM","YRP","ZP","BBP","TİP","OTH"];
-let partyColors = {
-  "CHP": "#FF0000",    // red
-  "AKP": "#FFFF00",    // yellow
-  "MHP": "#0000FF",    // blue
-  "İYİP": "#40E0D0",   // turquoise
-  "DEM": "#800080",    // purple
-  "YRP": "#008000",    // green
-  "ZP": "#000000",     // black
-  "BBP": "#FFC0CB",    // pink
-  "TİP": "#8B0000",    // dark red
-  "OTH": "#808080"     // gray
-};
-  
-// Candidate Colors for presidential modes (initial order)
-const candidateColorsArray = [
-  "#FF0000", // Candidate 1: red
-  "#FFFF00", // Candidate 2: yellow
-  "#008000", // Candidate 3: green
-  "#000000", // Candidate 4: black
-  "#800080", // Candidate 5: purple
-  "#FFFFFF", // Candidate 6: white
-  "#808080"  // Candidate 7: gray
-];
-  
-// Global election mode. Options: "parliamentary", "pres1", "pres2"
-let electionMode = "parliamentary";
-  
-let isSecondRound = false;
-let topTwoCandidates = [];
-let normalizedNational = {};
-let provinceResults = [];
-let overallHTML = "";
-let overallPresHTML = "";
-let candidateResults = [];
-let firstRoundSandigaValues = [];
-let secondRoundCandidateResults = null; // Will store 2nd round candidate results
-  
-// Global mapping from candidate name to fixed color.
-let candidateColorMapping = {};
-  
-/***********************************************
- * HELPER FUNCTIONS
- ***********************************************/
-function getFraction(val) {
-  return (val > 1) ? Math.min(val, 100) / 100 : val;
-}
-  
-function effectiveFraction(candidateInput, sandigaInput) {
-  let cand = Math.min(candidateInput, 100);
-  return (cand / 100) * ((100 - sandigaInput) / 100);
-}
-  
-// Update SVG map colors based on the current election mode.
-function updateMapColors() {
-  if (electionMode === "parliamentary") {
-    provinceResults.forEach(result => {
-      const provId = result.province;
-      const localPercents = result.localPercentages;
-      const winnerParty = Object.keys(localPercents).reduce((a, b) => localPercents[a] > localPercents[b] ? a : b);
-      const voteShare = localPercents[winnerParty];
-      let opacity = 0.5 + 0.5 * (voteShare / 100);
-      const baseColor = partyColors[winnerParty] || "#ccc";
-      const color = adjustColor(baseColor, voteShare);
-      const provElement = document.getElementById(provId);
-      if (provElement) {
-        provElement.style.fill = color;
-        provElement.style.opacity = opacity;
-      }
-    });
-  } else if (electionMode === "pres1") {
-    if (candidateResults.length === 0) return;
-    provinces.forEach(prov => {
-      let total = candidateResults.reduce((sum, candidate) => sum + (candidate.presVotes[prov.id] || 0), 0);
-      let winnerIndex = -1;
-      let maxVotes = -1;
-      candidateResults.forEach((candidate, index) => {
-        let votes = candidate.presVotes[prov.id] || 0;
-        if (votes > maxVotes) { maxVotes = votes; winnerIndex = index; }
-      });
-      const voteShare = total > 0 ? (maxVotes / total * 100) : 0;
-      let opacity = 0.5 + 0.5 * (voteShare / 100);
-      const winnerCandidate = candidateResults[winnerIndex].candidate;
-      const baseColor = candidateColorMapping[winnerCandidate] || "#ccc";
-      const color = adjustColor(baseColor, voteShare);
-      const provElement = document.getElementById(prov.id);
-      if (provElement) {
-        provElement.style.fill = color;
-        provElement.style.opacity = opacity;
-      }
-    });
-  } else if (electionMode === "pres2") {
-    if (!secondRoundCandidateResults) return;
-    provinces.forEach(prov => {
-      let total = secondRoundCandidateResults.reduce((sum, candidate) => sum + (candidate.presVotes[prov.id] || 0), 0);
-      let winnerIndex = -1;
-      let maxVotes = -1;
-      secondRoundCandidateResults.forEach((candidate, index) => {
-        let votes = candidate.presVotes[prov.id] || 0;
-        if (votes > maxVotes) { maxVotes = votes; winnerIndex = index; }
-      });
-      const voteShare = total > 0 ? (maxVotes / total * 100) : 0;
-      let opacity = 0.5 + 0.5 * (voteShare / 100);
-      const winnerCandidate = secondRoundCandidateResults[winnerIndex].candidate;
-      const baseColor = candidateColorMapping[winnerCandidate] || "#ccc";
-      const color = adjustColor(baseColor, voteShare);
-      const provElement = document.getElementById(prov.id);
-      if (provElement) {
-        provElement.style.fill = color;
-        provElement.style.opacity = opacity;
-      }
-    });
-  }
-}
-  
-// Add tooltip functionality to each SVG province.
-function addTooltipListeners() {
-  provinces.forEach(prov => {
-    let path = document.getElementById(prov.id);
-    if (path) {
-      path.addEventListener("mouseover", function(event) {
-        let result = provinceResults.find(r => r.province === prov.id);
-        let content = "<strong>" + prov.displayName + "</strong><br>";
-        if (result) {
-          content += "<u>Parliamentary:</u><br>";
-          for (let party in result.localPercentages) {
-            content += party + ": " + result.localPercentages[party].toFixed(2) + "%, MPs: " + result.seatsAllocated[party] + "<br>";
-          }
-          if (candidateResults && candidateResults.length > 0) {
-            let totalVotes = candidateResults.reduce((sum, cand) => sum + (cand.presVotes[prov.id] || 0), 0);
-            content += "<u>Presidential (1st Round):</u><br>";
-            candidateResults.forEach(candidate => {
-              let vote = candidate.presVotes[prov.id] || 0;
-              let perc = totalVotes > 0 ? (vote / totalVotes * 100).toFixed(2) : "0.00";
-              content += candidate.candidate + ": " + perc + "%<br>";
-            });
-          }
-          if (secondRoundCandidateResults) {
-            let totalVotes2 = secondRoundCandidateResults.reduce((sum, cand) => sum + (cand.presVotes[prov.id] || 0), 0);
-            content += "<u>Presidential (2nd Round):</u><br>";
-            secondRoundCandidateResults.forEach(candidate => {
-              let vote = candidate.presVotes[prov.id] || 0;
-              let perc = totalVotes2 > 0 ? (vote / totalVotes2 * 100).toFixed(2) : "0.00";
-              content += candidate.candidate + ": " + perc + "%<br>";
-            });
-          }
-        } else {
-          content += "No data available.";
-        }
-        tooltip.innerHTML = content;
-        tooltip.style.display = "block";
-      });
-      path.addEventListener("mousemove", function(event) {
-        tooltip.style.left = (event.pageX + 10) + "px";
-        tooltip.style.top = (event.pageY + 10) + "px";
-      });
-      path.addEventListener("mouseout", function() {
-        tooltip.style.display = "none";
-      });
-    }
-  });
-}
-  
-/***********************************************
- * INITIALIZATION
- ***********************************************/
-let tooltip;
-window.onload = function() {
-  tooltip = document.getElementById("tooltip");
-  
-  // Build Parliamentary Table
-  const swingTbody = document.querySelector("form#swingometerForm tbody");
-  swingTbody.innerHTML = "";
-  parties.forEach(party => {
-    const row = document.createElement("tr");
-    const cellParty = document.createElement("td");
-    cellParty.textContent = party;
-    row.appendChild(cellParty);
-    const cellInput = document.createElement("td");
-    const input = document.createElement("input");
-    input.type = "number";
-    input.id = "input_" + party;
-    input.value = "0";
-    input.step = "any";
-    cellInput.appendChild(input);
-    row.appendChild(cellInput);
-    const cellCheckbox = document.createElement("td");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.id = "qualify_" + party;
-    if (party === "OTH") { checkbox.disabled = true; checkbox.checked = false; }
-    cellCheckbox.appendChild(checkbox);
-    row.appendChild(cellCheckbox);
-    swingTbody.appendChild(row);
-  });
-  
-  // Build First Round Presidential Table Header
-  const presHeader = document.getElementById("presidentialTableHeader");
-  presHeader.innerHTML = "";
-  let th = document.createElement("th");
-  th.textContent = "Candidate";
-  presHeader.appendChild(th);
-  parties.forEach(party => {
-    let th = document.createElement("th");
-    th.textContent = party;
-    presHeader.appendChild(th);
-  });
-  
-  // Populate default candidates
-  const presTbody = document.querySelector("#presidentialTable tbody");
-  presTbody.innerHTML = "";
-  const defaultCandidates = ["Imamoğlu", "Erdoğan", "Erbakan", "İYİ/ZP", "DEM"];
-  defaultCandidates.forEach(candidateName => {
-    let row = document.createElement("tr");
-    let cell = document.createElement("td");
-    let input = document.createElement("input");
-    input.type = "text";
-    input.value = candidateName;
-    cell.appendChild(input);
-    row.appendChild(cell);
-    parties.forEach(() => {
-      let cell = document.createElement("td");
-      let input = document.createElement("input");
-      input.type = "number";
-      input.value = "0";
-      input.step = "any";
-      cell.appendChild(input);
-      row.appendChild(cell);
-    });
-    presTbody.appendChild(row);
-  });
-  
-  // Add final row for "Sandığa Gitmeyen"
-  let sandigaRow = document.createElement("tr");
-  sandigaRow.id = "sandigaRow";
-  let labelCell = document.createElement("td");
-  labelCell.textContent = "Sandığa Gitmeyen";
-  sandigaRow.appendChild(labelCell);
-  parties.forEach(() => {
-    let cell = document.createElement("td");
-    let input = document.createElement("input");
-    input.type = "number";
-    input.value = "0";
-    input.step = "any";
-    cell.appendChild(input);
-    sandigaRow.appendChild(cell);
-  });
-  presTbody.appendChild(sandigaRow);
-  
-  // Hide second round section initially.
-  document.getElementById("secondRoundDiv").style.display = "none";
-  
-  // Add tooltip listeners to the SVG map.
-  addTooltipListeners();
-  
-  // Add change listeners to all input fields so any edits trigger recalculation.
-  document.querySelectorAll("input").forEach(input => {
-    input.addEventListener("change", calculateWrapper);
-  });
-};
-  
-/***********************************************
- * Create Second Round Table
- ***********************************************/
-function createSecondRoundTable(candidates) {
-  const srHeader = document.getElementById("secondRoundTableHeader");
-  srHeader.innerHTML = "";
-  let th = document.createElement("th");
-  th.textContent = "Candidate";
-  srHeader.appendChild(th);
-  parties.forEach(party => {
-    let th = document.createElement("th");
-    th.textContent = party;
-    srHeader.appendChild(th);
-  });
-  const srTbody = document.querySelector("#secondRoundTable tbody");
-  srTbody.innerHTML = "";
-  candidates.forEach(candidateName => {
-    let row = document.createElement("tr");
-    let cell = document.createElement("td");
-    let input = document.createElement("input");
-    input.type = "text";
-    input.value = candidateName;
-    cell.appendChild(input);
-    row.appendChild(cell);
-    parties.forEach(() => {
-      let cell = document.createElement("td");
-      let input = document.createElement("input");
-      input.type = "number";
-      input.value = "0";
-      input.step = "any";
-      cell.appendChild(input);
-      row.appendChild(cell);
-    });
-    srTbody.appendChild(row);
-  });
-  // Add final row for "Sandığa Gitmeyen"
-  let srSandigaRow = document.createElement("tr");
-  srSandigaRow.id = "srSandigaRow";
-  let srLabelCell = document.createElement("td");
-  srLabelCell.textContent = "Sandığa Gitmeyen";
-  srSandigaRow.appendChild(srLabelCell);
-  parties.forEach(() => {
-    let cell = document.createElement("td");
-    let input = document.createElement("input");
-    input.type = "number";
-    input.value = "0";
-    input.step = "any";
-    cell.appendChild(input);
-    srSandigaRow.appendChild(cell);
-  });
-  srTbody.appendChild(srSandigaRow);
-  
-  document.getElementById("secondRoundDiv").style.display = "block";
-}
-  
-/***********************************************
- * Build Province Combined Results Block (1st Round)
- ***********************************************/
-function buildProvinceCombinedResults(provResultsArr, candResultsArr, sandigaValues, roundLabel) {
-  roundLabel = roundLabel || "Presidential Results";
-  let provinceHTML = "";
-  provinces.forEach(prov => {
-    provinceHTML += `<div class="province-block"><h3>${prov.displayName} (MPs: ${prov.mpCount})</h3>`;
-    let provResult = provResultsArr.find(pr => pr.province === prov.id);
-    provinceHTML += "<table><thead><tr><th>Party</th><th>Local Vote %</th><th>MPs Allocated</th></tr></thead><tbody>";
-    parties.forEach(party => {
-      provinceHTML += `<tr><td>${party}</td><td>${provResult.localPercentages[party].toFixed(2)}%</td><td>${provResult.seatsAllocated[party]}</td></tr>`;
-    });
-    provinceHTML += "</tbody></table>";
-    provinceHTML += `<h4>${roundLabel} Presidential Results in ${prov.displayName}</h4>`;
-    provinceHTML += "<table><thead><tr><th>Candidate</th><th>Vote %</th></tr></thead><tbody>";
-    candResultsArr.forEach(candidate => {
-      let total = candResultsArr.reduce((sum, cand) => sum + (cand.presVotes[prov.id] || 0), 0);
-      let perc = total > 0 ? ((candidate.presVotes[prov.id] || 0) / total * 100) : 0;
-      provinceHTML += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
-    });
-    provinceHTML += "</tbody></table></div>";
-  });
-  return provinceHTML;
-}
-  
-/***********************************************
- * Build Combined Province Results Block (All Rounds)
- ***********************************************/
-function buildCombinedProvinceResults(provResultsArr, candResults1, candResults2, sandigaValues1, sandigaValues2) {
-  let html = "";
-  provinces.forEach(prov => {
-    html += `<div class="province-block"><h3>${prov.displayName} (MPs: ${prov.mpCount})</h3>`;
-    let provResult = provResultsArr.find(pr => pr.province === prov.id);
-    html += "<table><thead><tr><th>Party</th><th>Local Vote %</th><th>MPs Allocated</th></tr></thead><tbody>";
-    parties.forEach(party => {
-      html += `<tr><td>${party}</td><td>${provResult.localPercentages[party].toFixed(2)}%</td><td>${provResult.seatsAllocated[party]}</td></tr>`;
-    });
-    html += "</tbody></table>";
-    // 1st Round Results
-    html += `<h4>1st Round Presidential Results in ${prov.displayName}</h4>`;
-    html += "<table><thead><tr><th>Candidate</th><th>Vote %</th></tr></thead><tbody>";
-    let total1 = candResults1.reduce((sum, cand) => sum + (cand.presVotes[prov.id] || 0), 0);
-    candResults1.forEach(candidate => {
-      let vote = candidate.presVotes[prov.id] || 0;
-      let perc = total1 > 0 ? (vote / total1 * 100) : 0;
-      html += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
-    });
-    html += "</tbody></table>";
-    // 2nd Round Results (if available)
-    if (candResults2) {
-      html += `<h4>2nd Round Presidential Results in ${prov.displayName}</h4>`;
-      html += "<table><thead><tr><th>Candidate</th><th>Vote %</th></tr></thead><tbody>";
-      let total2 = candResults2.reduce((sum, cand) => sum + (cand.presVotes[prov.id] || 0), 0);
-      candResults2.forEach(candidate => {
-        let vote = candidate.presVotes[prov.id] || 0;
-        let perc = total2 > 0 ? (vote / total2 * 100) : 0;
-        html += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
-      });
-      html += "</tbody></table>";
-    }
-    html += "</div>";
-  });
-  return html;
-}
-  
-/***********************************************
- * First Round Calculation
- ***********************************************/
-function calculateSwingometer() {
-  let nationalInputs = {};
-  let totalInput = 0;
-  parties.forEach(party => {
-    let val = parseFloat(document.getElementById("input_" + party).value);
-    if (isNaN(val)) { val = 0; }
-    nationalInputs[party] = val;
-    totalInput += val;
-  });
-  if (totalInput === 0) { alert("Please enter some vote share values."); return; }
-  parties.forEach(party => { normalizedNational[party] = nationalInputs[party] / totalInput; });
-  let thresholdPercent = parseFloat(document.getElementById("threshold").value);
-  if (isNaN(thresholdPercent)) { thresholdPercent = 10; }
-  
-  let overallSeats = {};
-  parties.forEach(party => { overallSeats[party] = 0; });
-  
-  provinceResults = [];
-  provinces.forEach(prov => {
-    let computedVotes = {};
-    parties.forEach(party => { computedVotes[party] = normalizedNational[party] * prov.ratios[party]; });
-    let sumComputed = parties.reduce((sum, party) => sum + computedVotes[party], 0);
-    let localPercentages = {};
-    parties.forEach(party => { localPercentages[party] = sumComputed > 0 ? (computedVotes[party] / sumComputed) * 100 : 0; });
-    let computedVotesForSeats = {};
-    parties.forEach(party => {
-      if (party === "OTH") { computedVotesForSeats[party] = 0; }
-      else {
-        const qualifyCheckbox = document.getElementById("qualify_" + party);
-        const forceQualify = qualifyCheckbox ? qualifyCheckbox.checked : false;
-        computedVotesForSeats[party] = (forceQualify || (normalizedNational[party] * 100 >= thresholdPercent))
-          ? computedVotes[party] : 0;
-      }
-    });
-    let seatsAllocated = {};
-    parties.forEach(party => { seatsAllocated[party] = 0; });
-    for (let i = 0; i < prov.mpCount; i++) {
-      let maxQ = -1, winParty = null;
-      parties.forEach(party => {
-        let quotient = computedVotesForSeats[party] / (seatsAllocated[party] + 1);
-        if (quotient > maxQ) { maxQ = quotient; winParty = party; }
-      });
-      if (winParty) { seatsAllocated[winParty]++; }
-    }
-    parties.forEach(party => { overallSeats[party] += seatsAllocated[party]; });
-    provinceResults.push({
-      province: prov.id,
-      mpCount: prov.mpCount,
-      computedVotes: computedVotes,
-      localPercentages: localPercentages,
-      seatsAllocated: seatsAllocated
-    });
-  });
-  
-  let overallPercentages = {};
-  parties.forEach(party => { overallPercentages[party] = normalizedNational[party] * 100; });
-  overallHTML = "<h2>Overall National Parliamentary Results</h2><table><thead><tr><th>Party</th><th>National Vote %</th><th>MPs Allocated</th></tr></thead><tbody>";
-  parties.forEach(party => {
-    overallHTML += `<tr><td>${party}</td><td>${overallPercentages[party].toFixed(2)}%</td><td>${overallSeats[party]}</td></tr>`;
-  });
-  overallHTML += "</tbody></table>";
-  
-  const presTbody = document.querySelector("#presidentialTable tbody");
-  const candidateRows = Array.from(presTbody.getElementsByTagName("tr")).filter(row => row.id !== "sandigaRow");
-  candidateResults = [];
-  candidateRows.forEach(row => {
-    const cells = row.getElementsByTagName("td");
-    let name = cells[0].querySelector("input").value.trim();
-    if (!name) { name = "Candidate"; }
-    let supportArray = [];
-    for (let j = 1; j < cells.length; j++) {
-      let val = parseFloat(cells[j].querySelector("input").value);
-      if (isNaN(val)) { val = 0; }
-      supportArray.push(val);
-    }
-    candidateResults.push({ candidate: name, support: supportArray, totalVotes: 0, presVotes: {} });
-  });
-  
-  candidateColorMapping = {};
-  candidateResults.forEach((candidate, index) => {
-    candidateColorMapping[candidate.candidate] = candidateColorsArray[index] || "#ccc";
-  });
-  
-  let sandigaRowElem = document.getElementById("sandigaRow");
-  const sandigaCells = sandigaRowElem.getElementsByTagName("td");
-  let sandigaValues = [];
-  for (let j = 1; j < sandigaCells.length; j++) {
-    let val = parseFloat(sandigaCells[j].querySelector("input").value);
-    if (isNaN(val)) { val = 0; }
-    sandigaValues.push(val);
-  }
-  firstRoundSandigaValues = sandigaValues;
-  
-  candidateResults.forEach(candidate => { candidate.totalVotes = 0; });
-  for (let i = 0; i < parties.length; i++) {
-    candidateResults.forEach(candidate => {
-      let eff = effectiveFraction(candidate.support[i], sandigaValues[i]);
-      candidate.totalVotes += normalizedNational[parties[i]] * eff;
-    });
-  }
-  
-  let sumRatios = {};
-  parties.forEach(party => {
-    sumRatios[party] = provinces.reduce((sum, prov) => sum + prov.ratios[party], 0);
-  });
-  candidateResults.forEach(candidate => {
-    candidate.presVotes = {};
-    provinces.forEach(prov => {
-      candidate.presVotes[prov.id] = 0;
-    });
-  });
-  provinces.forEach(prov => {
-    parties.forEach((party, i) => {
-      let weight = (sumRatios[party] > 0) ? prov.ratios[party] / sumRatios[party] : 0;
-      candidateResults.forEach(candidate => {
-        let eff = effectiveFraction(candidate.support[i], sandigaValues[i]);
-        candidate.presVotes[prov.id] += normalizedNational[party] * weight * eff;
-      });
-    });
-  });
-  
-  let totalAll = candidateResults.reduce((sum, cand) => sum + cand.totalVotes, 0);
-  overallPresHTML = "<h2>Overall National Presidential Results (1st Round)</h2><table><thead><tr><th>Candidate</th><th>National Vote %</th></tr></thead><tbody>";
-  candidateResults.forEach(candidate => {
-    let perc = totalAll > 0 ? (candidate.totalVotes / totalAll * 100) : 0;
-    overallPresHTML += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
-  });
-  overallPresHTML += "</tbody></table>";
-  
-  let resultsDiv = document.getElementById("results");
-  let provinceHTML = buildProvinceCombinedResults(provinceResults, candidateResults, sandigaValues, "1st Round");
-  
-  if (totalAll > 0 && candidateResults.some(candidate => (candidate.totalVotes / totalAll * 100) > 50)) {
-    resultsDiv.innerHTML = overallHTML + overallPresHTML;
-    document.getElementById("secondRoundDiv").style.display = "none";
-  } else {
-    candidateResults.sort((a, b) => b.totalVotes - a.totalVotes);
-    topTwoCandidates = candidateResults.slice(0, 2).map(c => c.candidate);
-    resultsDiv.innerHTML = overallHTML + overallPresHTML +
-      "<h2>No candidate reached 50% in the first round.</h2>" +
-      "<p>Please enter second round party support values for the top two candidates below.</p>";
-    if (document.getElementById("secondRoundDiv").style.display === "none") {
-      createSecondRoundTable(topTwoCandidates);
-    }
-  }
-  
-  document.getElementById("provinceResults").innerHTML = buildCombinedProvinceResults(provinceResults, candidateResults, sandigaValues, "1st Round");
-  isSecondRound = !candidateResults.some(candidate => totalAll > 0 && (candidate.totalVotes / totalAll * 100) > 50);
-  updateMapColors();
-}
-  
-/***********************************************
- * Second Round Calculation
- ***********************************************/
-function calculateSecondRound() {
-  // FIX: Set the election mode to "pres2" so that updateMapColors() processes the second round data.
-  electionMode = "pres2";
-  
-  // Retrieve candidate rows from the second round table (excluding the "Sandığa Gitmeyen" row).
-  const srTbody = document.querySelector("#secondRoundTable tbody");
-  const candidateRows = Array.from(srTbody.getElementsByTagName("tr")).filter(row => row.id !== "srSandigaRow");
-  let srCandidateResults = [];
-  
-  candidateRows.forEach(row => {
-    const cells = row.getElementsByTagName("td");
-    let name = cells[0].querySelector("input").value.trim();
-    if (!name) { name = "Candidate"; }
-    let supportArray = [];
-    for (let j = 1; j < cells.length; j++) {
-      let val = parseFloat(cells[j].querySelector("input").value);
-      if (isNaN(val)) { val = 0; }
-      supportArray.push(val);
-    }
-    srCandidateResults.push({ candidate: name, support: supportArray, totalVotes: 0, presVotes: {} });
-  });
-  
-  // Retrieve "Sandığa Gitmeyen" (non-voter) values from the second round table.
-  let srSandigaRow = document.getElementById("srSandigaRow");
-  const srSandigaCells = srSandigaRow.getElementsByTagName("td");
-  let srSandigaValues = [];
-  for (let j = 1; j < srSandigaCells.length; j++) {
-    let val = parseFloat(srSandigaCells[j].querySelector("input").value);
-    if (isNaN(val)) { val = 0; }
-    srSandigaValues.push(val);
-  }
-  
-  // Calculate total votes for each candidate using the effectiveFraction function.
-  srCandidateResults.forEach(candidate => { candidate.totalVotes = 0; });
-  for (let i = 0; i < parties.length; i++) {
-    srCandidateResults.forEach(candidate => {
-      let eff = effectiveFraction(candidate.support[i], srSandigaValues[i]);
-      candidate.totalVotes += normalizedNational[parties[i]] * eff;
-    });
-  }
-  
-  // Distribute votes to provinces according to party ratios.
-  let sumRatios = {};
-  parties.forEach(party => {
-    sumRatios[party] = provinces.reduce((sum, prov) => sum + prov.ratios[party], 0);
-  });
-  
-  srCandidateResults.forEach(candidate => {
-    candidate.presVotes = {};
-    provinces.forEach(prov => {
-      candidate.presVotes[prov.id] = 0;
-    });
-  });
-  
-  provinces.forEach(prov => {
-    parties.forEach((party, i) => {
-      let weight = (sumRatios[party] > 0) ? prov.ratios[party] / sumRatios[party] : 0;
-      srCandidateResults.forEach(candidate => {
-        let eff = effectiveFraction(candidate.support[i], srSandigaValues[i]);
-        candidate.presVotes[prov.id] += normalizedNational[party] * weight * eff;
-      });
-    });
-  });
-  
-  // Build the overall second round results HTML.
-  let totalAllSR = srCandidateResults.reduce((sum, cand) => sum + cand.totalVotes, 0);
-  let overallSRPresHTML = "<h2>Overall Second Round Presidential Results</h2><table><thead><tr><th>Candidate</th><th>National Vote %</th></tr></thead><tbody>";
-  srCandidateResults.forEach(candidate => {
-    let perc = totalAllSR > 0 ? (candidate.totalVotes / totalAllSR * 100) : 0;
-    overallSRPresHTML += `<tr><td>${candidate.candidate}</td><td>${perc.toFixed(2)}%</td></tr>`;
-  });
-  overallSRPresHTML += "</tbody></table>";
-  
-  // Build combined province results HTML (incorporates both rounds) using the helper function.
-  let combinedProvinceHTML = buildCombinedProvinceResults(
-    provinceResults,  // first round province results
-    candidateResults, // first round candidate results
-    srCandidateResults, // second round candidate results
-    firstRoundSandigaValues,
-    srSandigaValues
-  );
-  
-  // Update the results display and save the second round candidate results.
-  let resultsDiv = document.getElementById("results");
-  resultsDiv.innerHTML = overallHTML + overallPresHTML + overallSRPresHTML;
-  document.getElementById("provinceResults").innerHTML = combinedProvinceHTML;
-  secondRoundCandidateResults = srCandidateResults;
-  
-  // Update the map colors so that the second round data is reflected.
-  updateMapColors();
-}
 
-document.querySelectorAll("#secondRoundTable input").forEach(input => {
-  input.addEventListener("change", calculateWrapper);
+// --- STATE ---
+let parties = ["CHP", "AKP", "MHP", "IYIP", "DEM", "YRP", "ZP", "BBP", "TIP", "OTH"];
+let partyColors = {
+    "CHP": "#E5252A", "AKP": "#FFC72C", "MHP": "#005B9A", "IYIP": "#40E0D0",
+    "DEM": "#800080", "YRP": "#008000", "ZP": "#000000", "BBP": "#FFC0CB",
+    "TIP": "#B22222", "OTH": "#808080"
+};
+const candidateColorsArray = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#C9CBCF"];
+
+let electionMode = "parliamentary";
+let candidateColorMapping = {};
+let provinceResultsStore = [];
+let presidentialResultsStore = {
+    round1: [],
+    round2: []
+};
+let normalizedNationalVotes = {};
+
+// --- DOM ELEMENTS ---
+const tooltip = document.getElementById("tooltip");
+const resultsDiv = document.getElementById("results");
+const parliamentaryInputsDiv = document.getElementById('parliamentary-inputs');
+const presidentialInputsDiv = document.getElementById('presidential-inputs');
+const secondRoundDiv = document.getElementById('secondRoundDiv');
+const secondRoundInputsDiv = document.getElementById('second-round-inputs');
+const mapSVGContainer = document.getElementById('turkeyMapSVG');
+
+// --- INITIALIZATION ---
+document.addEventListener("DOMContentLoaded", () => {
+    if (provinces.length === 0) {
+        // You must re-insert the province data array here for the app to work.
+        // For now, we'll just show an alert.
+        alert("Province data is missing. Please insert data into the script.");
+        return;
+    }
+    renderParliamentaryInputs();
+    renderPresidentialInputs();
+    addMapPathListeners();
 });
 
-
-
-function calculateWrapper() {
-  // Always recalc first round results
-  calculateSwingometer();
-  
-  // Check if the second round section is visible using getComputedStyle
-  if (window.getComputedStyle(document.getElementById("secondRoundDiv")).display !== "none") {
-    // Explicitly set election mode to "pres2" before calculating the second round
-    electionMode = "pres2";
-    calculateSecondRound();
-  }
-  
-  // Finally, update the map colors based on the current election mode
-  updateMapColors();
-}
-
-/***********************************************
- * Add Candidate Row (First Round)
- ***********************************************/
-function addCandidate() {
-  const presTbody = document.querySelector("#presidentialTable tbody");
-  const sandigaRow = document.getElementById("sandigaRow");
-  let newRow = document.createElement("tr");
-  let cell = document.createElement("td");
-  let input = document.createElement("input");
-  input.type = "text";
-  input.placeholder = "Candidate Name";
-  cell.appendChild(input);
-  newRow.appendChild(cell);
-  parties.forEach(() => {
-    let cell = document.createElement("td");
-    let input = document.createElement("input");
-    input.type = "number";
-    input.value = "0";
-    input.step = "any";
-    cell.appendChild(input);
-    newRow.appendChild(cell);
-  });
-  presTbody.insertBefore(newRow, document.getElementById("sandigaRow"));
-}
-  
-  
-  
-  
-  
-/***********************************************
- * Switch Election Mode (Map Button Handler)
- ***********************************************/
-function switchElectionMode(mode) {
-  electionMode = mode;
-  updateMapColors();
-}
-  
-/***********************************************
- * CREATE PARTY FUNCTIONALITY
- ***********************************************/
-// Opens the modal popup for creating a new party.
-function openCreatePartyModal() {
-  let container = document.getElementById("baseShareContainer");
-  container.innerHTML = "";
-  parties.forEach(function(party) {
-    container.innerHTML += `
-      <div style="margin-bottom:5px;">
-        <label for="baseShare_${party}">${party}:</label>
-        <input type="number" id="baseShare_${party}" value="0" step="any" style="width:60px;">
-      </div>
-    `;
-  });
-  document.getElementById("createPartyModal").style.display = "block";
-}
-  
-// Handles submission of the new party.
-function submitNewParty() {
-  let partyName = document.getElementById("newPartyName").value.trim();
-  let partyColor = document.getElementById("newPartyColor").value;
-  if (!partyName) {
-    alert("Please enter a party name.");
-    return;
-  }
-  let baseShares = {};
-  parties.forEach(function(existingParty) {
-    let inputElem = document.getElementById("baseShare_" + existingParty);
-    baseShares[existingParty] = parseFloat(inputElem.value) || 0;
-  });
-  
-  provinces.forEach(function(prov) {
-    let newRatio = 0;
-    parties.forEach(function(existingParty) {
-      newRatio += (baseShares[existingParty] / 100) * (prov.ratios[existingParty] || 0);
+// --- RENDER FUNCTIONS ---
+function renderParliamentaryInputs() {
+    let html = `<table class="w-full text-sm text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+                <th scope="col" class="px-4 py-3">Parti</th>
+                <th scope="col" class="px-4 py-3">Oy %</th>
+                <th scope="col" class="px-4 py-3" title="Barajdan bağımsız olarak doğrudan nitelendirme sağlar.">İttifak?</th>
+            </tr>
+        </thead>
+        <tbody>`;
+    parties.forEach(party => {
+        html += `<tr class="border-b"><td class="px-4 py-2 font-semibold" style="color:${partyColors[party]}">${party}</td><td class="px-4 py-3"><input type="number" id="input_${party}" value="0" step="any" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"></td><td class="px-4 py-3 text-center"><input type="checkbox" id="qualify_${party}" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" ${party === 'OTH' ? 'disabled' : ''}></td></tr>`;
     });
-    prov.ratios[partyName] = newRatio;
-  });
-  
-  parties.push(partyName);
-  partyColors[partyName] = partyColor;
-  
-  let swingTbody = document.querySelector("form#swingometerForm tbody");
-  let newRow = document.createElement("tr");
-  let cellParty = document.createElement("td");
-  cellParty.textContent = partyName;
-  newRow.appendChild(cellParty);
-  let cellInput = document.createElement("td");
-  let inputElem = document.createElement("input");
-  inputElem.type = "number";
-  inputElem.id = "input_" + partyName;
-  inputElem.value = "0";
-  inputElem.step = "any";
-  cellInput.appendChild(inputElem);
-  newRow.appendChild(cellInput);
-  let cellCheckbox = document.createElement("td");
-  let checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.id = "qualify_" + partyName;
-  cellCheckbox.appendChild(checkbox);
-  newRow.appendChild(cellCheckbox);
-  swingTbody.appendChild(newRow);
-  
-  document.getElementById("createPartyModal").style.display = "none";
-  
-  calculateWrapper();
+    html += `</tbody></table>`;
+    parliamentaryInputsDiv.innerHTML = html;
 }
 
+function renderPresidentialInputs(defaultCandidates = ["Aday 1", "Aday 2"]) {
+    let table = document.createElement('table');
+    table.className = "w-full text-sm text-left text-gray-500";
+    table.id = "presidentialTable";
 
+    let thead = table.createTHead();
+    thead.className = "text-xs text-gray-700 uppercase bg-gray-50";
+    let headerRow = thead.insertRow();
+    headerRow.innerHTML = `<th scope="col" class="px-2 py-3">Aday</th>` + parties.map(p => `<th scope="col" class="px-2 py-3" style="min-width: 55px;">${p}</th>`).join('');
 
-function reloadMap() {
-  // Simply reapply the current map coloring.
-  updateMapColors();
+    let tbody = table.createTBody();
+    defaultCandidates.forEach(name => addCandidateRow(tbody, name));
+    
+    let sandigaRow = tbody.insertRow();
+    sandigaRow.id = "sandigaRow";
+    sandigaRow.innerHTML = `<th scope="row" class="px-2 py-3 font-medium text-gray-900 whitespace-nowrap">Sandığa Gitmeyen</th>` +
+        parties.map(() => `<td class="px-2 py-3"><input type="number" value="0" step="any" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center"></td>`).join('');
+
+    presidentialInputsDiv.innerHTML = '';
+    presidentialInputsDiv.appendChild(table);
 }
 
-/***********************************************
- * 2nd Round Calculate Button Handler
- ***********************************************/
-function calculateSecondRoundOnly() {
-  // Set the election mode explicitly for the second round.
-  electionMode = "pres2";
-  
-  // Calculate the second round results using the existing function.
-  calculateSecondRound();
-  
-  // Update the map to reflect the second round vote distributions.
-  updateMapColors();
+function renderSecondRoundInputs(candidates) {
+    let table = document.createElement('table');
+    table.className = "w-full text-sm text-left text-gray-500";
+    table.id = "secondRoundTable";
+
+    let thead = table.createTHead();
+    thead.className = "text-xs text-gray-700 uppercase bg-gray-50";
+    let headerRow = thead.insertRow();
+    headerRow.innerHTML = `<th scope="col" class="px-2 py-3">Aday</th>` + parties.map(p => `<th scope="col" class="px-2 py-3" style="min-width: 55px;">${p}</th>`).join('');
+    
+    let tbody = table.createTBody();
+    candidates.forEach(name => {
+        let row = tbody.insertRow();
+        row.innerHTML = `<th scope="row" class="px-2 py-3 font-medium text-gray-900 whitespace-nowrap"><input type="text" value="${name}" class="w-full bg-gray-50 border-none text-sm rounded-lg p-2" readonly></th>` +
+            parties.map(() => `<td class="px-2 py-3"><input type="number" value="0" step="any" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center"></td>`).join('');
+    });
+    
+    let sandigaRow = tbody.insertRow();
+    sandigaRow.id = "srSandigaRow";
+    sandigaRow.innerHTML = `<th scope="row" class="px-2 py-3 font-medium text-gray-900 whitespace-nowrap">Sandığa Gitmeyen</th>` +
+        parties.map(() => `<td class="px-2 py-3"><input type="number" value="0" step="any" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center"></td>`).join('');
+
+    secondRoundInputsDiv.innerHTML = '';
+    secondRoundInputsDiv.appendChild(table);
+    secondRoundDiv.classList.remove('hidden');
 }
 
+// --- SVG & MAP ---
+function addMapPathListeners() {
+    provinces.forEach(prov => {
+        const path = mapSVGContainer.querySelector(`[id="${prov.id}"]`);
+        if (path) {
+            path.classList.add('transition-all', 'duration-300', 'cursor-pointer');
+            path.setAttribute('stroke', '#fff');
+            path.setAttribute('stroke-width', '0.5');
+            path.addEventListener("mouseover", (e) => handleMouseOver(e, prov));
+            path.addEventListener("mousemove", handleMouseMove);
+            path.addEventListener("mouseout", handleMouseOut);
+        }
+    });
+}
 
+function updateMapColors() {
+    mapSVGContainer.querySelectorAll('path').forEach(p => {
+        p.style.fill = '#D1D5DB';
+        p.style.opacity = 1;
+    });
+
+    if (electionMode === "parliamentary" && provinceResultsStore.length > 0) {
+        provinceResultsStore.forEach(result => {
+            const winner = Object.entries(result.localPercentages).reduce((a, b) => a[1] > b[1] ? a : b);
+            const color = adjustColor(partyColors[winner[0]] || '#ccc', winner[1]);
+            const path = document.getElementById(result.province);
+            if (path) {
+                path.style.fill = color;
+                path.style.opacity = 0.5 + 0.5 * (winner[1] / 100);
+            }
+        });
+    } else if (electionMode.startsWith("pres")) {
+        const results = (electionMode === 'pres1') ? presidentialResultsStore.round1 : presidentialResultsStore.round2;
+        if (!results || results.length === 0) return;
+
+        provinces.forEach(prov => {
+            let winner = { name: '', votes: -1 };
+            let totalVotes = 0;
+            results.forEach(cand => {
+                const provVotes = cand.presVotes[prov.id] || 0;
+                totalVotes += provVotes;
+                if (provVotes > winner.votes) {
+                    winner = { name: cand.candidate, votes: provVotes };
+                }
+            });
+            if (winner.name) {
+                const voteShare = totalVotes > 0 ? (winner.votes / totalVotes * 100) : 0;
+                const color = adjustColor(candidateColorMapping[winner.name] || '#ccc', voteShare);
+                const path = document.getElementById(prov.id);
+                if (path) {
+                    path.style.fill = color;
+                    path.style.opacity = 0.5 + 0.5 * (voteShare / 100);
+                }
+            }
+        });
+    }
+}
+
+// --- TOOLTIP ---
+function handleMouseOver(event, prov) {
+    let content = `<strong class="text-lg font-bold block mb-2">${prov.displayName}</strong>`;
+    const provResult = provinceResultsStore.find(r => r.province === prov.id);
+
+    if (provResult) {
+        content += `<div class="mb-2"><strong class="text-blue-400">Milletvekili Sonuçları</strong><br>`;
+        Object.entries(provResult.seatsAllocated).filter(([, seats]) => seats > 0).sort((a, b) => b[1] - a[1]).forEach(([party, seats]) => {
+            content += `${party}: ${seats} MV (${provResult.localPercentages[party].toFixed(1)}%)<br>`;
+        });
+        content += `</div>`;
+    }
+
+    if (presidentialResultsStore.round1.length > 0) {
+        content += `<div class="mb-2"><strong class="text-green-400">CB 1. Tur</strong><br>`;
+        const totalVotes = presidentialResultsStore.round1.reduce((s, c) => s + (c.presVotes[prov.id] || 0), 0);
+        presidentialResultsStore.round1.sort((a,b) => (b.presVotes[prov.id]||0) - (a.presVotes[prov.id]||0)).forEach(cand => {
+            const voteShare = totalVotes > 0 ? ((cand.presVotes[prov.id] || 0) / totalVotes * 100) : 0;
+            if (voteShare > 0.1) content += `${cand.candidate}: ${voteShare.toFixed(1)}%<br>`;
+        });
+        content += `</div>`;
+    }
+    
+    if (presidentialResultsStore.round2.length > 0) {
+        content += `<div><strong class="text-yellow-400">CB 2. Tur</strong><br>`;
+        const totalVotes = presidentialResultsStore.round2.reduce((s, c) => s + (c.presVotes[prov.id] || 0), 0);
+        presidentialResultsStore.round2.sort((a,b) => (b.presVotes[prov.id]||0) - (a.presVotes[prov.id]||0)).forEach(cand => {
+            const voteShare = totalVotes > 0 ? ((cand.presVotes[prov.id] || 0) / totalVotes * 100) : 0;
+             if (voteShare > 0.1) content += `${cand.candidate}: ${voteShare.toFixed(1)}%<br>`;
+        });
+        content += `</div>`;
+    }
+
+    tooltip.innerHTML = content;
+    tooltip.style.display = "block";
+}
+
+function handleMouseMove(event) {
+    tooltip.style.left = (event.pageX + 15) + 'px';
+    tooltip.style.top = (event.pageY + 15) + 'px';
+}
+
+function handleMouseOut() {
+    tooltip.style.display = "none";
+}
+
+// --- CALCULATIONS ---
+function calculateWrapper() {
+    let nationalInputs = {};
+    let totalInput = 0;
+    parties.forEach(party => {
+        const val = parseFloat(document.getElementById(`input_${party}`).value) || 0;
+        nationalInputs[party] = val;
+        totalInput += val;
+    });
+
+    if (totalInput === 0) {
+        resultsDiv.innerHTML = `<div class="text-center p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg">Lütfen parti oy oranlarını girin.</div>`;
+        return;
+    }
+
+    normalizedNationalVotes = {};
+    parties.forEach(party => {
+        normalizedNationalVotes[party] = (nationalInputs[party] / totalInput);
+    });
+
+    calculateParliamentary();
+    const { candidates, isRunoff } = calculatePresidential(1);
+    presidentialResultsStore.round1 = candidates;
+
+    presidentialResultsStore.round2 = [];
+    if (isRunoff) {
+        if (secondRoundDiv.classList.contains('hidden')) {
+            const topTwo = candidates.sort((a, b) => b.totalVotes - a.totalVotes).slice(0, 2).map(c => c.candidate);
+            renderSecondRoundInputs(topTwo);
+        }
+        const { candidates: runoffCandidates } = calculatePresidential(2);
+        presidentialResultsStore.round2 = runoffCandidates;
+    } else {
+        secondRoundDiv.classList.add('hidden');
+    }
+
+    renderAllResults();
+    updateMapColors();
+}
+
+function calculateParliamentary() {
+    const thresholdPercent = 7;
+    let overallSeats = Object.fromEntries(parties.map(p => [p, 0]));
+    provinceResultsStore = [];
+
+    provinces.forEach(prov => {
+        let computedVotes = {};
+        parties.forEach(party => {
+            computedVotes[party] = (normalizedNationalVotes[party] || 0) * (prov.ratios[party] || 0);
+        });
+
+        const sumComputed = Object.values(computedVotes).reduce((a, b) => a + b, 0);
+        let localPercentages = {};
+        parties.forEach(party => {
+            localPercentages[party] = sumComputed > 0 ? (computedVotes[party] / sumComputed) * 100 : 0;
+        });
+
+        let seatsAllocated = Object.fromEntries(parties.map(p => [p, 0]));
+        for (let i = 0; i < prov.mpCount; i++) {
+            let maxQuotient = -1, winnerParty = null;
+            parties.forEach(party => {
+                const isQualified = document.getElementById(`qualify_${party}`).checked || (normalizedNationalVotes[party] * 100 >= thresholdPercent);
+                if (party !== 'OTH' && isQualified) {
+                    const quotient = computedVotes[party] / (seatsAllocated[party] + 1);
+                    if (quotient > maxQuotient) {
+                        maxQuotient = quotient;
+                        winnerParty = party;
+                    }
+                }
+            });
+            if (winnerParty) {
+                seatsAllocated[winnerParty]++;
+            }
+        }
+        
+        parties.forEach(party => { overallSeats[party] += seatsAllocated[party]; });
+        provinceResultsStore.push({
+            province: prov.id,
+            localPercentages,
+            seatsAllocated
+        });
+    });
+}
+
+function calculatePresidential(round) {
+    const tableId = round === 1 ? 'presidentialTable' : 'secondRoundTable';
+    const sandigaRowId = round === 1 ? 'sandigaRow' : 'srSandigaRow';
+    const table = document.getElementById(tableId);
+    if (!table) return { candidates: [], isRunoff: false };
+
+    const candidateRows = Array.from(table.tBodies[0].rows).filter(row => row.id !== sandigaRowId);
+    let candidates = candidateRows.map(row => {
+        const cells = row.cells;
+        const name = cells[0].querySelector('input').value.trim() || `Aday ${row.rowIndex}`;
+        const support = Array.from(cells).slice(1).map(cell => parseFloat(cell.querySelector('input').value) || 0);
+        return { candidate: name, support: Object.fromEntries(parties.map((p, i) => [p, support[i]])), totalVotes: 0, presVotes: {} };
+    });
+
+    const sandigaRow = document.getElementById(sandigaRowId);
+    const sandigaValues = Array.from(sandigaRow.cells).slice(1).map(cell => parseFloat(cell.querySelector('input').value) || 0);
+    const sandigaSupport = Object.fromEntries(parties.map((p, i) => [p, sandigaValues[i]]));
+
+    candidates.forEach((cand, i) => {
+        if (!candidateColorMapping[cand.candidate]) {
+            candidateColorMapping[cand.candidate] = candidateColorsArray[i % candidateColorsArray.length];
+        }
+    });
+
+    candidates.forEach(cand => {
+        cand.totalVotes = 0;
+        parties.forEach(party => {
+            const effectiveVote = (cand.support[party] / 100) * ((100 - sandigaSupport[party]) / 100);
+            cand.totalVotes += (normalizedNationalVotes[party] || 0) * effectiveVote;
+        });
+    });
+
+    const sumRatios = Object.fromEntries(parties.map(p => [p, provinces.reduce((sum, prov) => sum + (prov.ratios[p] || 0), 0)]));
+    candidates.forEach(cand => {
+        cand.presVotes = Object.fromEntries(provinces.map(p => [p.id, 0]));
+        provinces.forEach(prov => {
+            parties.forEach(party => {
+                const weight = sumRatios[party] > 0 ? (prov.ratios[party] || 0) / sumRatios[party] : 0;
+                const effectiveVote = (cand.support[party] / 100) * ((100 - sandigaSupport[party]) / 100);
+                cand.presVotes[prov.id] += (normalizedNationalVotes[party] || 0) * weight * effectiveVote;
+            });
+        });
+    });
+
+    const totalAllVotes = candidates.reduce((sum, cand) => sum + cand.totalVotes, 0);
+    const isRunoff = round === 1 && totalAllVotes > 0 && !candidates.some(c => (c.totalVotes / totalAllVotes * 100) > 50);
+
+    return { candidates, isRunoff };
+}
+
+function renderAllResults() {
+    let html = `<div class="space-y-1 sm:space-y-2 md:space-y-4">`;
+    const overallSeats = Object.fromEntries(parties.map(p => [p, 0]));
+    provinceResultsStore.forEach(provRes => {
+        Object.entries(provRes.seatsAllocated).forEach(([party, seats]) => {
+            overallSeats[party] += seats;
+        });
+    });
+    html += `<div class="flex-shrink-0"><h3 class="text-lg sm:text-xl font-bold mb-1">Genel Milletvekili Sonuçları</h3>
+             <table class="w-full text-xs sm:text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-2 py-1">Parti</th><th class="px-2 py-1">Oy %</th><th class="px-2 py-1">MV</th></tr></thead>
+                <tbody>`;
+    Object.entries(normalizedNationalVotes).sort((a, b) => b[1] - a[1]).forEach(([party, vote]) => {
+        html += `<tr class="border-b"><td class="px-2 py-1 font-semibold" style="color:${partyColors[party]}">${party}</td><td class="px-2 py-1">${(vote * 100).toFixed(2)}%</td><td class="px-2 py-1">${overallSeats[party]}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+
+    if (presidentialResultsStore.round1.length > 0) {
+        const totalVotes = presidentialResultsStore.round1.reduce((s, c) => s + c.totalVotes, 0);
+        html += `<div class="flex-shrink-0"><h3 class="text-lg sm:text-xl font-bold mb-1">Genel CB Sonuçları (1. Tur)</h3>
+                 <table class="w-full text-xs sm:text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-2 py-1">Aday</th><th class="px-2 py-1">Oy %</th></tr></thead>
+                    <tbody>`;
+        presidentialResultsStore.round1.sort((a,b) => b.totalVotes - a.totalVotes).forEach(cand => {
+            const voteShare = totalVotes > 0 ? (cand.totalVotes / totalVotes * 100) : 0;
+            html += `<tr class="border-b"><td class="px-2 py-1 font-semibold">${cand.candidate}</td><td class="px-2 py-1">${voteShare.toFixed(2)}%</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+    }
+    
+    if (presidentialResultsStore.round2.length > 0) {
+        const totalVotes = presidentialResultsStore.round2.reduce((s, c) => s + c.totalVotes, 0);
+        html += `<div class="flex-shrink-0"><h3 class="text-lg sm:text-xl font-bold mb-1">Genel CB Sonuçları (2. Tur)</h3>
+                 <table class="w-full text-xs sm:text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-2 py-1">Aday</th><th class="px-2 py-1">Oy %</th></tr></thead>
+                    <tbody>`;
+        presidentialResultsStore.round2.sort((a,b) => b.totalVotes - a.totalVotes).forEach(cand => {
+            const voteShare = totalVotes > 0 ? (cand.totalVotes / totalVotes * 100) : 0;
+            html += `<tr class="border-b"><td class="px-2 py-1 font-semibold">${cand.candidate}</td><td class="px-2 py-1">${voteShare.toFixed(2)}%</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+    }
+
+    html += `</div>`;
+    resultsDiv.innerHTML = html;
+}
+
+// --- UI INTERACTIONS ---
+function switchElectionMode(mode) {
+    electionMode = mode;
+    document.querySelectorAll('.btn-mode').forEach(btn => {
+        btn.classList.replace('bg-blue-600', 'bg-gray-500');
+        btn.classList.replace('hover:bg-blue-700', 'hover:bg-gray-600');
+    });
+    const activeBtn = Array.from(document.querySelectorAll('.btn-mode')).find(b => {
+        if(mode === 'parliamentary' && b.textContent === 'Milletvekili') return true;
+        if(mode === 'pres1' && b.textContent === 'CB 1. Tur') return true;
+        if(mode === 'pres2' && b.textContent === 'CB 2. Tur') return true;
+        return false;
+    });
+    if (activeBtn) {
+        activeBtn.classList.replace('bg-gray-500', 'bg-blue-600');
+        activeBtn.classList.replace('hover:bg-gray-600', 'hover:bg-blue-700');
+    }
+    updateMapColors();
+}
+
+function addCandidate() {
+    const tbody = document.querySelector("#presidentialTable tbody");
+    const sandigaRow = document.getElementById("sandigaRow");
+    addCandidateRow(tbody, '', sandigaRow);
+}
+
+function addCandidateRow(tbody, name, beforeNode = null) {
+    let newRow = tbody.insertRow(beforeNode ? beforeNode.rowIndex : -1);
+    newRow.innerHTML = `<th scope="row" class="px-2 py-3 font-medium text-gray-900 whitespace-nowrap"><input type="text" value="${name}" placeholder="Aday Adı" class="w-full bg-gray-50 border-none text-sm rounded-lg p-2"></th>` +
+        parties.map(() => `<td class="px-2 py-3"><input type="number" value="0" step="any" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center"></td>`).join('');
+}
+
+function openCreatePartyModal() {
+    let container = document.getElementById("baseShareContainer");
+    container.innerHTML = "";
+    parties.forEach(party => {
+        if (party !== 'OTH') {
+            container.innerHTML += `<div class="flex justify-between items-center">
+                <label for="baseShare_${party}" class="text-sm">${party}:</label>
+                <input type="number" id="baseShare_${party}" value="0" step="any" class="w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2">
+            </div>`;
+        }
+    });
+    document.getElementById("createPartyModal").classList.remove('hidden');
+}
+
+function submitNewParty() {
+    const partyName = document.getElementById("newPartyName").value.trim().toUpperCase();
+    if (!partyName || parties.includes(partyName)) {
+        alert("Lütfen geçerli ve benzersiz bir parti adı girin.");
+        return;
+    }
+    const partyColor = document.getElementById("newPartyColor").value;
+
+    parties.push(partyName);
+    partyColors[partyName] = partyColor;
+    
+    provinces.forEach(prov => {
+        let newRatio = 0;
+        Object.keys(prov.ratios).forEach(existingParty => {
+            const shareInput = document.getElementById(`baseShare_${existingParty}`);
+            if (shareInput) {
+                const share = parseFloat(shareInput.value) || 0;
+                newRatio += (share / 100) * (prov.ratios[existingParty] || 0);
+            }
+        });
+        prov.ratios[partyName] = newRatio > 0 ? newRatio : 0.5;
+    });
+
+    renderParliamentaryInputs();
+    renderPresidentialInputs(Array.from(document.querySelectorAll('#presidentialTable tbody tr:not(#sandigaRow) input[type="text"]')).map(i => i.value));
+    
+    document.getElementById("createPartyModal").classList.add('hidden');
+}
+
+// --- COLOR UTILITIES ---
+function hexToHSL(H) {
+    let r = 0, g = 0, b = 0;
+    if (H.length == 4) {
+        r = "0x" + H[1] + H[1]; g = "0x" + H[2] + H[2]; b = "0x" + H[3] + H[3];
+    } else if (H.length == 7) {
+        r = "0x" + H[1] + H[2]; g = "0x" + H[3] + H[4]; b = "0x" + H[5] + H[6];
+    }
+    r /= 255; g /= 255; b /= 255;
+    let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+    if (delta == 0) h = 0;
+    else if (cmax == r) h = ((g - b) / delta) % 6;
+    else if (cmax == g) h = (b - r) / delta + 2;
+    else h = (r - g) / delta + 4;
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+    l = (cmax + cmin) / 2;
+    s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+    s = +(s * 100).toFixed(1);
+    l = +(l * 100).toFixed(1);
+    return { h, s, l };
+}
+
+function hslToHex({h, s, l}) {
+    s /= 100; l /= 100;
+    let c = (1 - Math.abs(2 * l - 1)) * s,
+        x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+        m = l - c/2, r = 0, g = 0, b = 0;
+    if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+    else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+    else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+    else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+    else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+    else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+    r = Math.round((r + m) * 255).toString(16);
+    g = Math.round((g + m) * 255).toString(16);
+    b = Math.round((b + m) * 255).toString(16);
+    if (r.length == 1) r = "0" + r;
+    if (g.length == 1) g = "0" + g;
+    if (b.length == 1) b = "0" + b;
+    return "#" + r + g + b;
+}
+
+function adjustColor(baseColor, voteShare) {
+    if (!baseColor) return '#CCCCCC';
+    const baseline = 50;
+    const steps = Math.round((voteShare - baseline) / 5);
+    const stepAmount = 5;
+    let hsl = hexToHSL(baseColor);
+    hsl.l = Math.min(100, Math.max(15, hsl.l - steps * stepAmount));
+    return hslToHex(hsl);
+}
 
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465774414153454"
-     crossorigin="anonymous"></script>
 </body>
 </html>
