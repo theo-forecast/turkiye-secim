@@ -397,7 +397,7 @@ let partyColors = {
     "DEM": "#800080", "YRP": "#008000", "ZP": "#000000", "BBP": "#FFC0CB",
     "TIP": "#B22222", "OTH": "#808080"
 };
-const candidateColorsArray = ["#FF6384", "#FFCE56", "#36A2EB", "#4BC0C0", "#9966FF", "#FF9F40", "#C9CBCF"];
+const candidateColorsArray = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#C9CBCF"];
 
 let electionMode = "parliamentary";
 let candidateColorMapping = {};
@@ -720,7 +720,7 @@ function calculatePresidential(round, provinceVotes) {
         }
     });
 
-    // STEP 1: Calculate PURE national ratio vote share ("Oran %")
+    // STEP 1: Calculate PURE national ratio vote share ("Oran %") for each candidate.
     candidates.forEach(cand => {
         cand.totalRatioVote = 0;
         parties.forEach(party => {
@@ -729,7 +729,7 @@ function calculatePresidential(round, provinceVotes) {
         });
     });
 
-    // STEP 2: Calculate provincial scores for distributing absolute votes
+    // STEP 2: Calculate provincial scores, which are weighted by provincial tendencies (ratios).
     candidates.forEach(cand => {
         cand.presVoteRatios = {};
         provinces.forEach(prov => {
@@ -743,7 +743,7 @@ function calculatePresidential(round, provinceVotes) {
         });
     });
 
-    // STEP 3: Distribute absolute votes based on provincial scores
+    // STEP 3: Distribute absolute votes based on the provincial scores calculated in Step 2.
     provinces.forEach(prov => {
         const totalProvRatio = candidates.reduce((sum, c) => sum + (c.presVoteRatios[prov.id] || 0), 0);
         
@@ -762,7 +762,7 @@ function calculatePresidential(round, provinceVotes) {
         }
     });
 
-    // STEP 4: Sum up the absolute votes for each candidate's national total
+    // STEP 4: Sum up the absolute votes for each candidate's national total.
     candidates.forEach(cand => {
         cand.totalAbsoluteVotes = Object.values(cand.presAbsoluteVotes).reduce((a, b) => a + b, 0);
     });
