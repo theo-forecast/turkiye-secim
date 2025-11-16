@@ -243,15 +243,17 @@
 
     let currentResults = {}; // { id: { dShare, rShare, winner, margin } }
 
-    // --- Map loading with visible error if it fails ---
+    // --- Map loading (use only polygon features, ignore labels) ---
     async function loadTexasMap() {
       try {
         const response = await fetch("./district-shapes.geojson");
         if (!response.ok) {
           throw new Error("HTTP " + response.status + " when fetching district-shapes.geojson");
         }
-        const data = await response.json();
-        console.log("Loaded GeoJSON with", data.features.length, "features");
+        const raw = await response.json();
+
+        // Use ONLY the district polygons for drawing & fitting
+        const data = { type: "FeatureCollection", features: raw.features };
 
         const width = svg.viewBox.baseVal.width || 1000;
         const height = svg.viewBox.baseVal.height || 600;
@@ -265,13 +267,21 @@
         svg.appendChild(g);
 
         data.features.forEach((feature) => {
-          const distId = feature.properties.id; // 1..38
+          const distId = feature.properties.id;
+          if (distId == null) return;
+
+          const d = pathGen(feature);
+          if (!d) return;
+
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          path.setAttribute("d", pathGen(feature));
+          path.setAttribute("d", d);
           path.dataset.districtId = String(distId);
 
-          path.setAttribute("stroke", "#020617");
-          path.setAttribute("stroke-width", "0.7");
+          // Always show boundaries clearly
+          path.setAttribute("fill", "none");
+          path.setAttribute("stroke", "#e5e7eb");
+          path.setAttribute("stroke-width", "1");
+
           path.classList.add("transition", "duration-150", "cursor-pointer");
 
           path.addEventListener("mouseover", (e) => showTooltip(e, distId));
@@ -281,6 +291,7 @@
           g.appendChild(path);
         });
 
+        // Apply colors based on current swing
         recomputeAndRender();
       } catch (err) {
         console.error("Error loading Texas GeoJSON:", err);
@@ -357,7 +368,6 @@
         }
 
         const baseColor = res.winner === "D" ? "#2563EB" : "#DC2626";
-        // margin 0–40+ => opacity 0.3–1.0
         const marginClamped = Math.min(res.margin, 40);
         const opacity = 0.3 + 0.7 * (marginClamped / 40);
 
