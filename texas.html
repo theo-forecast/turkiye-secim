@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Texas District D/R Ratios Map</title>
+
+  <!-- Tailwind for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- D3 for GeoJSON & projection -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    }
+
+    #tooltip {
+      position: fixed;
+      z-index: 50;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(16px);
+      max-width: 260px;
+      font-size: 0.875rem;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    #tooltip.hidden {
+      display: none;
+    }
+
+    .map-hover {
+      transition: transform 0.15s ease-out, filter 0.15s ease-out, opacity 0.15s ease-out;
+    }
+
+    .map-hover:hover {
+      transform: translateY(-1px) scale(1.01);
+      filter: brightness(1.1);
+      opacity: 1 !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-50">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-semibold tracking-tight">
+            Texas Congressional District Ratios
+          </h1>
+          <p class="text-sm text-slate-400">
+            Visualizing relative <span class="text-blue-400">D</span> /
+            <span class="text-red-400">R</span> strengths by district.
+          </p>
+        </div>
+        <div class="hidden sm:flex items-center gap-3 text-xs text-slate-400">
+          <div class="flex items-center gap-1.5">
+            <span class="inline-block w-3 h-3 rounded-full bg-blue-500/80 border border-blue-300/70"></span>
+            <span>Dem-lean</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="inline-block w-3 h-3 rounded-full bg-red-500/80 border border-red-300/70"></span>
+            <span>GOP-lean</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1">
+      <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        <!-- Tooltip -->
+        <div id="tooltip" class="hidden"></div>
+
+        <!-- Map + side panel -->
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Map -->
+          <section class="md:col-span-2">
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+              <div class="px-4 sm:px-5 pt-4 pb-3 flex items-center justify-between gap-3">
+                <div>
+                  <h2 class="text-sm font-medium text-slate-100 tracking-tight">
+                    Texas districts map
+                  </h2>
+                  <p class="text-xs text-slate-400">
+                    Hover a district to see its D/R ratio and implied vote shares.
+                  </p>
+                </div>
+                <div class="flex items-center gap-2 text-[0.7rem] text-slate-400">
+                  <span class="inline-flex items-center gap-1">
+                    <span class="w-3 h-3 rounded-full bg-blue-500/80 border border-blue-300/70"></span>
+                    D advantage
+                  </span>
+                  <span class="inline-flex items-center gap-1">
+                    <span class="w-3 h-3 rounded-full bg-red-500/80 border border-red-300/70"></span>
+                    R advantage
+                  </span>
+                </div>
+              </div>
+              <div class="bg-slate-950/60">
+                <div
+                  class="aspect-[16/9] w-full bg-slate-950 rounded-b-2xl overflow-hidden flex items-center justify-center"
+                >
+                  <svg
+                    id="texasMapSVG"
+                    class="w-full h-full map-hover"
+                    viewBox="0 0 1000 600"
+                    preserveAspectRatio="xMidYMid meet"
+                  ></svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Table / ratios -->
+          <aside class="space-y-3">
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl shadow-xl h-full flex flex-col">
+              <div class="px-4 pt-4 pb-3 border-b border-slate-800/80">
+                <h2 class="text-sm font-medium text-slate-100 tracking-tight">
+                  District ratios
+                </h2>
+                <p class="text-xs text-slate-400">
+                  Raw D/R weights per district (not normalized vote shares).
+                </p>
+              </div>
+              <div class="flex-1 overflow-y-auto max-h-[420px]">
+                <table class="min-w-full text-xs text-slate-300">
+                  <thead class="sticky top-0 bg-slate-900/95 backdrop-blur">
+                    <tr class="border-b border-slate-800">
+                      <th class="text-left px-3 py-2 font-medium text-slate-400 w-14">Dist</th>
+                      <th class="text-right px-3 py-2 font-medium text-blue-300">D ratio</th>
+                      <th class="text-right px-3 py-2 font-medium text-red-300">R ratio</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ratioTableBody"></tbody>
+                </table>
+              </div>
+              <div class="px-4 py-3 border-t border-slate-800/80 text-[0.7rem] text-slate-400 space-y-1.5">
+                <p>
+                  Color intensity tracks winner’s share:
+                  stronger advantage → higher opacity.
+                </p>
+                <p class="italic">
+                  If your GeoJSON uses a different property than
+                  <code class="bg-slate-800/80 px-1 rounded text-[0.65rem]">id</code>, just adjust the
+                  <code>feature.properties.id</code> line in the script.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Script -->
+  <script>
+    // --- D/R RATIOS ---
+    // Keys are district numbers 1–38. Values are D and R "ratios" (weights).
+    const districtRatios = {
+      1:  { D: 0.59, R: 1.35 },
+      2:  { D: 0.86, R: 1.12 },
+      3:  { D: 0.87, R: 1.09 },
+      4:  { D: 0.87, R: 1.11 },
+      5:  { D: 0.90, R: 1.09 },
+      6:  { D: 0.87, R: 1.11 },
+      7:  { D: 1.41, R: 0.65 },
+      8:  { D: 0.85, R: 1.13 },
+      9:  { D: 0.95, R: 1.05 },
+      10: { D: 0.90, R: 1.08 },
+      11: { D: 0.75, R: 1.21 },
+      12: { D: 0.88, R: 1.10 },
+      13: { D: 0.60, R: 1.33 },
+      14: { D: 0.85, R: 1.13 },
+      15: { D: 1.00, R: 1.01 },
+      16: { D: 1.40, R: 0.67 },
+      17: { D: 0.90, R: 1.08 },
+      18: { D: 1.78, R: 0.36 },
+      19: { D: 0.56, R: 1.37 },
+      20: { D: 1.49, R: 0.59 },
+      21: { D: 0.89, R: 1.09 },
+      22: { D: 0.88, R: 1.09 },
+      23: { D: 0.99, R: 1.01 },
+      24: { D: 0.95, R: 1.04 },
+      25: { D: 0.89, R: 1.10 },
+      26: { D: 0.87, R: 1.11 },
+      27: { D: 0.89, R: 1.09 },
+      28: { D: 1.11, R: 0.92 },
+      29: { D: 1.52, R: 0.57 },
+      30: { D: 1.69, R: 0.43 },
+      31: { D: 0.88, R: 1.09 },
+      32: { D: 0.95, R: 1.04 },
+      33: { D: 1.54, R: 0.55 },
+      34: { D: 1.07, R: 0.95 },
+      35: { D: 1.04, R: 0.97 },
+      36: { D: 0.87, R: 1.11 },
+      37: { D: 1.77, R: 0.35 },
+      38: { D: 0.89, R: 1.09 },
+    };
+
+    const tooltip = document.getElementById("tooltip");
+    const ratioTableBody = document.getElementById("ratioTableBody");
+    const svg = document.getElementById("texasMapSVG");
+
+    // --- Utility: compute color from D/R ---
+    function getDistrictColor(dr) {
+      const total = dr.D + dr.R;
+      if (!total || !isFinite(total)) {
+        return { fill: "#64748b", opacity: 0.35, lean: "none", dShare: 0, rShare: 0 };
+      }
+
+      const dShare = (dr.D / total) * 100;
+      const rShare = (dr.R / total) * 100;
+      const dWins = dShare >= rShare;
+      const winnerShare = dWins ? dShare : rShare;
+
+      const baseBlue = "#2563EB";
+      const baseRed = "#DC2626";
+
+      // Winner share 50–100% → 0–1 intensity
+      const intensity = Math.max(0, Math.min(1, (winnerShare - 50) / 50));
+
+      const fill = dWins ? baseBlue : baseRed;
+      // Keep opacity between 0.4 and 1.0
+      const opacity = 0.4 + 0.6 * intensity;
+
+      return {
+        fill,
+        opacity,
+        lean: dWins ? "D" : "R",
+        dShare,
+        rShare,
+      };
+    }
+
+    // --- Map loading ---
+    async function loadTexasMap() {
+      try {
+        const response = await fetch("district-shapes.geojson");
+        const geojson = await response.json();
+
+        const width = svg.viewBox.baseVal.width || 1000;
+        const height = svg.viewBox.baseVal.height || 600;
+
+        const projection = d3.geoMercator().fitSize([width, height], geojson);
+        const pathGen = d3.geoPath().projection(projection);
+
+        // Clear previous content
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("id", "features");
+        svg.appendChild(g);
+
+        geojson.features.forEach((feature) => {
+          const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          const d = pathGen(feature);
+          pathEl.setAttribute("d", d);
+
+          // Assumes your GeoJSON has an integer id 1..38 in properties.id
+          const distId = feature.properties.id;
+          pathEl.setAttribute("id", `district-${distId}`);
+          pathEl.dataset.districtId = String(distId);
+
+          pathEl.setAttribute("stroke", "#0f172a");
+          pathEl.setAttribute("stroke-width", "0.75");
+          pathEl.style.fill = "#0f172a";
+          pathEl.style.opacity = 0.5;
+          pathEl.classList.add("map-hover");
+
+          g.appendChild(pathEl);
+        });
+
+        addMapInteractions();
+        colorMapFromRatios();
+      } catch (err) {
+        console.error("Error loading Texas GeoJSON:", err);
+      }
+    }
+
+    // --- Mouse / tooltip handlers ---
+    function addMapInteractions() {
+      const paths = svg.querySelectorAll("path[data-district-id]");
+      paths.forEach((path) => {
+        const distId = path.dataset.districtId;
+        path.addEventListener("mouseover", (e) => handleDistrictHover(e, distId));
+        path.addEventListener("mousemove", handleMouseMove);
+        path.addEventListener("mouseout", handleMouseOut);
+      });
+    }
+
+    function handleDistrictHover(event, distId) {
+      const dr = districtRatios[distId];
+      let content = `<div class="mb-1"><span class="text-xs uppercase tracking-wide text-slate-400">District</span><div class="text-base font-semibold text-slate-50">TX-${distId}</div></div>`;
+
+      if (dr) {
+        const total = dr.D + dr.R;
+        const dShare = total ? (dr.D / total) * 100 : 0;
+        const rShare = total ? (dr.R / total) * 100 : 0;
+
+        const lean =
+          dShare > rShare
+            ? `<span class="text-blue-300 font-medium">Democratic-leaning</span>`
+            : dShare < rShare
+            ? `<span class="text-red-300 font-medium">Republican-leaning</span>`
+            : `<span class="text-slate-300 font-medium">Balanced</span>`;
+
+        content += `
+          <div class="mt-1 mb-2 text-xs text-slate-300">
+            ${lean}
+          </div>
+          <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+            <div>
+              <div class="text-[0.7rem] uppercase tracking-wide text-blue-300/80">D ratio</div>
+              <div class="font-semibold text-blue-200">${dr.D.toFixed(2)}</div>
+            </div>
+            <div>
+              <div class="text-[0.7rem] uppercase tracking-wide text-red-300/80">R ratio</div>
+              <div class="font-semibold text-red-200">${dr.R.toFixed(2)}</div>
+            </div>
+            <div>
+              <div class="text-[0.7rem] uppercase tracking-wide text-slate-400/80 mt-1">D share</div>
+              <div class="text-slate-100">${dShare.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div class="text-[0.7rem] uppercase tracking-wide text-slate-400/80 mt-1">R share</div>
+              <div class="text-slate-100">${rShare.toFixed(1)}%</div>
+            </div>
+          </div>`;
+      } else {
+        content += `<div class="text-xs text-slate-400">No ratio data for this district.</div>`;
+      }
+
+      tooltip.innerHTML = content;
+      tooltip.classList.remove("hidden");
+      positionTooltip(event);
+    }
+
+    function handleMouseMove(event) {
+      positionTooltip(event);
+    }
+
+    function handleMouseOut() {
+      tooltip.classList.add("hidden");
+    }
+
+    function positionTooltip(event) {
+      const padding = 12;
+      const tooltipRect = tooltip.getBoundingClientRect();
+      let x = event.clientX + padding;
+      let y = event.clientY + padding;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (x + tooltipRect.width + padding > vw) {
+        x = event.clientX - tooltipRect.width - padding;
+      }
+      if (y + tooltipRect.height + padding > vh) {
+        y = event.clientY - tooltipRect.height - padding;
+      }
+
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+    }
+
+    // --- Color the map based on ratios ---
+    function colorMapFromRatios() {
+      Object.entries(districtRatios).forEach(([id, dr]) => {
+        const path = document.getElementById(`district-${id}`);
+        if (!path) return;
+        const { fill, opacity } = getDistrictColor(dr);
+        path.style.fill = fill;
+        path.style.opacity = opacity;
+      });
+    }
+
+    // --- Populate sidebar table ---
+    function populateRatioTable() {
+      const entries = Object.entries(districtRatios).sort(
+        ([aId], [bId]) => Number(aId) - Number(bId)
+      );
+
+      ratioTableBody.innerHTML = entries
+        .map(([id, dr]) => {
+          return `
+            <tr class="border-b border-slate-800/70 hover:bg-slate-900/70">
+              <td class="px-3 py-1.5 text-slate-200 text-xs">TX-${id}</td>
+              <td class="px-3 py-1.5 text-right text-blue-200">${dr.D.toFixed(2)}</td>
+              <td class="px-3 py-1.5 text-right text-red-200">${dr.R.toFixed(2)}</td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    // --- Init ---
+    document.addEventListener("DOMContentLoaded", async () => {
+      populateRatioTable();
+      await loadTexasMap();
+    });
+  </script>
+</body>
+</html>
