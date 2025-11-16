@@ -8,9 +8,6 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- D3 for GeoJSON + projections -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
@@ -230,7 +227,7 @@
       38: { D: 0.89, R: 1.09 },
     };
 
-    // --- DOM refs ---
+    // DOM refs
     const svg = document.getElementById("texasMapSVG");
     const tooltip = document.getElementById("tooltip");
     const demInput = document.getElementById("demInput");
@@ -243,7 +240,79 @@
 
     let currentResults = {}; // { id: { dShare, rShare, winner, margin } }
 
-    // --- Map loading (use only polygon features, ignore labels) ---
+    // ---- Simple lon/lat → SVG projection (no D3) ----
+    function computeBounds(features) {
+      let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+
+      for (const f of features) {
+        const geom = f.geometry;
+        if (!geom) continue;
+
+        if (geom.type === "MultiPolygon") {
+          for (const poly of geom.coordinates) {
+            for (const ring of poly) {
+              for (const coord of ring) {
+                const [lon, lat] = coord;
+                if (lon < minLon) minLon = lon;
+                if (lon > maxLon) maxLon = lon;
+                if (lat < minLat) minLat = lat;
+                if (lat > maxLat) maxLat = lat;
+              }
+            }
+          }
+        } else if (geom.type === "Polygon") {
+          for (const ring of geom.coordinates) {
+            for (const coord of ring) {
+              const [lon, lat] = coord;
+              if (lon < minLon) minLon = lon;
+              if (lon > maxLon) maxLon = lon;
+              if (lat < minLat) minLat = lat;
+              if (lat > maxLat) maxLat = lat;
+            }
+          }
+        }
+      }
+
+      return { minLon, maxLon, minLat, maxLat };
+    }
+
+    function projectPoint(lon, lat, bounds, width, height) {
+      const { minLon, maxLon, minLat, maxLat } = bounds;
+      const x = ((lon - minLon) / (maxLon - minLon)) * width;
+      // Flip Y so north is up
+      const y = height - ((lat - minLat) / (maxLat - minLat)) * height;
+      return [x, y];
+    }
+
+    function geometryToPath(geom, bounds, width, height) {
+      let d = "";
+
+      if (geom.type === "MultiPolygon") {
+        for (const poly of geom.coordinates) {
+          for (const ring of poly) {
+            ring.forEach((coord, idx) => {
+              const [lon, lat] = coord;
+              const [x, y] = projectPoint(lon, lat, bounds, width, height);
+              d += (idx === 0 ? "M" : "L") + x + " " + y + " ";
+            });
+            d += "Z ";
+          }
+        }
+      } else if (geom.type === "Polygon") {
+        for (const ring of geom.coordinates) {
+          ring.forEach((coord, idx) => {
+            const [lon, lat] = coord;
+            const [x, y] = projectPoint(lon, lat, bounds, width, height);
+            d += (idx === 0 ? "M" : "L") + x + " " + y + " ";
+          });
+          d += "Z ";
+        }
+      }
+
+      return d.trim();
+    }
+
+    // ---- Map loading ----
     async function loadTexasMap() {
       try {
         const response = await fetch("./district-shapes.geojson");
@@ -252,35 +321,37 @@
         }
         const raw = await response.json();
 
-        // Use ONLY the district polygons for drawing & fitting
-        const data = { type: "FeatureCollection", features: raw.features };
+        const features = raw.features || [];
+        if (!features.length) {
+          throw new Error("GeoJSON has no features");
+        }
 
         const width = svg.viewBox.baseVal.width || 1000;
         const height = svg.viewBox.baseVal.height || 600;
 
-        const projection = d3.geoMercator().fitSize([width, height], data);
-        const pathGen = d3.geoPath().projection(projection);
+        const bounds = computeBounds(features);
 
         while (svg.firstChild) svg.removeChild(svg.firstChild);
 
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         svg.appendChild(g);
 
-        data.features.forEach((feature) => {
-          const distId = feature.properties.id;
-          if (distId == null) return;
+        for (const feature of features) {
+          const distId = feature.properties && feature.properties.id;
+          if (distId == null) continue;
+          const geom = feature.geometry;
+          if (!geom) continue;
 
-          const d = pathGen(feature);
-          if (!d) return;
+          const pathData = geometryToPath(geom, bounds, width, height);
+          if (!pathData) continue;
 
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          path.setAttribute("d", d);
+          path.setAttribute("d", pathData);
           path.dataset.districtId = String(distId);
 
-          // Always show boundaries clearly
-          path.setAttribute("fill", "none");
           path.setAttribute("stroke", "#e5e7eb");
-          path.setAttribute("stroke-width", "1");
+          path.setAttribute("stroke-width", "0.8");
+          path.setAttribute("fill", "none");
 
           path.classList.add("transition", "duration-150", "cursor-pointer");
 
@@ -289,9 +360,9 @@
           path.addEventListener("mouseout", hideTooltip);
 
           g.appendChild(path);
-        });
+        }
 
-        // Apply colors based on current swing
+        // After shapes exist, color them based on current swing
         recomputeAndRender();
       } catch (err) {
         console.error("Error loading Texas GeoJSON:", err);
@@ -307,7 +378,7 @@
       }
     }
 
-    // --- Core swing logic ---
+    // ---- Swing logic ----
     function recomputeAndRender() {
       let dNat = parseFloat(demInput.value);
       let rNat = parseFloat(repInput.value);
@@ -315,7 +386,6 @@
       if (!isFinite(dNat)) dNat = 50;
       if (!isFinite(rNat)) rNat = 50;
 
-      // Normalize so D + R = 100
       const total = dNat + rNat;
       if (total === 0) {
         dNat = 50;
@@ -416,12 +486,11 @@
       const dAvg = dSum / values.length;
       const rAvg = rSum / values.length;
 
-      statewideSummary.textContent = `Average across districts: D ${dAvg.toFixed(
-        1
-      )}% – R ${rAvg.toFixed(1)}%`;
+      statewideSummary.textContent =
+        "Average across districts: D " + dAvg.toFixed(1) + "% – R " + rAvg.toFixed(1) + "%";
     }
 
-    // --- Tooltip helpers ---
+    // ---- Tooltip ----
     function showTooltip(event, distId) {
       const res = currentResults[distId];
       const dr = districtRatios[distId];
@@ -490,7 +559,7 @@
       tooltip.classList.add("hidden");
     }
 
-    // --- Events ---
+    // ---- Events ----
     demInput.addEventListener("input", recomputeAndRender);
     repInput.addEventListener("input", recomputeAndRender);
     resetBtn.addEventListener("click", () => {
