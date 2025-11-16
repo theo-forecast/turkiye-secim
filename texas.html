@@ -135,11 +135,11 @@
               </div>
             </div>
             <div class="bg-white border-t border-slate-200">
-              <div class="aspect-[16/9] w-full flex items-center justify-center">
+              <div class="aspect-[4/3] w-full flex items-center justify-center">
                 <svg
                   id="texasMapSVG"
                   class="w-full h-full"
-                  viewBox="0 0 1000 600"
+                  viewBox="0 0 400 300"
                   preserveAspectRatio="xMidYMid meet"
                 ></svg>
               </div>
@@ -325,8 +325,8 @@
           throw new Error("GeoJSON has no features");
         }
 
-        const width = svg.viewBox.baseVal.width || 1000;
-        const height = svg.viewBox.baseVal.height || 600;
+        const width = svg.viewBox.baseVal.width || 400;
+        const height = svg.viewBox.baseVal.height || 300;
 
         const bounds = computeBounds(features);
 
@@ -438,7 +438,7 @@
         // margin 0–40 => very light to dark
         const marginClamped = Math.min(res.margin, 40);
         const t = marginClamped / 40; // 0..1
-        const lightness = 95 - t * 45; // 95% (almost white) -> 50% (dark-ish)
+        const lightness = 95 - t * 45; // 95% (almost white) -> 50% (darker)
 
         const color =
           res.winner === "D"
@@ -494,34 +494,25 @@
         "Average across districts: D " + dAvg.toFixed(1) + "% – R " + rAvg.toFixed(1) + "%";
     }
 
-    // ---- Tooltip ----
+    // ---- Tooltip (no ratios shown) ----
     function showTooltip(event, distId) {
       const res = currentResults[distId];
-      const dr = districtRatios[distId];
 
       let html = `
         <div class="text-[0.65rem] uppercase tracking-wide text-slate-500">District</div>
         <div class="text-sm font-semibold text-slate-900 mb-1">TX-${distId}</div>
       `;
 
-      if (dr && res) {
+      if (res) {
         html += `
           <div class="grid grid-cols-2 gap-x-3 gap-y-1 mb-1">
             <div>
-              <div class="text-[0.65rem] uppercase text-blue-600/80">D ratio</div>
-              <div class="text-xs text-blue-800 font-semibold">${dr.D.toFixed(2)}</div>
+              <div class="text-[0.65rem] uppercase text-blue-600/80">D share</div>
+              <div class="text-xs text-slate-900 font-semibold">${res.dShare.toFixed(1)}%</div>
             </div>
             <div>
-              <div class="text-[0.65rem] uppercase text-red-600/80">R ratio</div>
-              <div class="text-xs text-red-800 font-semibold">${dr.R.toFixed(2)}</div>
-            </div>
-            <div class="mt-1">
-              <div class="text-[0.65rem] uppercase text-slate-500/80">D share</div>
-              <div class="text-xs text-slate-900">${res.dShare.toFixed(1)}%</div>
-            </div>
-            <div class="mt-1">
-              <div class="text-[0.65rem] uppercase text-slate-500/80">R share</div>
-              <div class="text-xs text-slate-900">${res.rShare.toFixed(1)}%</div>
+              <div class="text-[0.65rem] uppercase text-red-600/80">R share</div>
+              <div class="text-xs text-slate-900 font-semibold">${res.rShare.toFixed(1)}%</div>
             </div>
           </div>
           <div class="text-[0.65rem] text-slate-600">
@@ -573,7 +564,6 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      // Start at 43–57
       demInput.value = 43;
       repInput.value = 57;
       recomputeAndRender();
