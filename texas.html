@@ -243,11 +243,15 @@
 
     let currentResults = {}; // { id: { dShare, rShare, winner, margin } }
 
-    // --- Map loading ---
+    // --- Map loading with visible error if it fails ---
     async function loadTexasMap() {
       try {
-        const response = await fetch("district-shapes.geojson");
+        const response = await fetch("./district-shapes.geojson");
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status + " when fetching district-shapes.geojson");
+        }
         const data = await response.json();
+        console.log("Loaded GeoJSON with", data.features.length, "features");
 
         const width = svg.viewBox.baseVal.width || 1000;
         const height = svg.viewBox.baseVal.height || 600;
@@ -280,6 +284,15 @@
         recomputeAndRender();
       } catch (err) {
         console.error("Error loading Texas GeoJSON:", err);
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", "50%");
+        text.setAttribute("y", "50%");
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", "#e5e7eb");
+        text.setAttribute("font-size", "14");
+        text.textContent = "Failed to load district-shapes.geojson. Check path / GitHub Pages.";
+        svg.appendChild(text);
       }
     }
 
