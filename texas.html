@@ -23,26 +23,26 @@
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-50">
+<body class="bg-slate-50 text-slate-900">
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur">
+    <header class="border-b border-slate-200 bg-white">
       <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">
             Texas Congressional District Swingometer
           </h1>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
             Adjust statewide D/R support and see how districts tip.
           </p>
         </div>
-        <div class="flex items-center gap-3 text-[0.7rem] text-slate-400">
+        <div class="flex items-center gap-3 text-[0.7rem] text-slate-600">
           <span class="inline-flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-blue-500/80 border border-blue-300/70"></span>
+            <span class="w-3 h-3 rounded-full bg-blue-600 border border-blue-700"></span>
             Dem lead
           </span>
           <span class="inline-flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-red-500/80 border border-red-300/70"></span>
+            <span class="w-3 h-3 rounded-full bg-red-600 border border-red-700"></span>
             GOP lead
           </span>
         </div>
@@ -55,19 +55,19 @@
         <!-- Controls + Map -->
         <div class="grid lg:grid-cols-3 gap-6">
           <!-- Controls -->
-          <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-xl p-5 space-y-4">
-            <h2 class="text-sm font-semibold text-slate-100 tracking-tight">
+          <section class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
+            <h2 class="text-sm font-semibold text-slate-900 tracking-tight">
               Statewide inputs
             </h2>
-            <p class="text-xs text-slate-400">
+            <p class="text-xs text-slate-600">
               These are statewide vote shares. Each district’s response is shaped by its D/R ratio.
             </p>
 
             <div class="space-y-3 mt-2">
               <div>
-                <label for="demInput" class="flex justify-between text-xs text-slate-300 mb-1">
+                <label for="demInput" class="flex justify-between text-xs text-slate-700 mb-1">
                   <span>Democratic vote share</span>
-                  <span id="demLabel" class="font-semibold text-blue-300">50.0%</span>
+                  <span id="demLabel" class="font-semibold text-blue-700">43.0%</span>
                 </label>
                 <input
                   id="demInput"
@@ -75,15 +75,15 @@
                   min="0"
                   max="100"
                   step="0.1"
-                  value="50"
+                  value="43"
                   class="w-full"
                 />
               </div>
 
               <div>
-                <label for="repInput" class="flex justify-between text-xs text-slate-300 mb-1">
+                <label for="repInput" class="flex justify-between text-xs text-slate-700 mb-1">
                   <span>Republican vote share</span>
-                  <span id="repLabel" class="font-semibold text-red-300">50.0%</span>
+                  <span id="repLabel" class="font-semibold text-red-700">57.0%</span>
                 </label>
                 <input
                   id="repInput"
@@ -91,7 +91,7 @@
                   min="0"
                   max="100"
                   step="0.1"
-                  value="50"
+                  value="57"
                   class="w-full"
                 />
                 <p class="mt-1 text-[0.65rem] text-slate-500">
@@ -103,38 +103,38 @@
             <div class="flex items-center gap-2 mt-3">
               <button
                 id="resetBtn"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 border border-slate-700"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 border border-slate-300"
               >
-                Reset to 50–50
+                Reset to 43–57
               </button>
-              <span class="text-[0.7rem] text-slate-400">
+              <span class="text-[0.7rem] text-slate-600">
                 Colors update automatically as you move the sliders.
               </span>
             </div>
 
-            <div class="mt-4 text-xs text-slate-300 space-y-1">
-              <div id="statewideSummary" class="font-medium text-slate-100">
-                Average across districts: D 50.0% – R 50.0%
+            <div class="mt-4 text-xs text-slate-700 space-y-1">
+              <div id="statewideSummary" class="font-medium text-slate-900">
+                Average across districts: D 43.0% – R 57.0%
               </div>
-              <div class="text-slate-500">
-                District intensity reflects margin: narrow races are pale, blowouts are saturated.
+              <div class="text-slate-600">
+                District intensity reflects margin: near ties are very light, blowouts are dark.
               </div>
             </div>
           </section>
 
           <!-- Map -->
-          <section class="lg:col-span-2 bg-slate-900/70 border border-slate-800 rounded-2xl shadow-xl">
+          <section class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
             <div class="px-5 pt-4 pb-3 flex items-center justify-between gap-2">
               <div>
-                <h2 class="text-sm font-semibold text-slate-100 tracking-tight">
+                <h2 class="text-sm font-semibold text-slate-900 tracking-tight">
                   Texas districts map
                 </h2>
-                <p class="text-xs text-slate-400">
+                <p class="text-xs text-slate-600">
                   Hover a district for details.
                 </p>
               </div>
             </div>
-            <div class="bg-slate-950/80 border-t border-slate-800">
+            <div class="bg-white border-t border-slate-200">
               <div class="aspect-[16/9] w-full flex items-center justify-center">
                 <svg
                   id="texasMapSVG"
@@ -148,26 +148,26 @@
         </div>
 
         <!-- District table -->
-        <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-xl">
+        <section class="bg-white border border-slate-200 rounded-2xl shadow-sm">
           <div class="px-5 pt-4 pb-3 flex items-center justify-between">
             <div>
-              <h2 class="text-sm font-semibold text-slate-100 tracking-tight">
+              <h2 class="text-sm font-semibold text-slate-900 tracking-tight">
                 District-level results
               </h2>
-              <p class="text-xs text-slate-400">
+              <p class="text-xs text-slate-600">
                 Based on current statewide inputs and fixed district D/R ratios.
               </p>
             </div>
           </div>
-          <div class="border-t border-slate-800 max-h-[420px] overflow-y-auto">
-            <table class="min-w-full text-xs text-slate-200">
-              <thead class="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-slate-800">
+          <div class="border-t border-slate-200 max-h-[420px] overflow-y-auto">
+            <table class="min-w-full text-xs text-slate-800">
+              <thead class="sticky top-0 bg-slate-100 border-b border-slate-200">
                 <tr>
-                  <th class="px-3 py-2 text-left text-slate-400 font-medium">District</th>
-                  <th class="px-3 py-2 text-right text-blue-300 font-medium">D %</th>
-                  <th class="px-3 py-2 text-right text-red-300 font-medium">R %</th>
-                  <th class="px-3 py-2 text-center text-slate-400 font-medium">Winner</th>
-                  <th class="px-3 py-2 text-right text-slate-400 font-medium">Margin</th>
+                  <th class="px-3 py-2 text-left text-slate-600 font-medium">District</th>
+                  <th class="px-3 py-2 text-right text-blue-700 font-medium">D %</th>
+                  <th class="px-3 py-2 text-right text-red-700 font-medium">R %</th>
+                  <th class="px-3 py-2 text-center text-slate-600 font-medium">Winner</th>
+                  <th class="px-3 py-2 text-right text-slate-600 font-medium">Margin</th>
                 </tr>
               </thead>
               <tbody id="districtTableBody"></tbody>
@@ -181,7 +181,7 @@
   <!-- Tooltip -->
   <div
     id="tooltip"
-    class="hidden bg-slate-900/95 border border-slate-700 text-slate-100 text-xs rounded-lg shadow-xl px-3 py-2"
+    class="hidden bg-white border border-slate-300 text-slate-900 text-xs rounded-lg shadow-lg px-3 py-2"
   ></div>
 
   <script>
@@ -279,7 +279,6 @@
     function projectPoint(lon, lat, bounds, width, height) {
       const { minLon, maxLon, minLat, maxLat } = bounds;
       const x = ((lon - minLon) / (maxLon - minLon)) * width;
-      // Flip Y so north is up
       const y = height - ((lat - minLat) / (maxLat - minLat)) * height;
       return [x, y];
     }
@@ -349,7 +348,7 @@
           path.setAttribute("d", pathData);
           path.dataset.districtId = String(distId);
 
-          path.setAttribute("stroke", "#e5e7eb");
+          path.setAttribute("stroke", "#94a3b8");
           path.setAttribute("stroke-width", "0.8");
           path.setAttribute("fill", "none");
 
@@ -362,7 +361,6 @@
           g.appendChild(path);
         }
 
-        // After shapes exist, color them based on current swing
         recomputeAndRender();
       } catch (err) {
         console.error("Error loading Texas GeoJSON:", err);
@@ -371,7 +369,7 @@
         text.setAttribute("x", "50%");
         text.setAttribute("y", "50%");
         text.setAttribute("text-anchor", "middle");
-        text.setAttribute("fill", "#e5e7eb");
+        text.setAttribute("fill", "#334155");
         text.setAttribute("font-size", "14");
         text.textContent = "Failed to load district-shapes.geojson. Check path / GitHub Pages.";
         svg.appendChild(text);
@@ -383,13 +381,13 @@
       let dNat = parseFloat(demInput.value);
       let rNat = parseFloat(repInput.value);
 
-      if (!isFinite(dNat)) dNat = 50;
-      if (!isFinite(rNat)) rNat = 50;
+      if (!isFinite(dNat)) dNat = 43;
+      if (!isFinite(rNat)) rNat = 57;
 
       const total = dNat + rNat;
       if (total === 0) {
-        dNat = 50;
-        rNat = 50;
+        dNat = 43;
+        rNat = 57;
       } else {
         dNat = (dNat / total) * 100;
         rNat = 100 - dNat;
@@ -432,17 +430,23 @@
         const res = currentResults[id];
 
         if (!res) {
-          path.style.fill = "#64748b";
-          path.style.opacity = 0.35;
+          path.style.fill = "#e2e8f0";
+          path.style.opacity = "1";
           return;
         }
 
-        const baseColor = res.winner === "D" ? "#2563EB" : "#DC2626";
+        // margin 0–40 => very light to dark
         const marginClamped = Math.min(res.margin, 40);
-        const opacity = 0.3 + 0.7 * (marginClamped / 40);
+        const t = marginClamped / 40; // 0..1
+        const lightness = 95 - t * 45; // 95% (almost white) -> 50% (dark-ish)
 
-        path.style.fill = baseColor;
-        path.style.opacity = opacity.toString();
+        const color =
+          res.winner === "D"
+            ? `hsl(220, 80%, ${lightness}%)`
+            : `hsl(0, 80%, ${lightness}%)`;
+
+        path.style.fill = color;
+        path.style.opacity = "1";
       });
     }
 
@@ -452,16 +456,16 @@
         .map(([id, res]) => {
           const winnerLabel =
             res.winner === "D"
-              ? '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-blue-500/15 text-blue-200 border border-blue-400/50 text-[0.65rem]">D</span>'
-              : '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-200 border border-red-400/50 text-[0.65rem]">R</span>';
+              ? '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-300 text-[0.65rem]">D</span>'
+              : '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-300 text-[0.65rem]">R</span>';
 
           return `
-            <tr class="border-b border-slate-800/70 hover:bg-slate-900/80">
-              <td class="px-3 py-1.5 text-slate-100 text-xs">TX-${id}</td>
-              <td class="px-3 py-1.5 text-right text-blue-200">${res.dShare.toFixed(1)}%</td>
-              <td class="px-3 py-1.5 text-right text-red-200">${res.rShare.toFixed(1)}%</td>
+            <tr class="border-b border-slate-200 hover:bg-slate-100">
+              <td class="px-3 py-1.5 text-slate-900 text-xs">TX-${id}</td>
+              <td class="px-3 py-1.5 text-right text-blue-700">${res.dShare.toFixed(1)}%</td>
+              <td class="px-3 py-1.5 text-right text-red-700">${res.rShare.toFixed(1)}%</td>
               <td class="px-3 py-1.5 text-center">${winnerLabel}</td>
-              <td class="px-3 py-1.5 text-right text-slate-300">${res.margin.toFixed(1)} pts</td>
+              <td class="px-3 py-1.5 text-right text-slate-700">${res.margin.toFixed(1)} pts</td>
             </tr>
           `;
         })
@@ -496,39 +500,39 @@
       const dr = districtRatios[distId];
 
       let html = `
-        <div class="text-[0.65rem] uppercase tracking-wide text-slate-400">District</div>
-        <div class="text-sm font-semibold text-slate-50 mb-1">TX-${distId}</div>
+        <div class="text-[0.65rem] uppercase tracking-wide text-slate-500">District</div>
+        <div class="text-sm font-semibold text-slate-900 mb-1">TX-${distId}</div>
       `;
 
       if (dr && res) {
         html += `
           <div class="grid grid-cols-2 gap-x-3 gap-y-1 mb-1">
             <div>
-              <div class="text-[0.65rem] uppercase text-blue-300/80">D ratio</div>
-              <div class="text-xs text-blue-100 font-semibold">${dr.D.toFixed(2)}</div>
+              <div class="text-[0.65rem] uppercase text-blue-600/80">D ratio</div>
+              <div class="text-xs text-blue-800 font-semibold">${dr.D.toFixed(2)}</div>
             </div>
             <div>
-              <div class="text-[0.65rem] uppercase text-red-300/80">R ratio</div>
-              <div class="text-xs text-red-100 font-semibold">${dr.R.toFixed(2)}</div>
+              <div class="text-[0.65rem] uppercase text-red-600/80">R ratio</div>
+              <div class="text-xs text-red-800 font-semibold">${dr.R.toFixed(2)}</div>
             </div>
             <div class="mt-1">
-              <div class="text-[0.65rem] uppercase text-slate-400/80">D share</div>
-              <div class="text-xs text-slate-100">${res.dShare.toFixed(1)}%</div>
+              <div class="text-[0.65rem] uppercase text-slate-500/80">D share</div>
+              <div class="text-xs text-slate-900">${res.dShare.toFixed(1)}%</div>
             </div>
             <div class="mt-1">
-              <div class="text-[0.65rem] uppercase text-slate-400/80">R share</div>
-              <div class="text-xs text-slate-100">${res.rShare.toFixed(1)}%</div>
+              <div class="text-[0.65rem] uppercase text-slate-500/80">R share</div>
+              <div class="text-xs text-slate-900">${res.rShare.toFixed(1)}%</div>
             </div>
           </div>
-          <div class="text-[0.65rem] text-slate-400">
+          <div class="text-[0.65rem] text-slate-600">
             Winner: <span class="${
-              res.winner === "D" ? "text-blue-300" : "text-red-300"
+              res.winner === "D" ? "text-blue-700" : "text-red-700"
             } font-semibold">${res.winner}</span>,
             margin ${res.margin.toFixed(1)} pts
           </div>
         `;
       } else {
-        html += `<div class="text-xs text-slate-300">No data for this district.</div>`;
+        html += `<div class="text-xs text-slate-700">No data for this district.</div>`;
       }
 
       tooltip.innerHTML = html;
@@ -563,12 +567,15 @@
     demInput.addEventListener("input", recomputeAndRender);
     repInput.addEventListener("input", recomputeAndRender);
     resetBtn.addEventListener("click", () => {
-      demInput.value = 50;
-      repInput.value = 50;
+      demInput.value = 43;
+      repInput.value = 57;
       recomputeAndRender();
     });
 
     document.addEventListener("DOMContentLoaded", () => {
+      // Start at 43–57
+      demInput.value = 43;
+      repInput.value = 57;
       recomputeAndRender();
       loadTexasMap();
     });
