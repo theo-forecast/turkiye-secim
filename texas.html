@@ -116,6 +116,9 @@
               <div id="statewideSummary" class="font-medium text-slate-900">
                 Average across districts: D 43.0% – R 57.0%
               </div>
+              <div id="seatSummary" class="font-medium text-slate-900">
+                Projected seats: D 0 – R 0 (of 38)
+              </div>
               <div class="text-slate-600">
                 District intensity reflects margin: near ties are very light, blowouts are dark.
               </div>
@@ -236,6 +239,7 @@
     const repLabel = document.getElementById("repLabel");
     const resetBtn = document.getElementById("resetBtn");
     const statewideSummary = document.getElementById("statewideSummary");
+    const seatSummary = document.getElementById("seatSummary");
     const tableBody = document.getElementById("districtTableBody");
 
     let currentResults = {}; // { id: { dShare, rShare, winner, margin } }
@@ -435,10 +439,9 @@
           return;
         }
 
-        // margin 0–40 => very light to dark
         const marginClamped = Math.min(res.margin, 40);
         const t = marginClamped / 40; // 0..1
-        const lightness = 95 - t * 45; // 95% (almost white) -> 50% (darker)
+        const lightness = 95 - t * 45; // 95% -> 50%
 
         const color =
           res.winner === "D"
@@ -478,20 +481,30 @@
       const values = Object.values(currentResults);
       if (!values.length) {
         statewideSummary.textContent = "No district data.";
+        seatSummary.textContent = "";
         return;
       }
 
       let dSum = 0;
       let rSum = 0;
+      let dSeats = 0;
+      let rSeats = 0;
+
       values.forEach((res) => {
         dSum += res.dShare;
         rSum += res.rShare;
+        if (res.winner === "D") dSeats++;
+        else rSeats++;
       });
+
       const dAvg = dSum / values.length;
       const rAvg = rSum / values.length;
 
       statewideSummary.textContent =
         "Average across districts: D " + dAvg.toFixed(1) + "% – R " + rAvg.toFixed(1) + "%";
+
+      seatSummary.textContent =
+        "Projected seats: D " + dSeats + " – R " + rSeats + " (of " + values.length + ")";
     }
 
     // ---- Tooltip (no ratios shown) ----
