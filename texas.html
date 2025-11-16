@@ -112,14 +112,31 @@
               </span>
             </div>
 
-            <div class="mt-4 text-xs text-slate-700 space-y-1">
-              <div id="statewideSummary" class="font-medium text-slate-900">
-                Average across districts: D 43.0% – R 57.0%
+            <div class="mt-4 text-xs text-slate-700 space-y-2">
+              <div class="text-[0.7rem] uppercase tracking-wide text-slate-500">
+                Projected seats
               </div>
-              <div id="seatSummary" class="font-medium text-slate-900">
-                Projected seats: D 0 – R 0 (of 38)
+              <div id="seatSummary" class="flex items-center gap-3">
+                <span
+                  id="seatSummaryDem"
+                  class="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-300 text-xs font-semibold"
+                >
+                  D 0
+                </span>
+                <span
+                  id="seatSummaryRep"
+                  class="inline-flex items-center px-2 py-1 rounded-full bg-red-50 text-red-700 border border-red-300 text-xs font-semibold"
+                >
+                  R 0
+                </span>
+                <span
+                  id="seatSummaryTotal"
+                  class="text-[0.75rem] text-slate-600"
+                >
+                  (of 38)
+                </span>
               </div>
-              <div class="text-slate-600">
+              <div class="text-[0.7rem] text-slate-600">
                 District intensity reflects margin: near ties are very light, blowouts are dark.
               </div>
             </div>
@@ -238,8 +255,10 @@
     const demLabel = document.getElementById("demLabel");
     const repLabel = document.getElementById("repLabel");
     const resetBtn = document.getElementById("resetBtn");
-    const statewideSummary = document.getElementById("statewideSummary");
     const seatSummary = document.getElementById("seatSummary");
+    const seatSummaryDem = document.getElementById("seatSummaryDem");
+    const seatSummaryRep = document.getElementById("seatSummaryRep");
+    const seatSummaryTotal = document.getElementById("seatSummaryTotal");
     const tableBody = document.getElementById("districtTableBody");
 
     let currentResults = {}; // { id: { dShare, rShare, winner, margin } }
@@ -424,7 +443,7 @@
 
       colorMap();
       renderTable();
-      renderStatewideSummary();
+      renderSeatSummary();
     }
 
     function colorMap() {
@@ -477,34 +496,26 @@
       tableBody.innerHTML = rows;
     }
 
-    function renderStatewideSummary() {
+    function renderSeatSummary() {
       const values = Object.values(currentResults);
       if (!values.length) {
-        statewideSummary.textContent = "No district data.";
-        seatSummary.textContent = "";
+        seatSummaryDem.textContent = "D 0";
+        seatSummaryRep.textContent = "R 0";
+        seatSummaryTotal.textContent = "(of 0)";
         return;
       }
 
-      let dSum = 0;
-      let rSum = 0;
       let dSeats = 0;
       let rSeats = 0;
 
       values.forEach((res) => {
-        dSum += res.dShare;
-        rSum += res.rShare;
         if (res.winner === "D") dSeats++;
         else rSeats++;
       });
 
-      const dAvg = dSum / values.length;
-      const rAvg = rSum / values.length;
-
-      statewideSummary.textContent =
-        "Average across districts: D " + dAvg.toFixed(1) + "% – R " + rAvg.toFixed(1) + "%";
-
-      seatSummary.textContent =
-        "Projected seats: D " + dSeats + " – R " + rSeats + " (of " + values.length + ")";
+      seatSummaryDem.textContent = "D " + dSeats;
+      seatSummaryRep.textContent = "R " + rSeats;
+      seatSummaryTotal.textContent = "(of " + values.length + ")";
     }
 
     // ---- Tooltip (no ratios shown) ----
