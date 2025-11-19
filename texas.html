@@ -1,250 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="antialiased">
 <head>
   <meta charset="UTF-8" />
-  <title>Texas Congressional District Swingometer</title>
+  <title>Texas 2024: District Swingometer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            pol: {
+              dem: '#2563EB', // Vivid Blue
+              rep: '#DC2626', // Vivid Red
+              bg: '#F8FAFC',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    /* Custom Range Slider Styling */
+    input[type=range] {
+      -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+      width: 100%;
+      background: transparent; /* Otherwise white in Chrome */
     }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #475569;
+      cursor: pointer;
+      margin-top: -8px; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: transform 0.1s ease;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      background: #E2E8F0;
+      border-radius: 2px;
+    }
+
+    input[type=range]:focus {
+      outline: none;
+    }
+
+    /* Dot Pattern Background */
+    .bg-dot-pattern {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* Tooltip Glass Effect */
     #tooltip {
-      position: fixed;
-      z-index: 50;
-      pointer-events: none;
-      max-width: 260px;
+      backdrop-filter: blur(8px);
+      background-color: rgba(255, 255, 255, 0.95);
     }
-    #tooltip.hidden {
-      display: none;
+
+    /* Scrollbar Polish */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <div class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="border-b border-slate-200 bg-white">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+<body class="bg-dot-pattern text-slate-800 h-screen overflow-hidden flex flex-col">
+
+  <header class="flex-none border-b border-slate-200 bg-white/80 backdrop-blur-md z-40 sticky top-0">
+    <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-slate-900 text-white rounded-lg flex items-center justify-center font-bold tracking-tighter shadow-lg">
+          TX
+        </div>
         <div>
-          <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">
-            Texas Congressional District Swingometer
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-tight">
+            Congressional Swingometer
           </h1>
-          <p class="text-xs sm:text-sm text-slate-600 mt-1">
-            Adjust statewide D/R support and see how districts tip.
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">
+            Interactive Projection Model
           </p>
         </div>
-        <div class="flex items-center gap-3 text-[0.7rem] text-slate-600">
-          <span class="inline-flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-blue-600 border border-blue-700"></span>
-            Dem lead
-          </span>
-          <span class="inline-flex items-center gap-1">
-            <span class="w-3 h-3 rounded-full bg-red-600 border border-red-700"></span>
-            GOP lead
-          </span>
+      </div>
+      
+      <div class="hidden sm:flex items-center gap-6 px-4 py-2 bg-slate-50 rounded-full border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-2">
+          <div class="flex gap-0.5">
+            <span class="w-1.5 h-4 bg-blue-600 rounded-sm opacity-100"></span>
+            <span class="w-1.5 h-4 bg-blue-600 rounded-sm opacity-60"></span>
+            <span class="w-1.5 h-4 bg-blue-600 rounded-sm opacity-30"></span>
+          </div>
+          <span class="text-[0.7rem] font-semibold text-slate-600 uppercase tracking-wide">Dem Lead</span>
+        </div>
+        <div class="w-px h-4 bg-slate-300"></div>
+        <div class="flex items-center gap-2">
+          <span class="text-[0.7rem] font-semibold text-slate-600 uppercase tracking-wide">GOP Lead</span>
+          <div class="flex gap-0.5">
+            <span class="w-1.5 h-4 bg-red-600 rounded-sm opacity-30"></span>
+            <span class="w-1.5 h-4 bg-red-600 rounded-sm opacity-60"></span>
+            <span class="w-1.5 h-4 bg-red-600 rounded-sm opacity-100"></span>
+          </div>
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Main -->
-    <main class="flex-1">
-      <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <!-- Controls + Map -->
-        <div class="grid lg:grid-cols-3 gap-6">
-          <!-- Controls -->
-          <section class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
-            <h2 class="text-sm font-semibold text-slate-900 tracking-tight">
-              Statewide inputs
+  <main class="flex-1 overflow-hidden">
+    <div class="max-w-[1400px] mx-auto px-4 py-6 h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <div class="lg:col-span-4 flex flex-col gap-6 overflow-y-auto pr-2 pb-10">
+        
+        <section class="bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-200 p-6 relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-32 h-32 bg-slate-50 rounded-full blur-2xl -z-10"></div>
+
+          <div class="mb-6">
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+              Statewide Vote Share
             </h2>
-            <p class="text-xs text-slate-600">
-              These are statewide vote shares. Each district’s response is shaped by its D/R ratio.
-            </p>
+            <p class="text-xs text-slate-500 mt-1">Adjust the sliders to simulate a statewide shift.</p>
+          </div>
 
-            <div class="space-y-3 mt-2">
-              <div>
-                <label for="demInput" class="flex justify-between text-xs text-slate-700 mb-1">
-                  <span>Democratic vote share</span>
-                  <span id="demLabel" class="font-semibold text-blue-700">43.0%</span>
-                </label>
-                <input
-                  id="demInput"
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value="43"
-                  class="w-full"
-                />
+          <div class="space-y-8">
+            <div class="relative group">
+              <div class="flex justify-between items-end mb-2">
+                <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-100 group-hover:bg-blue-100 transition-colors">Democrats</span>
+                <span id="demLabel" class="font-mono text-lg font-bold text-slate-900">43.0%</span>
               </div>
-
-              <div>
-                <label for="repInput" class="flex justify-between text-xs text-slate-700 mb-1">
-                  <span>Republican vote share</span>
-                  <span id="repLabel" class="font-semibold text-red-700">57.0%</span>
-                </label>
-                <input
-                  id="repInput"
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value="57"
-                  class="w-full"
-                />
-                <p class="mt-1 text-[0.65rem] text-slate-500">
-                  Sliders are always normalized so D + R = 100.
-                </p>
-              </div>
+              <input id="demInput" type="range" min="0" max="100" step="0.1" value="43" class="accent-blue-600" />
+              <div class="h-1 w-full bg-gradient-to-r from-blue-100 to-blue-600 rounded-full mt-[-4px] opacity-30 pointer-events-none"></div>
             </div>
 
-            <div class="flex items-center gap-2 mt-3">
-              <button
-                id="resetBtn"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 border border-slate-300"
-              >
-                Reset to 43–57
-              </button>
-              <span class="text-[0.7rem] text-slate-600">
-                Colors update automatically as you move the sliders.
-              </span>
-            </div>
-
-            <div class="mt-4 text-xs text-slate-700 space-y-2">
-              <div class="text-[0.7rem] uppercase tracking-wide text-slate-500">
-                Projected seats
+            <div class="relative group">
+              <div class="flex justify-between items-end mb-2">
+                <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-1 rounded border border-red-100 group-hover:bg-red-100 transition-colors">Republicans</span>
+                <span id="repLabel" class="font-mono text-lg font-bold text-slate-900">57.0%</span>
               </div>
-              <div id="seatSummary" class="flex items-center gap-3">
-                <span
-                  id="seatSummaryDem"
-                  class="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-300 text-xs font-semibold"
-                >
-                  D 0
-                </span>
-                <span
-                  id="seatSummaryRep"
-                  class="inline-flex items-center px-2 py-1 rounded-full bg-red-50 text-red-700 border border-red-300 text-xs font-semibold"
-                >
-                  R 0
-                </span>
-                <span
-                  id="seatSummaryTotal"
-                  class="text-[0.75rem] text-slate-600"
-                >
-                  (of 38)
-                </span>
-              </div>
-              <div class="text-[0.7rem] text-slate-600">
-                District intensity reflects margin: near ties are very light, blowouts are dark.
-              </div>
-            </div>
-          </section>
-
-          <!-- Map -->
-          <section class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm">
-            <div class="px-5 pt-4 pb-3 flex items-center justify-between gap-2">
-              <div>
-                <h2 class="text-sm font-semibold text-slate-900 tracking-tight">
-                  Texas districts map
-                </h2>
-                <p class="text-xs text-slate-600">
-                  Hover a district for details.
-                </p>
-              </div>
-            </div>
-            <div class="bg-white border-t border-slate-200">
-              <div class="aspect-[4/3] w-full flex items-center justify-center">
-                <svg
-                  id="texasMapSVG"
-                  class="w-full h-full"
-                  viewBox="0 0 400 400"
-                  preserveAspectRatio="xMidYMid meet"
-                ></svg>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <!-- District table -->
-        <section class="bg-white border border-slate-200 rounded-2xl shadow-sm">
-          <div class="px-5 pt-4 pb-3 flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-semibold text-slate-900 tracking-tight">
-                District-level results
-              </h2>
-              <p class="text-xs text-slate-600">
-                Based on current statewide inputs and fixed district D/R ratios.
-              </p>
+              <input id="repInput" type="range" min="0" max="100" step="0.1" value="57" class="accent-red-600" />
+              <div class="h-1 w-full bg-gradient-to-r from-red-100 to-red-600 rounded-full mt-[-4px] opacity-30 pointer-events-none"></div>
             </div>
           </div>
-          <div class="border-t border-slate-200 max-h-[420px] overflow-y-auto">
-            <table class="min-w-full text-xs text-slate-800">
-              <thead class="sticky top-0 bg-slate-100 border-b border-slate-200">
+
+          <div class="mt-6 pt-6 border-t border-slate-100 flex justify-between items-center">
+             <button id="resetBtn" class="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              Reset Baseline (43-57)
+             </button>
+          </div>
+        </section>
+
+        <section class="bg-slate-900 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden">
+           <div class="absolute top-0 right-0 p-3 opacity-10">
+             <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 7a1 1 0 00-1 1v5a1 1 0 001 1h2a1 1 0 001-1V8a1 1 0 00-1-1h-2z"></path></svg>
+           </div>
+           <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Projected Delegation</h3>
+           <div id="seatSummary" class="flex items-baseline gap-6">
+             <div class="flex flex-col">
+                <span class="text-xs text-blue-300 font-medium mb-1">Democrats</span>
+                <span id="seatSummaryDem" class="text-4xl font-mono font-bold text-blue-400">0</span>
+             </div>
+             <div class="h-10 w-px bg-slate-700"></div>
+             <div class="flex flex-col">
+                <span class="text-xs text-red-300 font-medium mb-1">Republicans</span>
+                <span id="seatSummaryRep" class="text-4xl font-mono font-bold text-red-400">0</span>
+             </div>
+             <div class="ml-auto flex flex-col items-end justify-end">
+                <span class="text-[0.65rem] text-slate-500 uppercase">Total Seats</span>
+                <span class="font-mono text-xl text-slate-300">38</span>
+             </div>
+           </div>
+           <div class="mt-6 h-2 bg-slate-800 rounded-full overflow-hidden flex" id="seatProgressBar">
+              </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-[300px]">
+          <div class="px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wide">District Data</h2>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="sticky top-0 bg-white shadow-sm z-10 text-[0.65rem] uppercase tracking-wider text-slate-500 font-semibold">
                 <tr>
-                  <th class="px-3 py-2 text-left text-slate-600 font-medium">District</th>
-                  <th class="px-3 py-2 text-right text-blue-700 font-medium">D %</th>
-                  <th class="px-3 py-2 text-right text-red-700 font-medium">R %</th>
-                  <th class="px-3 py-2 text-center text-slate-600 font-medium">Winner</th>
-                  <th class="px-3 py-2 text-right text-slate-600 font-medium">Margin</th>
+                  <th class="px-4 py-3 bg-slate-50/90 backdrop-blur">Dist</th>
+                  <th class="px-4 py-3 text-right bg-slate-50/90 backdrop-blur text-blue-600">Dem %</th>
+                  <th class="px-4 py-3 text-right bg-slate-50/90 backdrop-blur text-red-600">Rep %</th>
+                  <th class="px-4 py-3 text-center bg-slate-50/90 backdrop-blur">Win</th>
+                  <th class="px-4 py-3 text-right bg-slate-50/90 backdrop-blur">Margin</th>
                 </tr>
               </thead>
-              <tbody id="districtTableBody"></tbody>
+              <tbody id="districtTableBody" class="divide-y divide-slate-100 font-mono">
+                </tbody>
             </table>
           </div>
         </section>
       </div>
-    </main>
-  </div>
 
-  <!-- Tooltip -->
+      <div class="lg:col-span-8 h-full flex flex-col">
+        <section class="bg-white rounded-2xl shadow-[0_8px_30px_-6px_rgba(0,0,0,0.1)] border border-slate-200 flex-1 relative p-4 sm:p-8 flex items-center justify-center overflow-hidden">
+           <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"></div>
+           
+           <div class="w-full h-full max-h-[80vh] relative z-10">
+             <svg
+               id="texasMapSVG"
+               class="w-full h-full drop-shadow-xl"
+               style="filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.08));"
+               viewBox="0 0 400 400"
+               preserveAspectRatio="xMidYMid meet"
+             ></svg>
+           </div>
+
+           <div class="absolute bottom-6 right-6 text-[0.65rem] text-slate-400 bg-white/80 backdrop-blur px-2 py-1 rounded-md border border-slate-100 shadow-sm pointer-events-none">
+             Hover district for details
+           </div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
   <div
     id="tooltip"
-    class="hidden bg-white border border-slate-300 text-slate-900 text-xs rounded-lg shadow-lg px-3 py-2"
+    class="hidden fixed z-50 text-sm rounded-xl shadow-2xl border border-white/50 px-4 py-3 pointer-events-none transition-opacity duration-150 min-w-[180px]"
   ></div>
 
   <script>
-    // --- District D/R ratios (your data) ---
+    // --- District D/R ratios (unchanged data) ---
     const districtRatios = {
-      1:  { D: 0.59, R: 1.35 },
-      2:  { D: 0.86, R: 1.12 },
-      3:  { D: 0.87, R: 1.09 },
-      4:  { D: 0.87, R: 1.11 },
-      5:  { D: 0.90, R: 1.09 },
-      6:  { D: 0.87, R: 1.11 },
-      7:  { D: 1.41, R: 0.65 },
-      8:  { D: 0.85, R: 1.13 },
-      9:  { D: 0.95, R: 1.05 },
-      10: { D: 0.90, R: 1.08 },
-      11: { D: 0.75, R: 1.21 },
-      12: { D: 0.88, R: 1.10 },
-      13: { D: 0.60, R: 1.33 },
-      14: { D: 0.85, R: 1.13 },
-      15: { D: 1.00, R: 1.01 },
-      16: { D: 1.40, R: 0.67 },
-      17: { D: 0.90, R: 1.08 },
-      18: { D: 1.78, R: 0.36 },
-      19: { D: 0.56, R: 1.37 },
-      20: { D: 1.49, R: 0.59 },
-      21: { D: 0.89, R: 1.09 },
-      22: { D: 0.88, R: 1.09 },
-      23: { D: 0.99, R: 1.01 },
-      24: { D: 0.95, R: 1.04 },
-      25: { D: 0.89, R: 1.10 },
-      26: { D: 0.87, R: 1.11 },
-      27: { D: 0.89, R: 1.09 },
-      28: { D: 1.11, R: 0.92 },
-      29: { D: 1.52, R: 0.57 },
-      30: { D: 1.69, R: 0.43 },
-      31: { D: 0.88, R: 1.09 },
-      32: { D: 0.95, R: 1.04 },
-      33: { D: 1.54, R: 0.55 },
-      34: { D: 1.07, R: 0.95 },
-      35: { D: 1.04, R: 0.97 },
-      36: { D: 0.87, R: 1.11 },
-      37: { D: 1.77, R: 0.35 },
-      38: { D: 0.89, R: 1.09 },
+      1:  { D: 0.59, R: 1.35 }, 2:  { D: 0.86, R: 1.12 }, 3:  { D: 0.87, R: 1.09 },
+      4:  { D: 0.87, R: 1.11 }, 5:  { D: 0.90, R: 1.09 }, 6:  { D: 0.87, R: 1.11 },
+      7:  { D: 1.41, R: 0.65 }, 8:  { D: 0.85, R: 1.13 }, 9:  { D: 0.95, R: 1.05 },
+      10: { D: 0.90, R: 1.08 }, 11: { D: 0.75, R: 1.21 }, 12: { D: 0.88, R: 1.10 },
+      13: { D: 0.60, R: 1.33 }, 14: { D: 0.85, R: 1.13 }, 15: { D: 1.00, R: 1.01 },
+      16: { D: 1.40, R: 0.67 }, 17: { D: 0.90, R: 1.08 }, 18: { D: 1.78, R: 0.36 },
+      19: { D: 0.56, R: 1.37 }, 20: { D: 1.49, R: 0.59 }, 21: { D: 0.89, R: 1.09 },
+      22: { D: 0.88, R: 1.09 }, 23: { D: 0.99, R: 1.01 }, 24: { D: 0.95, R: 1.04 },
+      25: { D: 0.89, R: 1.10 }, 26: { D: 0.87, R: 1.11 }, 27: { D: 0.89, R: 1.09 },
+      28: { D: 1.11, R: 0.92 }, 29: { D: 1.52, R: 0.57 }, 30: { D: 1.69, R: 0.43 },
+      31: { D: 0.88, R: 1.09 }, 32: { D: 0.95, R: 1.04 }, 33: { D: 1.54, R: 0.55 },
+      34: { D: 1.07, R: 0.95 }, 35: { D: 1.04, R: 0.97 }, 36: { D: 0.87, R: 1.11 },
+      37: { D: 1.77, R: 0.35 }, 38: { D: 0.89, R: 1.09 },
     };
 
     // DOM refs
@@ -255,47 +282,31 @@
     const demLabel = document.getElementById("demLabel");
     const repLabel = document.getElementById("repLabel");
     const resetBtn = document.getElementById("resetBtn");
-    const seatSummary = document.getElementById("seatSummary");
     const seatSummaryDem = document.getElementById("seatSummaryDem");
     const seatSummaryRep = document.getElementById("seatSummaryRep");
-    const seatSummaryTotal = document.getElementById("seatSummaryTotal");
     const tableBody = document.getElementById("districtTableBody");
 
-    let currentResults = {}; // { id: { dShare, rShare, winner, margin } }
+    let currentResults = {}; 
 
-    // ---- Simple lon/lat → SVG projection (no D3) ----
+    // ---- Helper Functions for Geometry (unchanged logic) ----
     function computeBounds(features) {
       let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
-
       for (const f of features) {
-        const geom = f.geometry;
-        if (!geom) continue;
-
+        const geom = f.geometry; if (!geom) continue;
         if (geom.type === "MultiPolygon") {
-          for (const poly of geom.coordinates) {
-            for (const ring of poly) {
-              for (const coord of ring) {
-                const [lon, lat] = coord;
-                if (lon < minLon) minLon = lon;
-                if (lon > maxLon) maxLon = lon;
-                if (lat < minLat) minLat = lat;
-                if (lat > maxLat) maxLat = lat;
-              }
-            }
+          for (const poly of geom.coordinates) for (const ring of poly) for (const coord of ring) {
+            const [lon, lat] = coord;
+            if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
+            if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
           }
         } else if (geom.type === "Polygon") {
-          for (const ring of geom.coordinates) {
-            for (const coord of ring) {
-              const [lon, lat] = coord;
-              if (lon < minLon) minLon = lon;
-              if (lon > maxLon) maxLon = lon;
-              if (lat < minLat) minLat = lat;
-              if (lat > maxLat) maxLat = lat;
-            }
+          for (const ring of geom.coordinates) for (const coord of ring) {
+            const [lon, lat] = coord;
+            if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
+            if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
           }
         }
       }
-
       return { minLon, maxLon, minLat, maxLat };
     }
 
@@ -308,13 +319,11 @@
 
     function geometryToPath(geom, bounds, width, height) {
       let d = "";
-
       if (geom.type === "MultiPolygon") {
         for (const poly of geom.coordinates) {
           for (const ring of poly) {
             ring.forEach((coord, idx) => {
-              const [lon, lat] = coord;
-              const [x, y] = projectPoint(lon, lat, bounds, width, height);
+              const [x, y] = projectPoint(coord[0], coord[1], bounds, width, height);
               d += (idx === 0 ? "M" : "L") + x + " " + y + " ";
             });
             d += "Z ";
@@ -323,83 +332,73 @@
       } else if (geom.type === "Polygon") {
         for (const ring of geom.coordinates) {
           ring.forEach((coord, idx) => {
-            const [lon, lat] = coord;
-            const [x, y] = projectPoint(lon, lat, bounds, width, height);
+            const [x, y] = projectPoint(coord[0], coord[1], bounds, width, height);
             d += (idx === 0 ? "M" : "L") + x + " " + y + " ";
           });
           d += "Z ";
         }
       }
-
       return d.trim();
     }
 
-    // ---- Map loading ----
+    // ---- Map Loading ----
     async function loadTexasMap() {
       try {
+        // Ensure you have this file in the same directory
         const response = await fetch("./district-shapes.geojson");
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + " when fetching district-shapes.geojson");
-        }
+        if (!response.ok) throw new Error("HTTP " + response.status);
         const raw = await response.json();
-
         const features = raw.features || [];
-        if (!features.length) {
-          throw new Error("GeoJSON has no features");
-        }
 
         const width = svg.viewBox.baseVal.width || 400;
-        const height = svg.viewBox.baseVal.height || 300;
-
+        const height = svg.viewBox.baseVal.height || 400;
         const bounds = computeBounds(features);
 
         while (svg.firstChild) svg.removeChild(svg.firstChild);
-
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         svg.appendChild(g);
 
         for (const feature of features) {
           const distId = feature.properties && feature.properties.id;
           if (distId == null) continue;
-          const geom = feature.geometry;
-          if (!geom) continue;
-
-          const pathData = geometryToPath(geom, bounds, width, height);
+          const pathData = geometryToPath(feature.geometry, bounds, width, height);
           if (!pathData) continue;
 
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
           path.setAttribute("d", pathData);
           path.dataset.districtId = String(distId);
-
-          path.setAttribute("stroke", "#94a3b8");
-          path.setAttribute("stroke-width", "0.8");
-          path.setAttribute("fill", "none");
-
-          path.classList.add("transition", "duration-150", "cursor-pointer");
-
-          path.addEventListener("mouseover", (e) => showTooltip(e, distId));
+          
+          // Initial Style
+          path.setAttribute("stroke", "#fff");
+          path.setAttribute("stroke-width", "0.5");
+          path.setAttribute("stroke-opacity", "0.5");
+          path.setAttribute("fill", "#e2e8f0");
+          
+          // Modern interaction classes
+          path.classList.add("transition-all", "duration-300", "ease-out", "cursor-pointer", "hover:brightness-110");
+          
+          path.addEventListener("mouseover", (e) => {
+            path.setAttribute("stroke-width", "1.5");
+            path.setAttribute("stroke", "#1e293b");
+            showTooltip(e, distId);
+          });
           path.addEventListener("mousemove", positionTooltip);
-          path.addEventListener("mouseout", hideTooltip);
+          path.addEventListener("mouseout", (e) => {
+            path.setAttribute("stroke-width", "0.5");
+            path.setAttribute("stroke", "#fff");
+            hideTooltip();
+          });
 
           g.appendChild(path);
         }
-
         recomputeAndRender();
       } catch (err) {
-        console.error("Error loading Texas GeoJSON:", err);
-        while (svg.firstChild) svg.removeChild(svg.firstChild);
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", "50%");
-        text.setAttribute("y", "50%");
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("fill", "#334155");
-        text.setAttribute("font-size", "14");
-        text.textContent = "Failed to load district-shapes.geojson. Check path / GitHub Pages.";
-        svg.appendChild(text);
+        console.error(err);
+        svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#64748b" font-family="Inter" font-size="14">Map data not found. Ensure district-shapes.geojson is present.</text>`;
       }
     }
 
-    // ---- Swing logic ----
+    // ---- Logic & Rendering ----
     function recomputeAndRender() {
       let dNat = parseFloat(demInput.value);
       let rNat = parseFloat(repInput.value);
@@ -408,13 +407,8 @@
       if (!isFinite(rNat)) rNat = 57;
 
       const total = dNat + rNat;
-      if (total === 0) {
-        dNat = 43;
-        rNat = 57;
-      } else {
-        dNat = (dNat / total) * 100;
-        rNat = 100 - dNat;
-      }
+      if (total === 0) { dNat = 43; rNat = 57; } 
+      else { dNat = (dNat / total) * 100; rNat = 100 - dNat; }
 
       demInput.value = dNat.toFixed(1);
       repInput.value = rNat.toFixed(1);
@@ -427,17 +421,13 @@
         const scoreD = dr.D * dNat;
         const scoreR = dr.R * rNat;
         const scoreTotal = scoreD + scoreR;
-
-        let dShare = 50;
-        let rShare = 50;
+        let dShare = 50, rShare = 50;
         if (scoreTotal > 0) {
           dShare = (scoreD / scoreTotal) * 100;
           rShare = 100 - dShare;
         }
-
         const winner = dShare >= rShare ? "D" : "R";
         const margin = Math.abs(dShare - rShare);
-
         currentResults[id] = { dShare, rShare, winner, margin };
       });
 
@@ -451,24 +441,28 @@
       paths.forEach((path) => {
         const id = path.dataset.districtId;
         const res = currentResults[id];
+        if (!res) return;
 
-        if (!res) {
-          path.style.fill = "#e2e8f0";
-          path.style.opacity = "1";
-          return;
+        // Enhanced Color Logic: darker, more vivid political colors
+        const marginClamped = Math.min(res.margin, 35); // Cap saturation earlier
+        const t = marginClamped / 35; // 0..1
+        
+        // Interpolate between gray and political color
+        // Dem: HSL 221 (Blue-600ish) | Rep: HSL 354 (Red-600ish)
+        let color;
+        if (res.winner === "D") {
+             // Lightness goes from 90% (near gray) to 45% (deep blue)
+             const l = 90 - (t * 45);
+             // Saturation goes from 10% to 90%
+             const s = 10 + (t * 80);
+             color = `hsl(221, ${s}%, ${l}%)`;
+        } else {
+             const l = 90 - (t * 45);
+             const s = 10 + (t * 80);
+             color = `hsl(354, ${s}%, ${l}%)`;
         }
 
-        const marginClamped = Math.min(res.margin, 40);
-        const t = marginClamped / 40; // 0..1
-        const lightness = 95 - t * 45; // 95% -> 50%
-
-        const color =
-          res.winner === "D"
-            ? `hsl(220, 80%, ${lightness}%)`
-            : `hsl(0, 80%, ${lightness}%)`;
-
         path.style.fill = color;
-        path.style.opacity = "1";
       });
     }
 
@@ -476,99 +470,83 @@
       const rows = Object.entries(currentResults)
         .sort((a, b) => Number(a[0]) - Number(b[0]))
         .map(([id, res]) => {
-          const winnerLabel =
-            res.winner === "D"
-              ? '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-300 text-[0.65rem]">D</span>'
-              : '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-300 text-[0.65rem]">R</span>';
+            // Refined Pills
+            const dClass = res.winner === 'D' ? 'bg-blue-100 text-blue-700 font-bold' : 'text-slate-400';
+            const rClass = res.winner === 'R' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-400';
+            const winnerBadge = res.winner === 'D' 
+                ? `<span class="px-2 py-0.5 rounded text-[0.6rem] bg-blue-600 text-white font-bold">DEM</span>` 
+                : `<span class="px-2 py-0.5 rounded text-[0.6rem] bg-red-600 text-white font-bold">GOP</span>`;
 
-          return `
-            <tr class="border-b border-slate-200 hover:bg-slate-100">
-              <td class="px-3 py-1.5 text-slate-900 text-xs">TX-${id}</td>
-              <td class="px-3 py-1.5 text-right text-blue-700">${res.dShare.toFixed(1)}%</td>
-              <td class="px-3 py-1.5 text-right text-red-700">${res.rShare.toFixed(1)}%</td>
-              <td class="px-3 py-1.5 text-center">${winnerLabel}</td>
-              <td class="px-3 py-1.5 text-right text-slate-700">${res.margin.toFixed(1)} pts</td>
-            </tr>
-          `;
-        })
-        .join("");
-
+            return `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-2 font-medium text-slate-700">TX-${id}</td>
+                <td class="px-4 py-2 text-right ${dClass}">${res.dShare.toFixed(1)}%</td>
+                <td class="px-4 py-2 text-right ${rClass}">${res.rShare.toFixed(1)}%</td>
+                <td class="px-4 py-2 text-center">${winnerBadge}</td>
+                <td class="px-4 py-2 text-right text-slate-500 tabular-nums">+${res.margin.toFixed(1)}</td>
+            </tr>`;
+        }).join("");
       tableBody.innerHTML = rows;
     }
 
     function renderSeatSummary() {
       const values = Object.values(currentResults);
-      if (!values.length) {
-        seatSummaryDem.textContent = "D 0";
-        seatSummaryRep.textContent = "R 0";
-        seatSummaryTotal.textContent = "(of 0)";
-        return;
-      }
-
       let dSeats = 0;
-      let rSeats = 0;
-
-      values.forEach((res) => {
-        if (res.winner === "D") dSeats++;
-        else rSeats++;
-      });
-
-      seatSummaryDem.textContent = "D " + dSeats;
-      seatSummaryRep.textContent = "R " + rSeats;
-      seatSummaryTotal.textContent = "(of " + values.length + ")";
+      values.forEach(v => { if(v.winner === 'D') dSeats++; });
+      const rSeats = values.length - dSeats;
+      
+      // Count-up animation logic could go here, but direct text is snappy
+      seatSummaryDem.textContent = dSeats;
+      seatSummaryRep.textContent = rSeats;
     }
 
-    // ---- Tooltip (no ratios shown) ----
+    // ---- Modern Tooltip ----
     function showTooltip(event, distId) {
       const res = currentResults[distId];
+      if (!res) return;
 
-      let html = `
-        <div class="text-[0.65rem] uppercase tracking-wide text-slate-500">District</div>
-        <div class="text-sm font-semibold text-slate-900 mb-1">TX-${distId}</div>
+      const winColor = res.winner === "D" ? "text-blue-600" : "text-red-600";
+      
+      tooltip.innerHTML = `
+        <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-200">
+            <span class="font-bold text-slate-800">District ${distId}</span>
+            <span class="text-[0.65rem] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">
+                +${res.margin.toFixed(1)} ${res.winner}
+            </span>
+        </div>
+        <div class="space-y-1.5 font-mono text-xs">
+            <div class="flex justify-between">
+                <span class="text-blue-700 font-semibold">Democrat</span>
+                <span class="text-slate-900">${res.dShare.toFixed(1)}%</span>
+            </div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500" style="width:${res.dShare}%"></div>
+            </div>
+            
+            <div class="flex justify-between pt-1">
+                <span class="text-red-700 font-semibold">Republican</span>
+                <span class="text-slate-900">${res.rShare.toFixed(1)}%</span>
+            </div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div class="h-full bg-red-500" style="width:${res.rShare}%"></div>
+            </div>
+        </div>
       `;
-
-      if (res) {
-        html += `
-          <div class="grid grid-cols-2 gap-x-3 gap-y-1 mb-1">
-            <div>
-              <div class="text-[0.65rem] uppercase text-blue-600/80">D share</div>
-              <div class="text-xs text-slate-900 font-semibold">${res.dShare.toFixed(1)}%</div>
-            </div>
-            <div>
-              <div class="text-[0.65rem] uppercase text-red-600/80">R share</div>
-              <div class="text-xs text-slate-900 font-semibold">${res.rShare.toFixed(1)}%</div>
-            </div>
-          </div>
-          <div class="text-[0.65rem] text-slate-600">
-            Winner: <span class="${
-              res.winner === "D" ? "text-blue-700" : "text-red-700"
-            } font-semibold">${res.winner}</span>,
-            margin ${res.margin.toFixed(1)} pts
-          </div>
-        `;
-      } else {
-        html += `<div class="text-xs text-slate-700">No data for this district.</div>`;
-      }
-
-      tooltip.innerHTML = html;
       tooltip.classList.remove("hidden");
       positionTooltip(event);
     }
 
     function positionTooltip(event) {
-      const padding = 12;
+      const padding = 16;
       const rect = tooltip.getBoundingClientRect();
+      
+      // Prefer placing nicely next to cursor
       let x = event.clientX + padding;
       let y = event.clientY + padding;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      if (x + rect.width + padding > vw) {
-        x = event.clientX - rect.width - padding;
-      }
-      if (y + rect.height + padding > vh) {
-        y = event.clientY - rect.height - padding;
-      }
+      
+      // Boundary checks
+      if (x + rect.width > window.innerWidth) x = event.clientX - rect.width - padding;
+      if (y + rect.height > window.innerHeight) y = event.clientY - rect.height - padding;
 
       tooltip.style.left = x + "px";
       tooltip.style.top = y + "px";
