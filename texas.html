@@ -34,9 +34,9 @@
   <style>
     /* Custom Range Slider Styling */
     input[type=range] {
-      -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+      -webkit-appearance: none;
       width: 100%;
-      background: transparent; /* Otherwise white in Chrome */
+      background: transparent;
     }
 
     input[type=range]::-webkit-slider-thumb {
@@ -141,9 +141,9 @@
   <main class="flex-1 overflow-hidden">
     <div class="max-w-[1400px] mx-auto px-4 py-6 h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <div class="lg:col-span-4 flex flex-col gap-4 overflow-y-auto pr-2 pb-10 max-h-[85vh]">
-        
-        <section class="bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-200 p-5 relative overflow-hidden">
+      <div class="lg:col-span-4 h-full flex flex-col gap-4 overflow-hidden">
+            
+        <section class="bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-200 p-5 relative overflow-y-auto shrink-0 max-h-[35vh]">
           <div class="absolute -top-10 -right-10 w-32 h-32 bg-slate-50 rounded-full blur-2xl -z-10"></div>
 
           <div class="mb-6">
@@ -182,7 +182,7 @@
           </div>
         </section>
 
-        <section class="bg-slate-900 rounded-2xl shadow-xl p-5 text-white relative overflow-hidden">
+        <section class="bg-slate-900 rounded-2xl shadow-xl p-5 text-white relative overflow-y-auto shrink-0 max-h-[25vh]">
            <div class="absolute top-0 right-0 p-3 opacity-10">
              <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 7a1 1 0 00-1 1v5a1 1 0 001 1h2a1 1 0 001-1V8a1 1 0 00-1-1h-2z"></path></svg>
            </div>
@@ -208,8 +208,8 @@
            </div>
         </section>
 
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-[300px]">
-          <div class="px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 bg-slate-50/50 flex-none">
             <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wide">District Data</h2>
           </div>
           <div class="flex-1 overflow-auto">
@@ -259,7 +259,7 @@
   ></div>
 
   <script>
-    // --- District D/R ratios (unchanged data) ---
+    // --- District D/R ratios ---
     const districtRatios = {
       1:  { D: 0.59, R: 1.35 }, 2:  { D: 0.86, R: 1.12 }, 3:  { D: 0.87, R: 1.09 },
       4:  { D: 0.87, R: 1.11 }, 5:  { D: 0.90, R: 1.09 }, 6:  { D: 0.87, R: 1.11 },
@@ -290,7 +290,7 @@
 
     let currentResults = {}; 
 
-    // ---- Helper Functions for Geometry (unchanged logic) ----
+    // ---- Helper Functions for Geometry ----
     function computeBounds(features) {
       let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
       for (const f of features) {
@@ -346,7 +346,6 @@
     // ---- Map Loading ----
     async function loadTexasMap() {
       try {
-        // Ensure you have this file in the same directory
         const response = await fetch("./district-shapes.geojson");
         if (!response.ok) throw new Error("HTTP " + response.status);
         const raw = await response.json();
@@ -370,13 +369,11 @@
           path.setAttribute("d", pathData);
           path.dataset.districtId = String(distId);
           
-          // Initial Style
           path.setAttribute("stroke", "#fff");
           path.setAttribute("stroke-width", "0.5");
           path.setAttribute("stroke-opacity", "0.5");
           path.setAttribute("fill", "#e2e8f0");
           
-          // Modern interaction classes
           path.classList.add("transition-all", "duration-300", "ease-out", "cursor-pointer", "hover:brightness-110");
           
           path.addEventListener("mouseover", (e) => {
@@ -445,17 +442,12 @@
         const res = currentResults[id];
         if (!res) return;
 
-        // Enhanced Color Logic: darker, more vivid political colors
-        const marginClamped = Math.min(res.margin, 35); // Cap saturation earlier
-        const t = marginClamped / 35; // 0..1
+        const marginClamped = Math.min(res.margin, 35);
+        const t = marginClamped / 35; 
         
-        // Interpolate between gray and political color
-        // Dem: HSL 221 (Blue-600ish) | Rep: HSL 354 (Red-600ish)
         let color;
         if (res.winner === "D") {
-             // Lightness goes from 90% (near gray) to 45% (deep blue)
              const l = 90 - (t * 45);
-             // Saturation goes from 10% to 90%
              const s = 10 + (t * 80);
              color = `hsl(221, ${s}%, ${l}%)`;
         } else {
@@ -472,7 +464,6 @@
       const rows = Object.entries(currentResults)
         .sort((a, b) => Number(a[0]) - Number(b[0]))
         .map(([id, res]) => {
-            // Refined Pills
             const dClass = res.winner === 'D' ? 'bg-blue-100 text-blue-700 font-bold' : 'text-slate-400';
             const rClass = res.winner === 'R' ? 'bg-red-100 text-red-700 font-bold' : 'text-slate-400';
             const winnerBadge = res.winner === 'D' 
@@ -497,7 +488,6 @@
       values.forEach(v => { if(v.winner === 'D') dSeats++; });
       const rSeats = values.length - dSeats;
       
-      // Count-up animation logic could go here, but direct text is snappy
       seatSummaryDem.textContent = dSeats;
       seatSummaryRep.textContent = rSeats;
     }
@@ -507,8 +497,6 @@
       const res = currentResults[distId];
       if (!res) return;
 
-      const winColor = res.winner === "D" ? "text-blue-600" : "text-red-600";
-      
       tooltip.innerHTML = `
         <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-200">
             <span class="font-bold text-slate-800">District ${distId}</span>
@@ -542,11 +530,9 @@
       const padding = 16;
       const rect = tooltip.getBoundingClientRect();
       
-      // Prefer placing nicely next to cursor
       let x = event.clientX + padding;
       let y = event.clientY + padding;
       
-      // Boundary checks
       if (x + rect.width > window.innerWidth) x = event.clientX - rect.width - padding;
       if (y + rect.height > window.innerHeight) y = event.clientY - rect.height - padding;
 
