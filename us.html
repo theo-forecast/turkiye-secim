@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024 Congressional Swingometer (Vertical Snake Layout)</title>
+<title>2024 Congressional Swingometer (5x7 Snake Grid)</title>
 <style>
   :root {
     --bg-app: #0f1115;
@@ -317,13 +317,12 @@
 
   /* SENATE SPECTRUM (VERTICAL SNAKE) */
   .senate-spectrum {
-    display: grid; /* Changed to Grid */
-    /* We will rely on JS to place items, but define rows here */
-    grid-template-rows: repeat(6, 1fr); /* Fixed height of 6 rows */
+    display: grid; 
+    /* UPDATED: 5 Rows fixed */
+    grid-template-rows: repeat(5, 1fr); 
     gap: 8px;
     padding: 20px;
     justify-content: center;
-    /* Ensure columns are sized for the dots */
     grid-auto-columns: 40px;
   }
   .senate-seat {
@@ -340,7 +339,6 @@
     cursor: pointer;
     transition: all 0.2s;
     border: 2px solid transparent;
-    /* Important for explicit placement */
     position: relative; 
   }
   .senate-seat:hover {
@@ -373,7 +371,6 @@
     .sc-t { grid-column: 1 / -1; margin: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 5px 0;}
     .chamber-label { margin-bottom: 15px; }
     
-    /* On mobile, maybe standard wrapping is better, but keeping snake for now */
     .senate-spectrum { overflow-x: auto; justify-content: flex-start; }
   }
 
@@ -788,8 +785,8 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       // Clear Grid
       senateGrid.innerHTML = '';
 
-      // VERTICAL SNAKE LOGIC
-      const ROWS = 6; // Must match CSS grid-template-rows
+      // VERTICAL SNAKE LOGIC (5x7)
+      const ROWS = 5; // Must match CSS grid-template-rows
       
       sortedSenate.forEach((s, i) => {
         senateGrid.appendChild(s.element); 
@@ -799,16 +796,16 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         // GRID PLACEMENT
         // Determine Column Index (0, 1, 2...)
         const colIndex = Math.floor(i / ROWS);
-        // Determine Position within that column (0 to 5)
+        // Determine Position within that column (0 to 4)
         const remainder = i % ROWS;
         
         let rowIndex;
         
         if (colIndex % 2 === 0) {
-            // Even Columns: Top -> Bottom (0 -> 5)
+            // Even Columns: Top -> Bottom (0 -> 4)
             rowIndex = remainder;
         } else {
-            // Odd Columns: Bottom -> Top (5 -> 0)
+            // Odd Columns: Bottom -> Top (4 -> 0)
             rowIndex = (ROWS - 1) - remainder;
         }
 
