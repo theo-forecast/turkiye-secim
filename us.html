@@ -20,7 +20,7 @@
     --rep-lean:   #f87171; /* 1-2.5 */
     --rep-tilt:   #fca5a5; /* 0-1 */
     
-    --tossup-pure: #444444;    
+    --tossup-pure: #444444;     
     
     /* DEMOCRAT SHADES */
     --dem-tilt:   #93c5fd; /* 0-1 */
@@ -87,29 +87,65 @@
   }
 
   .scoreboard {
-    display: grid;
-    /* 11 columns: 5 R, 1 Tie, 5 D */
-    grid-template-columns: repeat(5, 1fr) 0.6fr repeat(5, 1fr);
-    gap: 2px;
+    display: flex; /* Changed from Grid to Flex Column to stack Totals and Breakdown */
+    flex-direction: column;
     background: var(--bg-panel);
     padding: 12px;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.08);
-    align-items: center;
   }
 
   .chamber-label {
-    grid-column: 1 / -1;
     font-size: 0.9rem;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 5px;
+    padding-bottom: 8px;
   }
   .chamber-label span { opacity: 0.6; font-weight: 400; font-size: 0.8em;}
+
+  /* --- NEW TOTALS BAR --- */
+  .totals-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 20px;
+  }
+
+  .total-box {
+    text-align: center;
+  }
+
+  .total-num {
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .total-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  .t-rep { color: var(--rep-solid); text-shadow: 0 0 15px rgba(220, 38, 38, 0.2); }
+  .t-dem { color: var(--dem-solid); text-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
+
+  /* --- BREAKDOWN GRID (The old scoreboard grid) --- */
+  .breakdown-grid {
+    display: grid;
+    /* 11 columns: 5 R, 1 Tie, 5 D */
+    grid-template-columns: repeat(5, 1fr) 0.6fr repeat(5, 1fr);
+    gap: 2px;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 12px;
+  }
 
   .score-card {
     display: flex;
@@ -325,7 +361,9 @@
   @media (max-width: 1000px) {
     .vis-container { grid-template-columns: 1fr; }
     .us-grid { gap: 4px; }
-    .scoreboard { 
+    
+    /* Adjusted Breakpoint logic for new layout */
+    .breakdown-grid { 
       grid-template-columns: repeat(5, 1fr); 
       grid-template-rows: auto auto auto;
     }
@@ -379,37 +417,63 @@
       <div class="scoreboard">
         <div class="chamber-label">US House <span>218 to win</span></div>
         
-        <div class="score-card sc-r-safe"><div class="score-value" id="h-r-safe">0</div><div class="score-label">Safe R</div></div>
-        <div class="score-card sc-r-solid"><div class="score-value" id="h-r-solid">0</div><div class="score-label">Solid R</div></div>
-        <div class="score-card sc-r-likely"><div class="score-value" id="h-r-likely">0</div><div class="score-label">Likely R</div></div>
-        <div class="score-card sc-r-lean"><div class="score-value" id="h-r-lean">0</div><div class="score-label">Lean R</div></div>
-        <div class="score-card sc-r-tilt"><div class="score-value" id="h-r-tilt">0</div><div class="score-label">Tilt R</div></div>
-        
-        <div class="score-card sc-t"><div class="score-value" id="h-tie">0</div><div class="score-label">Tie</div></div>
-        
-        <div class="score-card sc-d-tilt"><div class="score-value" id="h-d-tilt">0</div><div class="score-label">Tilt D</div></div>
-        <div class="score-card sc-d-lean"><div class="score-value" id="h-d-lean">0</div><div class="score-label">Lean D</div></div>
-        <div class="score-card sc-d-likely"><div class="score-value" id="h-d-likely">0</div><div class="score-label">Likely D</div></div>
-        <div class="score-card sc-d-solid"><div class="score-value" id="h-d-solid">0</div><div class="score-label">Solid D</div></div>
-        <div class="score-card sc-d-safe"><div class="score-value" id="h-d-safe">0</div><div class="score-label">Safe D</div></div>
+        <div class="totals-bar">
+           <div class="total-box">
+             <div class="total-num t-rep" id="h-total-r">0</div>
+             <div class="total-label">Republicans</div>
+           </div>
+           <div class="total-box">
+             <div class="total-num t-dem" id="h-total-d">0</div>
+             <div class="total-label">Democrats</div>
+           </div>
+        </div>
+
+        <div class="breakdown-grid">
+            <div class="score-card sc-r-safe"><div class="score-value" id="h-r-safe">0</div><div class="score-label">Safe R</div></div>
+            <div class="score-card sc-r-solid"><div class="score-value" id="h-r-solid">0</div><div class="score-label">Solid R</div></div>
+            <div class="score-card sc-r-likely"><div class="score-value" id="h-r-likely">0</div><div class="score-label">Likely R</div></div>
+            <div class="score-card sc-r-lean"><div class="score-value" id="h-r-lean">0</div><div class="score-label">Lean R</div></div>
+            <div class="score-card sc-r-tilt"><div class="score-value" id="h-r-tilt">0</div><div class="score-label">Tilt R</div></div>
+            
+            <div class="score-card sc-t"><div class="score-value" id="h-tie">0</div><div class="score-label">Tie</div></div>
+            
+            <div class="score-card sc-d-tilt"><div class="score-value" id="h-d-tilt">0</div><div class="score-label">Tilt D</div></div>
+            <div class="score-card sc-d-lean"><div class="score-value" id="h-d-lean">0</div><div class="score-label">Lean D</div></div>
+            <div class="score-card sc-d-likely"><div class="score-value" id="h-d-likely">0</div><div class="score-label">Likely D</div></div>
+            <div class="score-card sc-d-solid"><div class="score-value" id="h-d-solid">0</div><div class="score-label">Solid D</div></div>
+            <div class="score-card sc-d-safe"><div class="score-value" id="h-d-safe">0</div><div class="score-label">Safe D</div></div>
+        </div>
       </div>
 
       <div class="scoreboard">
         <div class="chamber-label">US Senate <span>51 to win (50+VP)</span></div>
         
-        <div class="score-card sc-r-safe"><div class="score-value" id="s-r-safe">0</div><div class="score-label">Safe R</div></div>
-        <div class="score-card sc-r-solid"><div class="score-value" id="s-r-solid">0</div><div class="score-label">Solid R</div></div>
-        <div class="score-card sc-r-likely"><div class="score-value" id="s-r-likely">0</div><div class="score-label">Likely R</div></div>
-        <div class="score-card sc-r-lean"><div class="score-value" id="s-r-lean">0</div><div class="score-label">Lean R</div></div>
-        <div class="score-card sc-r-tilt"><div class="score-value" id="s-r-tilt">0</div><div class="score-label">Tilt R</div></div>
-        
-        <div class="score-card sc-t"><div class="score-value" id="s-tie">0</div><div class="score-label">Tie</div></div>
-        
-        <div class="score-card sc-d-tilt"><div class="score-value" id="s-d-tilt">0</div><div class="score-label">Tilt D</div></div>
-        <div class="score-card sc-d-lean"><div class="score-value" id="s-d-lean">0</div><div class="score-label">Lean D</div></div>
-        <div class="score-card sc-d-likely"><div class="score-value" id="s-d-likely">0</div><div class="score-label">Likely D</div></div>
-        <div class="score-card sc-d-solid"><div class="score-value" id="s-d-solid">0</div><div class="score-label">Solid D</div></div>
-        <div class="score-card sc-d-safe"><div class="score-value" id="s-d-safe">0</div><div class="score-label">Safe D</div></div>
+        <div class="totals-bar">
+            <div class="total-box">
+              <div class="total-num t-rep" id="s-total-r">0</div>
+              <div class="total-label">Republicans</div>
+            </div>
+            <div class="total-box">
+              <div class="total-num t-dem" id="s-total-d">0</div>
+              <div class="total-label">Democrats</div>
+            </div>
+         </div>
+
+        <div class="breakdown-grid">
+            <div class="score-card sc-r-safe"><div class="score-value" id="s-r-safe">0</div><div class="score-label">Safe R</div></div>
+            <div class="score-card sc-r-solid"><div class="score-value" id="s-r-solid">0</div><div class="score-label">Solid R</div></div>
+            <div class="score-card sc-r-likely"><div class="score-value" id="s-r-likely">0</div><div class="score-label">Likely R</div></div>
+            <div class="score-card sc-r-lean"><div class="score-value" id="s-r-lean">0</div><div class="score-label">Lean R</div></div>
+            <div class="score-card sc-r-tilt"><div class="score-value" id="s-r-tilt">0</div><div class="score-label">Tilt R</div></div>
+            
+            <div class="score-card sc-t"><div class="score-value" id="s-tie">0</div><div class="score-label">Tie</div></div>
+            
+            <div class="score-card sc-d-tilt"><div class="score-value" id="s-d-tilt">0</div><div class="score-label">Tilt D</div></div>
+            <div class="score-card sc-d-lean"><div class="score-value" id="s-d-lean">0</div><div class="score-label">Lean D</div></div>
+            <div class="score-card sc-d-likely"><div class="score-value" id="s-d-likely">0</div><div class="score-label">Likely D</div></div>
+            <div class="score-card sc-d-solid"><div class="score-value" id="s-d-solid">0</div><div class="score-label">Solid D</div></div>
+            <div class="score-card sc-d-safe"><div class="score-value" id="s-d-safe">0</div><div class="score-label">Safe D</div></div>
+        </div>
       </div>
 
     </div>
@@ -682,6 +746,12 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       document.getElementById('h-d-solid').textContent = hC.dSolid;
       document.getElementById('h-d-safe').textContent = hC.dSafe;
 
+      // --- UPDATE HOUSE TOTALS ---
+      const hTotalR = hC.rSafe + hC.rSolid + hC.rLikely + hC.rLean + hC.rTilt;
+      const hTotalD = hC.dSafe + hC.dSolid + hC.dLikely + hC.dLean + hC.dTilt;
+      document.getElementById('h-total-r').textContent = hTotalR;
+      document.getElementById('h-total-d').textContent = hTotalD;
+
       // --- SENATE CALCULATIONS ---
       // Reset counts - Add base safe seats
       let sC = { 
@@ -733,6 +803,13 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       document.getElementById('s-d-likely').textContent = sC.dLikely;
       document.getElementById('s-d-solid').textContent = sC.dSolid;
       document.getElementById('s-d-safe').textContent = sC.dSafe;
+
+      // --- UPDATE SENATE TOTALS ---
+      const sTotalR = sC.rSafe + sC.rSolid + sC.rLikely + sC.rLean + sC.rTilt;
+      const sTotalD = sC.dSafe + sC.dSolid + sC.dLikely + sC.dLean + sC.dTilt;
+      document.getElementById('s-total-r').textContent = sTotalR;
+      document.getElementById('s-total-d').textContent = sTotalD;
+
     }
 
     // --- TOOLTIP ---
