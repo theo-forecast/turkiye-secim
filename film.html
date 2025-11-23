@@ -1,476 +1,640 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jameel Tolga | Film & Physics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAMEEL TOLGA | ORBITAL ARCHIVE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Syncopate:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #050505;
-            --surface: #121212;
-            --surface-hover: #1e1e1e;
-            --border: #2a2a2a;
-            --text-main: #ededed;
-            --text-muted: #888888;
+            /* COLOR PALETTE: Deep Space */
+            --void: #030304;
+            --panel: rgba(15, 15, 20, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --border-active: rgba(255, 255, 255, 0.3);
             
-            /* The "Physics" Palette */
-            --accent: #3b82f6; /* Blue Shift */
-            --highlight: #10b981; /* Green data */
-            --alert: #ef4444; /* Red Shift */
-            --gold: #f59e0b; /* Outliers */
+            /* DATA COLORS */
+            --star-gold: #FFD700;
+            --star-blue: #00F0FF;
+            --star-red: #FF2A6D;
+            --text-main: #EAEAEA;
+            --text-dim: #666666;
+
+            /* UI */
+            --accent: #00F0FF;
+            --font-display: 'Syncopate', sans-serif;
+            --font-code: 'IBM Plex Mono', monospace;
+            --font-body: 'Inter', sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        a { text-decoration: none; color: inherit; transition: 0.2s; }
         
-        /* --- 1. HERO SECTION --- */
-        header {
-            padding: 80px 20px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .identity {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        h1 {
-            font-size: clamp(3rem, 5vw, 5rem);
-            font-weight: 700;
-            line-height: 0.95;
-            letter-spacing: -2px;
-            margin-bottom: 20px;
-        }
-
-        .roles {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 30px;
-        }
-
-        .bio {
-            max-width: 600px;
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-        }
-
-        /* --- 2. DATA VISUALIZATION AREA --- */
-        .analytics-deck {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 25px;
-            border-radius: 4px;
-        }
-
-        .stat-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 500;
-            line-height: 1;
-        }
-
-        canvas#distributionCanvas {
-            width: 100%;
-            height: 100px;
-            margin-top: 10px;
-        }
-
-        /* --- 3. CONTROLS --- */
-        .control-bar {
-            position: sticky;
-            top: 0;
-            background: rgba(5, 5, 5, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            z-index: 100;
-            padding: 20px;
-        }
-
-        .control-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        input, select {
-            background: var(--surface);
-            border: 1px solid var(--border);
+        body {
+            background-color: var(--void);
             color: var(--text-main);
-            padding: 12px 16px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        input { flex: 1; min-width: 200px; }
-        input:focus, select:focus { border-color: var(--accent); }
-
-        /* --- 4. THE FEED --- */
-        .feed {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            font-family: var(--font-body);
+            height: 100vh;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
             display: flex;
             flex-direction: column;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: var(--text-muted);
+        /* --- BACKGROUND CANVAS --- */
+        #galaxy-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            cursor: crosshair;
         }
 
-        .card-header {
-            padding: 20px 20px 10px;
-            border-bottom: 1px solid var(--border);
+        /* --- UI LAYER --- */
+        #interface {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to canvas where needed */
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            grid-template-rows: 60px 1fr;
+        }
+
+        /* --- HEADER --- */
+        header {
+            grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            background: rgba(3, 3, 4, 0.9);
+            border-bottom: 1px solid var(--border);
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+        
+        .brand span { color: var(--accent); }
+
+        .meta-readout {
+            font-family: var(--font-code);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 20px;
+        }
+
+        .status-light {
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* --- SIDEBAR PANEL --- */
+        aside {
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 15px;
+            font-family: var(--font-code);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        /* CONTENT AREAS */
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            position: relative;
+        }
+        
+        .section { display: none; padding: 20px; }
+        .section.active { display: block; animation: fadeIn 0.3s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* LIST VIEW */
+        .movie-card {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .movie-card:hover { background: rgba(255,255,255,0.03); border-left: 3px solid var(--accent); padding-left: 17px; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .card-title { font-weight: 600; font-size: 0.9rem; }
+        .card-score { font-family: var(--font-code); font-weight: 700; color: var(--accent); }
+        .card-meta { font-family: var(--font-code); font-size: 0.7rem; color: var(--text-dim); margin-bottom: 8px; }
+        .card-summary { font-size: 0.8rem; color: #aaa; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* SEARCH */
+        .search-container { padding: 15px; border-bottom: 1px solid var(--border); }
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            outline: none;
+            border-radius: 4px;
+        }
+        input:focus { border-color: var(--accent); }
+
+        /* THEORY SECTION */
+        .theory-block { margin-bottom: 30px; }
+        .theory-title { font-family: var(--font-display); font-size: 1rem; margin-bottom: 10px; color: var(--text-main); }
+        .theory-text { font-size: 0.85rem; color: #ccc; line-height: 1.6; margin-bottom: 15px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 4px; border: 1px solid var(--border); }
+        .stat-label { font-family: var(--font-code); font-size: 0.6rem; color: var(--text-dim); display: block; }
+        .stat-val { font-family: var(--font-code); font-size: 1.2rem; font-weight: 600; color: var(--accent); }
+
+        /* --- MAIN STAGE OVERLAYS --- */
+        .hud-overlay {
+            grid-column: 2;
+            pointer-events: none;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
             align-items: flex-start;
         }
 
-        .movie-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 5px;
+        .tooltip {
+            position: absolute;
+            background: rgba(10, 10, 15, 0.95);
+            border: 1px solid var(--accent);
+            padding: 15px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            max-width: 300px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+            z-index: 100;
+            transform: translate(15px, 15px);
         }
+        .tooltip h3 { margin: 0 0 5px 0; font-size: 1rem; font-family: var(--font-display); }
+        .tooltip p { font-size: 0.8rem; color: #ccc; margin: 0; line-height: 1.4; }
+        .tooltip .data-row { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-family: var(--font-code); font-size: 0.7rem; color: var(--accent); }
 
-        .movie-year {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .score-badge {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            line-height: 1;
-        }
-
-        .card-body {
-            padding: 20px;
-            flex: 1;
-            font-size: 0.95rem;
-            color: #ccc;
-        }
-
-        .card-footer {
-            padding: 15px 20px;
-            background: rgba(255,255,255,0.02);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-        }
-
-        .sigma-tag {
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.05);
-            color: var(--text-muted);
-        }
-
-        /* --- LOADING STATE --- */
+        /* LOADING */
         #loader {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
+            position: fixed; inset: 0; background: var(--void); z-index: 999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
+        .loader-text { font-family: var(--font-display); font-size: 2rem; letter-spacing: 5px; animation: glitch 1s infinite alternate; }
+        .loader-sub { font-family: var(--font-code); color: var(--text-dim); margin-top: 10px; }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .analytics-deck { grid-template-columns: 1fr; }
-            .control-inner { flex-direction: column; }
+        @media (max-width: 900px) {
+            #interface { grid-template-columns: 1fr; grid-template-rows: 60px 1fr 200px; }
+            aside { grid-row: 3; border-top: 1px solid var(--border); border-right: none; }
+            .hud-overlay { display: none; }
+            .brand { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">INITIALIZING DATASET...</div>
+<div id="loader">
+    <div class="loader-text">INITIALIZING</div>
+    <div class="loader-sub">PARSING METRICS // GENERATING CONSTELLATION</div>
+</div>
 
+<canvas id="galaxy-canvas"></canvas>
+
+<div id="tooltip" class="tooltip">
+    <h3 id="tt-title">Movie Title</h3>
+    <p id="tt-summary">Summary goes here...</p>
+    <div class="data-row">
+        <span id="tt-year">2023</span>
+        <span id="tt-score">SCORE: 88</span>
+    </div>
+</div>
+
+<div id="interface">
+    
     <header>
-        <div class="identity">
-            <div class="roles">Physicist // Forecaster // Film Theorist</div>
-            <h1>Jameel Tolga</h1>
-        </div>
-        
-        <div class="bio">
-            Applying the rigorous methodology of statistical mechanics and predictive modeling to the subjective landscape of cinema. This is a public ledger of my ratings, analyzing deviations in film theory from 1957 to present.
-        </div>
-
-        <div class="analytics-deck">
-            <div class="stat-card">
-                <span class="stat-label">Sample Size (N)</span>
-                <span class="stat-value" id="val-n">0</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Mean Score (&mu;)</span>
-                <span class="stat-value" id="val-mean">0.0</span>
-            </div>
-            <div class="stat-card" style="grid-column: span 2;">
-                <span class="stat-label">Taste Distribution (Gaussian)</span>
-                <canvas id="distributionCanvas"></canvas>
-            </div>
+        <div class="brand">TOLGA <span>//</span> ARCHIVE</div>
+        <div class="meta-readout">
+            <span>PHYSICS & FILM THEORY</span>
+            <span><div class="status-light"></div> SYSTEM ONLINE</span>
         </div>
     </header>
 
-    <div class="control-bar">
-        <div class="control-inner">
-            <input type="text" id="searchInput" placeholder="Query Database (Title, Summary, Year)...">
-            <select id="sortSelect">
-                <option value="score_desc">Rating: High &rarr; Low</option>
-                <option value="score_asc">Rating: Low &rarr; High</option>
-                <option value="year_desc">Year: Newest</option>
-                <option value="year_asc">Year: Oldest</option>
-                <option value="z_desc">Deviation: Controversial</option>
-            </select>
+    <aside>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('list')">LEDGER</button>
+            <button class="tab-btn" onclick="switchTab('theory')">THEORY</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="FILTER DATABASE...">
+        </div>
+
+        <div class="panel-content">
+            
+            <div id="tab-list" class="section active">
+                <div id="movie-feed">
+                    </div>
+            </div>
+
+            <div id="tab-theory" class="section">
+                <div class="theory-block">
+                    <div class="theory-title">THE OBSERVER EFFECT</div>
+                    <p class="theory-text">
+                        Just as the act of observation affects a quantum system, the context of viewing affects the cinematic experience. This archive is an attempt to quantify that subjective experience into objective data points.
+                    </p>
+                    <p class="theory-text">
+                        The visualizer (Galaxy Map) plots films on a temporal axis (X) against a qualitative axis (Y). Brightness indicates magnitude (Quality). Color indicates deviation from the mean.
+                    </p>
+                </div>
+
+                <div class="theory-block">
+                    <div class="theory-title">DATASET METRICS</div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">OBSERVATIONS (N)</span>
+                            <span class="stat-val" id="stat-n">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">MEAN (&mu;)</span>
+                            <span class="stat-val" id="stat-mean">0.00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">SIGMA (&sigma;)</span>
+                            <span class="stat-val" id="stat-sigma">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <div class="hud-overlay">
+        <div style="font-family: var(--font-code); font-size: 0.8rem; color: var(--text-dim); background: rgba(0,0,0,0.5); padding: 20px; border: 1px solid var(--border);">
+            NAVIGATIONAL CONTROLS:<br><br>
+            [HOVER] IDENTIFY SIGNAL<br>
+            [CLICK] LOCK TARGET IN LEDGER<br>
+            <br>
+            X-AXIS: CHRONOLOGY (YEAR)<br>
+            Y-AXIS: RESONANCE (SCORE)<br>
         </div>
     </div>
 
-    <div class="feed" id="feed">
-        </div>
+</div>
 
-    <script>
-        // CONFIG
-        const FILE_NAME = 'ratings.txt';
+<script>
+    /* --- SYSTEM CONFIG --- */
+    const CONFIG = {
+        file: 'ratings.txt',
+        colors: {
+            high: '#00F0FF', // Cyan
+            mid: '#EAEAEA',  // White
+            low: '#FF2A6D',  // Red
+            bg: '#030304'
+        }
+    };
 
-        // STATE
-        let db = [];
-        let stats = { mean: 0, sigma: 0, n: 0 };
+    /* --- GLOBAL STATE --- */
+    let DB = [];
+    let STATS = { n: 0, mean: 0, sigma: 0 };
+    let CANVAS, CTX;
+    let POINTS = []; // Stores the star coordinates
+    let MOUSE = { x: -1000, y: -1000 };
+    let HOVERED_POINT = null;
 
-        // INITIALIZATION
-        async function init() {
-            try {
-                const response = await fetch(FILE_NAME);
-                if (!response.ok) throw new Error("File not found");
-                const text = await response.text();
-                parseData(text);
-            } catch (error) {
-                document.getElementById('loader').innerText = `ERROR: ${error.message}. Ensure 'ratings.txt' is in the root folder.`;
+    /* --- INITIALIZATION --- */
+    async function init() {
+        try {
+            const res = await fetch(CONFIG.file);
+            if (!res.ok) throw new Error("Database Offline");
+            const text = await res.text();
+            parseData(text);
+        } catch (e) {
+            console.error(e);
+            document.querySelector('.loader-sub').innerText = "ERROR: " + e.message;
+        }
+    }
+
+    /* --- PARSING ENGINE --- */
+    function parseData(text) {
+        const lines = text.split('\n');
+        // Looks for: 83 [tab] Title (2015)
+        const regex = /^(\d+)\t(.*?)\s\((\d{4})\)$/;
+        let current = null;
+
+        lines.forEach(line => {
+            line = line.trim();
+            if (!line) return;
+
+            const match = line.match(regex);
+            if (match) {
+                if (current) DB.push(current);
+                current = {
+                    score: parseInt(match[1]),
+                    title: match[2],
+                    year: parseInt(match[3]),
+                    summary: '',
+                    link: '',
+                    id: DB.length // unique ID
+                };
+            } else if (current) {
+                if (line.startsWith('http')) current.link = line;
+                else if (!line.startsWith('[source')) {
+                    current.summary += (current.summary ? ' ' : '') + line.replace('Summary:', '').trim();
+                }
+            }
+        });
+        if (current) DB.push(current);
+
+        calculatePhysics();
+        initCanvas();
+        renderFeed(DB);
+        
+        // Remove Loader
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').remove(), 500);
+        }, 800);
+    }
+
+    /* --- PHYSICS ENGINE --- */
+    function calculatePhysics() {
+        STATS.n = DB.length;
+        const sum = DB.reduce((a, b) => a + b.score, 0);
+        STATS.mean = sum / STATS.n;
+        const variance = DB.reduce((a, b) => a + Math.pow(b.score - STATS.mean, 2), 0) / STATS.n;
+        STATS.sigma = Math.sqrt(variance);
+
+        // Update UI Stats
+        document.getElementById('stat-n').innerText = STATS.n;
+        document.getElementById('stat-mean').innerText = STATS.mean.toFixed(2);
+        document.getElementById('stat-sigma').innerText = STATS.sigma.toFixed(2);
+    }
+
+    /* --- CANVAS GALAXY ENGINE --- */
+    function initCanvas() {
+        CANVAS = document.getElementById('galaxy-canvas');
+        CTX = CANVAS.getContext('2d');
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        CANVAS.addEventListener('mousemove', onMouseMove);
+        CANVAS.addEventListener('click', onCanvasClick);
+
+        calculatePoints();
+        animate();
+    }
+
+    function resizeCanvas() {
+        CANVAS.width = window.innerWidth;
+        CANVAS.height = window.innerHeight;
+        calculatePoints(); // Recalculate positions on resize
+    }
+
+    function calculatePoints() {
+        if (DB.length === 0) return;
+
+        // Find Ranges for Scaling
+        const years = DB.map(m => m.year);
+        const minYear = Math.min(...years);
+        const maxYear = Math.max(...years);
+        const yearRange = maxYear - minYear + 4; // Add padding
+
+        const w = CANVAS.width;
+        const h = CANVAS.height;
+        const padding = 100;
+
+        POINTS = DB.map(m => {
+            // Normalize X (Year)
+            const nx = (m.year - (minYear - 2)) / yearRange;
+            const x = padding + nx * (w - padding * 2);
+
+            // Normalize Y (Score)
+            // Flip Y so 100 is at top
+            const ny = m.score / 100;
+            const y = (h - padding) - (ny * (h - padding * 2));
+
+            // Color Logic based on deviation
+            let color = CONFIG.colors.mid;
+            let radius = 2;
+            let glow = 0;
+
+            const z = (m.score - STATS.mean) / STATS.sigma;
+            
+            if (m.score >= 80) { color = CONFIG.colors.high; radius = 4; glow = 15; }
+            else if (m.score < 50) { color = CONFIG.colors.low; radius = 3; glow = 5; }
+            else if (z > 0.5) { color = '#A0E0FF'; radius = 2.5; }
+
+            return { x, y, color, radius, glow, data: m };
+        });
+    }
+
+    function onMouseMove(e) {
+        MOUSE.x = e.clientX;
+        MOUSE.y = e.clientY;
+
+        // Collision Detection
+        let hit = null;
+        for (let p of POINTS) {
+            const dx = MOUSE.x - p.x;
+            const dy = MOUSE.y - p.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 15) { // Hover radius
+                hit = p;
+                break;
             }
         }
+        HOVERED_POINT = hit;
+        updateTooltip();
+    }
 
-        // PARSER
-        function parseData(text) {
-            const lines = text.split('\n');
-            const entryRegex = /^(\d+)\t(.*?)\s\((\d{4})\)$/;
+    function onCanvasClick(e) {
+        if (HOVERED_POINT) {
+            const title = HOVERED_POINT.data.title;
+            // Filter list to this movie
+            document.getElementById('searchInput').value = title;
+            filterFeed(title);
+            switchTab('list');
+        }
+    }
+
+    function updateTooltip() {
+        const tt = document.getElementById('tooltip');
+        if (HOVERED_POINT) {
+            tt.style.opacity = 1;
+            tt.style.left = HOVERED_POINT.x + 'px';
+            tt.style.top = HOVERED_POINT.y + 'px';
             
-            let current = null;
+            document.getElementById('tt-title').innerText = HOVERED_POINT.data.title;
+            document.getElementById('tt-summary').innerText = HOVERED_POINT.data.summary || "No Data.";
+            document.getElementById('tt-year').innerText = HOVERED_POINT.data.year;
+            document.getElementById('tt-score').innerText = "SCORE: " + HOVERED_POINT.data.score;
+            document.body.style.cursor = 'pointer';
+        } else {
+            tt.style.opacity = 0;
+            document.body.style.cursor = 'default';
+        }
+    }
 
-            lines.forEach(line => {
-                line = line.trim();
-                if (!line) return;
+    /* --- ANIMATION LOOP --- */
+    function animate() {
+        // Clear
+        CTX.fillStyle = CONFIG.colors.bg;
+        CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
 
-                const match = line.match(entryRegex);
-                if (match) {
-                    if (current) db.push(current);
-                    current = {
-                        score: parseInt(match[1]),
-                        title: match[2],
-                        year: parseInt(match[3]),
-                        summary: '',
-                        link: ''
-                    };
-                } else if (current) {
-                    if (line.startsWith('http')) current.link = line;
-                    else if (!line.startsWith('[source')) {
-                        current.summary += (current.summary ? ' ' : '') + line.replace('Summary:', '').trim();
-                    }
-                }
-            });
-            if (current) db.push(current);
+        // Draw Grid Lines (Subtle)
+        CTX.strokeStyle = 'rgba(255,255,255,0.03)';
+        CTX.lineWidth = 1;
+        
+        // Horizontal (Score) lines
+        for(let i=0; i<=100; i+=20) {
+            const y = (CANVAS.height - 100) - ((i/100) * (CANVAS.height - 200));
+            CTX.beginPath(); CTX.moveTo(0, y); CTX.lineTo(CANVAS.width, y); CTX.stroke();
+            // Label
+            CTX.fillStyle = 'rgba(255,255,255,0.1)';
+            CTX.font = '10px monospace';
+            CTX.fillText(i, 10, y + 3);
+        }
 
-            calculateStats();
-            drawDistribution();
-            renderFeed(db);
+        // Draw Stars
+        POINTS.forEach(p => {
+            CTX.beginPath();
+            CTX.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            CTX.fillStyle = p.color;
             
-            // Fade out loader
-            const loader = document.getElementById('loader');
-            loader.style.opacity = '0';
-            setTimeout(() => loader.remove(), 500);
-        }
-
-        // PHYSICS ENGINE
-        function calculateStats() {
-            stats.n = db.length;
-            const sum = db.reduce((a, b) => a + b.score, 0);
-            stats.mean = sum / stats.n;
-            const variance = db.reduce((a, b) => a + Math.pow(b.score - stats.mean, 2), 0) / stats.n;
-            stats.sigma = Math.sqrt(variance);
-
-            db.forEach(m => {
-                m.z = (m.score - stats.mean) / stats.sigma;
-            });
-
-            document.getElementById('val-n').innerText = stats.n;
-            document.getElementById('val-mean').innerText = stats.mean.toFixed(1);
-        }
-
-        // CANVAS VISUALIZER
-        function drawDistribution() {
-            const canvas = document.getElementById('distributionCanvas');
-            const ctx = canvas.getContext('2d');
+            // Hover Effect
+            if (HOVERED_POINT === p) {
+                CTX.shadowBlur = 20;
+                CTX.shadowColor = p.color;
+                CTX.fillStyle = '#FFF';
+                CTX.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2);
+            } else if (p.glow > 0) {
+                CTX.shadowBlur = p.glow;
+                CTX.shadowColor = p.color;
+            } else {
+                CTX.shadowBlur = 0;
+            }
             
-            // Fix resolution
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            CTX.fill();
+            CTX.shadowBlur = 0; // Reset
+        });
 
-            // Bins
-            const bins = new Array(21).fill(0); // 0-100 in steps of 5
-            db.forEach(m => {
-                let idx = Math.floor(m.score / 5);
-                if(idx >= 21) idx = 20;
-                bins[idx]++;
-            });
-
-            const maxVal = Math.max(...bins);
-            const barWidth = rect.width / 21;
-
-            bins.forEach((val, i) => {
-                const barHeight = (val / maxVal) * (rect.height - 10);
-                const x = i * barWidth;
-                const y = rect.height - barHeight;
-                
-                // Physics Coloring
-                if (i * 5 < 50) ctx.fillStyle = '#ef4444'; // Red shift
-                else if (i * 5 > 80) ctx.fillStyle = '#3b82f6'; // Blue shift
-                else ctx.fillStyle = '#2a2a2a'; // Standard model
-
-                ctx.fillRect(x, y, barWidth - 2, barHeight);
-            });
+        // Draw Connecting Line to Hover
+        if (HOVERED_POINT) {
+            CTX.beginPath();
+            CTX.moveTo(HOVERED_POINT.x, HOVERED_POINT.y);
+            CTX.lineTo(HOVERED_POINT.x, CANVAS.height);
+            CTX.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            CTX.setLineDash([5, 5]);
+            CTX.stroke();
+            CTX.setLineDash([]);
+            
+            // Draw Year Label at bottom
+            CTX.fillStyle = '#FFF';
+            CTX.fillText(HOVERED_POINT.data.year, HOVERED_POINT.x - 10, CANVAS.height - 10);
         }
 
-        // RENDERER
-        function renderFeed(data) {
-            const feed = document.getElementById('feed');
-            feed.innerHTML = '';
+        requestAnimationFrame(animate);
+    }
 
-            data.forEach(m => {
-                // Determine Category based on Z-Score
-                let category = "Standard Model";
-                let color = "var(--text-main)";
-                
-                if (m.score >= 80) { color = "var(--accent)"; category = "Essential"; }
-                if (m.score < 50) { color = "var(--alert)"; category = "Critical Failure"; }
-                if (m.score === 0) { category = "Null Value"; }
+    /* --- UI LOGIC --- */
+    function renderFeed(data) {
+        const feed = document.getElementById('movie-feed');
+        feed.innerHTML = '';
+        
+        data.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.onclick = () => { window.open(m.link, '_blank'); }; // Open source on click in list
+            
+            // Color score
+            let scoreColor = '#666';
+            if (m.score >= 80) scoreColor = CONFIG.colors.high;
+            if (m.score < 50) scoreColor = CONFIG.colors.low;
 
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div>
-                            <div class="movie-title">${m.title}</div>
-                            <div class="movie-year">${m.year}</div>
-                        </div>
-                        <div class="score-badge" style="color: ${color}">${m.score}</div>
-                    </div>
-                    <div class="card-body">
-                        ${m.summary || "Awaiting Analysis."}
-                    </div>
-                    <div class="card-footer">
-                        <span class="sigma-tag">${category} (${m.z > 0 ? '+' : ''}${m.z.toFixed(2)}σ)</span>
-                        ${m.link ? `<a href="${m.link}" target="_blank">SOURCE &nearr;</a>` : ''}
-                    </div>
-                `;
-                feed.appendChild(card);
-            });
-        }
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-title">${m.title}</div>
+                    <div class="card-score" style="color:${scoreColor}">${m.score}</div>
+                </div>
+                <div class="card-meta">
+                    ${m.year} // ${(m.score - STATS.mean).toFixed(1)} DEV
+                </div>
+                <div class="card-summary">${m.summary || "No analysis data."}</div>
+            `;
+            feed.appendChild(card);
+        });
+    }
 
-        // FILTERS
-        const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('sortSelect');
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        event.target.classList.add('active'); // Assumes button click
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+    
+    // Fix for initial load active state
+    document.querySelector('.tab-btn').onclick = function() { switchTab('list'); };
 
-        function update() {
-            const term = searchInput.value.toLowerCase();
-            let filtered = db.filter(m => 
-                m.title.toLowerCase().includes(term) || 
-                (m.summary && m.summary.toLowerCase().includes(term)) ||
-                m.year.toString().includes(term)
-            );
+    /* --- SEARCH --- */
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => filterFeed(e.target.value));
 
-            const mode = sortSelect.value;
-            filtered.sort((a, b) => {
-                if (mode === 'score_desc') return b.score - a.score;
-                if (mode === 'score_asc') return a.score - b.score;
-                if (mode === 'year_desc') return b.year - a.year;
-                if (mode === 'year_asc') return a.year - b.year;
-                if (mode === 'z_desc') return Math.abs(b.z) - Math.abs(a.z);
-            });
+    function filterFeed(term) {
+        term = term.toLowerCase();
+        const filtered = DB.filter(m => 
+            m.title.toLowerCase().includes(term) || 
+            (m.summary && m.summary.toLowerCase().includes(term))
+        );
+        renderFeed(filtered);
+    }
 
-            renderFeed(filtered);
-        }
+    /* --- BOOT --- */
+    init();
 
-        searchInput.addEventListener('input', update);
-        sortSelect.addEventListener('change', update);
-
-        // RUN
-        init();
-
-        // Handle Resize
-        window.addEventListener('resize', drawDistribution);
-
-    </script>
+</script>
 </body>
 </html>
