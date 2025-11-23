@@ -1,46 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024 Congressional Swingometer (5x7 Snake Grid)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2024 Congressional Swingometer (5x7 Snake Grid) – Enhanced</title>
+
 <style>
   :root {
-    --bg-app: #0f1115;
-    --bg-panel: #1a1d26;
+    --bg-app: #05060a;
+    --bg-panel: #141720;
+    --bg-panel-soft: #1b1f2a;
     --text-main: #ececf1;
     --text-muted: #8a8f98;
-    
-    /* --- EXPANDED PALETTE --- */
-    
+    --border-subtle: rgba(255, 255, 255, 0.06);
+
     /* REPUBLICAN SHADES */
     --rep-safe:   #b91c1c; /* 15+ */
     --rep-solid:  #dc2626; /* 5-15 */
     --rep-likely: #ef4444; /* 2.5-5 */
     --rep-lean:   #f87171; /* 1-2.5 */
     --rep-tilt:   #fca5a5; /* 0-1 */
-    
-    --tossup-pure: #444444;     
-    
+
+    --tossup-pure: #444444;
+
     /* DEMOCRAT SHADES */
     --dem-tilt:   #93c5fd; /* 0-1 */
     --dem-lean:   #60a5fa; /* 1-2.5 */
     --dem-likely: #3b82f6; /* 2.5-5 */
     --dem-solid:  #2563eb; /* 5-15 */
     --dem-safe:   #1e40af; /* 15+ */
-    
+
     /* Glows for main safe numbers */
     --glow-rep: rgba(220, 38, 38, 0.4);
     --glow-dem: rgba(37, 99, 235, 0.4);
+
+    --accent-gold: #fbbf24;
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     margin: 0;
-    padding: 20px;
-    font-family: system-ui, -apple-system, sans-serif;
-    background-color: var(--bg-app);
+    padding: 16px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      sans-serif;
+    background:
+      radial-gradient(circle at top left, #111827 0, #020617 55%),
+      radial-gradient(circle at bottom right, #0f172a 0, #020617 55%);
     color: var(--text-main);
     display: flex;
     flex-direction: column;
@@ -50,78 +58,144 @@
 
   /* --- Header --- */
   header {
-    text-align: center;
-    margin-bottom: 20px;
     width: 100%;
     max-width: 1300px;
+    margin-bottom: 18px;
+  }
+
+  .header-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
   }
 
   h1 {
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: -0.5px;
-    margin: 0 0 20px 0;
-    font-size: 1.8rem;
+    letter-spacing: -0.03em;
+    margin: 0;
+    font-size: 1.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  
-  h2.section-title {
-    font-size: 0.9rem;
+
+  h1 span.badge-year {
+    font-size: 0.75rem;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(148, 163, 184, 0.35);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-main);
-    margin: 0 0 15px 0;
-    text-align: center;
-    background: var(--bg-panel);
-    padding: 10px;
-    border-radius: 8px 8px 0 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    letter-spacing: 0.12em;
+  }
+
+  .header-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    max-width: 420px;
+    line-height: 1.4;
+  }
+
+  .meta-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .meta-pill {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: rgba(15, 23, 42, 0.8);
+    color: #cbd5f5;
   }
 
   /* --- Scoreboards --- */
   .scoreboard-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
     width: 100%;
-    margin-bottom: 25px;
+  }
+
+  @media (min-width: 880px) {
+    .scoreboard-wrapper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   .scoreboard {
     display: flex;
     flex-direction: column;
     background: var(--bg-panel);
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.08);
+    padding: 12px 14px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scoreboard::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    opacity: 0.15;
+    background:
+      radial-gradient(circle at -10% 0%, rgba(239, 68, 68, 0.5), transparent 55%),
+      radial-gradient(circle at 110% 100%, rgba(59, 130, 246, 0.5), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .scoreboard-inner {
+    position: relative;
+    z-index: 1;
   }
 
   .chamber-label {
     font-size: 0.9rem;
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 12px;
+    color: #f9fafb;
+    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 6px;
   }
-  .chamber-label span { opacity: 0.6; font-weight: 400; font-size: 0.8em;}
 
-  /* --- TOTALS BAR --- */
+  .chamber-label span {
+    opacity: 0.7;
+    font-weight: 400;
+    font-size: 0.78em;
+  }
+
   .totals-bar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 0 20px;
+    align-items: stretch;
+    margin-bottom: 10px;
+    gap: 12px;
   }
 
   .total-box {
+    flex: 1;
     text-align: center;
+    padding: 4px 6px;
+    border-radius: 10px;
+    background: radial-gradient(circle at 50% 0%, rgba(15, 23, 42, 0.6), transparent 70%);
   }
 
   .total-num {
-    font-size: 2.5rem;
+    font-size: 2.3rem;
     font-weight: 900;
     line-height: 1;
   }
@@ -129,22 +203,119 @@
   .total-label {
     font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.7;
+    letter-spacing: 0.13em;
+    opacity: 0.8;
+    margin-top: 1px;
   }
 
-  .t-rep { color: var(--rep-solid); text-shadow: 0 0 15px rgba(220, 38, 38, 0.2); }
-  .t-dem { color: var(--dem-solid); text-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
+  .t-rep {
+    color: var(--rep-solid);
+    text-shadow: 0 0 15px rgba(220, 38, 38, 0.22);
+  }
 
-  /* --- BREAKDOWN GRID --- */
+  .t-dem {
+    color: var(--dem-solid);
+    text-shadow: 0 0 15px rgba(37, 99, 235, 0.22);
+  }
+
+  .majority-bar-wrapper {
+    margin-bottom: 10px;
+  }
+
+  .majority-bar {
+    height: 7px;
+    border-radius: 999px;
+    background: #020617;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+  }
+
+  .majority-segment {
+    height: 100%;
+    transition: width 0.15s ease-out;
+  }
+
+  .majority-segment.rep {
+    background: linear-gradient(to right, #7f1d1d, #ef4444);
+  }
+
+  .majority-segment.dem {
+    background: linear-gradient(to right, #3b82f6, #1d4ed8);
+  }
+
+  .majority-marker {
+    position: absolute;
+    top: -3px;
+    width: 0;
+    border-left: 1px solid rgba(249, 250, 251, 0.9);
+    height: 13px;
+  }
+
+  .majority-marker::after {
+    content: "M";
+    position: absolute;
+    top: -10px;
+    left: 3px;
+    font-size: 0.55rem;
+    color: rgba(148, 163, 184, 0.9);
+  }
+
+  .majority-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+
+  .status-line {
+    font-size: 0.78rem;
+    color: #e5e7eb;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .status-primary {
+    font-weight: 600;
+  }
+
+  .status-primary span.party {
+    font-weight: 800;
+  }
+
+  .status-primary span.party.dem {
+    color: var(--dem-lean);
+  }
+
+  .status-primary span.party.rep {
+    color: var(--rep-lean);
+  }
+
+  .status-secondary {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+
+  .status-secondary strong {
+    color: #e5e7eb;
+  }
+
   .breakdown-grid {
     display: grid;
-    /* 11 columns: 5 R, 1 Tie, 5 D */
-    grid-template-columns: repeat(5, 1fr) 0.6fr repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr)) 0.75fr repeat(5, minmax(0, 1fr));
     gap: 2px;
     align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 10px;
   }
 
   .score-card {
@@ -152,9 +323,9 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    padding: 0 5px;
+    padding: 0 4px;
   }
-  
+
   .score-card:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -162,107 +333,312 @@
     top: 20%;
     height: 60%;
     width: 1px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.04);
   }
 
-  .score-value { font-size: 1.2rem; font-weight: 800; line-height: 1; }
-  .score-label { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 4px; text-align: center; white-space: nowrap;}
-  
+  .score-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 0.52rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-top: 3px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
   /* Republican text colors */
-  .sc-r-safe .score-value   { color: var(--rep-safe); text-shadow: 0 0 10px var(--glow-rep); }
-  .sc-r-solid .score-value  { color: var(--rep-solid); }
-  .sc-r-likely .score-value { color: var(--rep-likely); }
-  .sc-r-lean .score-value   { color: var(--rep-lean); }
-  .sc-r-tilt .score-value   { color: var(--rep-tilt); }
-  
-  /* Tie color */
-  .sc-t .score-value        { color: #666; font-size: 1.1rem; } 
-  
+  .sc-r-safe .score-value {
+    color: var(--rep-safe);
+    text-shadow: 0 0 10px var(--glow-rep);
+  }
+  .sc-r-solid .score-value {
+    color: var(--rep-solid);
+  }
+  .sc-r-likely .score-value {
+    color: var(--rep-likely);
+  }
+  .sc-r-lean .score-value {
+    color: var(--rep-lean);
+  }
+  .sc-r-tilt .score-value {
+    color: var(--rep-tilt);
+  }
+
+  .sc-t .score-value {
+    color: #9ca3af;
+  }
+
   /* Democrat text colors */
-  .sc-d-tilt .score-value   { color: var(--dem-tilt); }
-  .sc-d-lean .score-value   { color: var(--dem-lean); }
-  .sc-d-likely .score-value { color: var(--dem-likely); }
-  .sc-d-solid .score-value  { color: var(--dem-solid); }
-  .sc-d-safe .score-value   { color: var(--dem-safe); text-shadow: 0 0 10px var(--glow-dem); }
+  .sc-d-tilt .score-value {
+    color: var(--dem-tilt);
+  }
+  .sc-d-lean .score-value {
+    color: var(--dem-lean);
+  }
+  .sc-d-likely .score-value {
+    color: var(--dem-likely);
+  }
+  .sc-d-solid .score-value {
+    color: var(--dem-solid);
+  }
+  .sc-d-safe .score-value {
+    color: var(--dem-safe);
+    text-shadow: 0 0 10px var(--glow-dem);
+  }
 
   /* --- Controls --- */
   .controls-container {
-    background: var(--bg-panel);
-    padding: 15px 25px;
-    border-radius: 12px;
+    background: var(--bg-panel-soft);
+    padding: 14px 18px;
+    border-radius: 14px;
     width: 100%;
-    max-width: 900px;
-    margin-bottom: 30px;
-    border: 1px solid rgba(255,255,255,0.08);
+    max-width: 980px;
+    margin: 18px auto 24px;
+    border: 1px solid rgba(148, 163, 184, 0.4);
     position: sticky;
-    top: 10px;
+    top: 8px;
     z-index: 500;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.6);
+  }
+
+  .controls-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
   }
 
   .slider-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
   }
 
-  input[type=range] {
-    width: 100%;
+  .slider-header span {
+    font-weight: 700;
+  }
+
+  .slider-caption {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  input[type="range"] {
+    flex: 1;
     appearance: none;
     background: transparent;
     cursor: pointer;
   }
-  
-  input[type=range]::-webkit-slider-runnable-track {
-    background: linear-gradient(to right, var(--rep-safe), var(--rep-tilt), var(--dem-tilt), var(--dem-safe));
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: linear-gradient(
+      to right,
+      var(--dem-safe),
+      var(--dem-tilt),
+      #6b7280,
+      var(--rep-tilt),
+      var(--rep-safe)
+    );
     height: 8px;
-    border-radius: 4px;
+    border-radius: 999px;
   }
-  
-  input[type=range]::-webkit-slider-thumb {
+
+  input[type="range"]::-moz-range-track {
+    background: linear-gradient(
+      to right,
+      var(--dem-safe),
+      var(--dem-tilt),
+      #6b7280,
+      var(--rep-tilt),
+      var(--rep-safe)
+    );
+    height: 8px;
+    border-radius: 999px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    height: 24px;
-    width: 24px;
-    background: white;
+    height: 22px;
+    width: 22px;
+    background: #f9fafb;
     border-radius: 50%;
-    margin-top: -8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    transition: transform 0.1s;
+    margin-top: -7px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+    border: 2px solid #0f172a;
+    transition: transform 0.07s ease-out, box-shadow 0.07s ease-out;
   }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 3px rgba(249, 250, 251, 0.12);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    background: #f9fafb;
+    border-radius: 50%;
+    border: 2px solid #0f172a;
+  }
+
+  .slider-scale {
+    margin-top: 2px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+  }
+
+  .slider-scale span.center {
+    color: #e5e7eb;
+  }
+
+  .preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .preset-btn {
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background: rgba(15, 23, 42, 0.9);
+    padding: 4px 9px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #cbd5f5;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .preset-btn span.badge {
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.85);
+  }
+
+  .preset-btn:hover {
+    background: #020617;
+  }
+
+  .preset-btn.active {
+    border-color: var(--accent-gold);
+    color: #fef9c3;
+    box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.45);
+  }
 
   .legend {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 8px 12px;
-    margin-top: 15px;
+    margin-top: 10px;
     font-size: 0.65rem;
     color: var(--text-muted);
     text-transform: uppercase;
   }
-  .legend-item { display: flex; align-items: center; gap: 4px; }
-  .dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .legend-item b {
+    font-weight: 600;
+    color: #e5e7eb;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
 
   /* --- Visualizations (Side by Side Grid) --- */
   .vis-container {
     width: 100%;
-    max-width: 1400px; 
+    max-width: 1400px;
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr; 
-    gap: 20px;
-    align-items: start;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  @media (max-width: 1000px) {
+    .vis-container {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .breakdown-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-rows: auto auto auto;
+    }
+
+    .sc-t {
+      grid-column: 1 / -1;
+      margin: 8px 0;
+      border-top: 1px solid #333;
+      border-bottom: 1px solid #333;
+      padding: 4px 0;
+    }
+
+    .chamber-label {
+      margin-bottom: 12px;
+    }
   }
 
   .panel {
-    background: rgba(255,255,255,0.02);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(15, 23, 42, 0.85);
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
     overflow: hidden;
-    min-height: 500px;
+    min-height: 460px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  h2.section-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-main);
+    margin: 0;
+    text-align: center;
+    background: linear-gradient(to right, #020617, #020617),
+      radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.4), transparent 55%);
+    padding: 9px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  h2.section-title span.sub {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: none;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-top: 2px;
   }
 
   /* HOUSE MAP */
@@ -270,14 +646,16 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 20px 0;
+    padding: 18px 4px 20px;
   }
+
   .us-grid {
     display: grid;
-    grid-template-columns: repeat(12, 38px); 
-    grid-template-rows: repeat(8, 38px);    
+    grid-template-columns: repeat(12, 38px);
+    grid-template-rows: repeat(8, 38px);
     gap: 3px;
   }
+
   .state-wrapper {
     display: flex;
     flex-direction: column;
@@ -286,45 +664,69 @@
     padding-top: 4px;
     position: relative;
   }
+
   .state-label {
     font-size: 8px;
     font-weight: 700;
     color: var(--text-muted);
     margin-bottom: 3px;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.6;
   }
+
   .districts-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 2px; 
+    gap: 2px;
     max-width: 36px;
   }
+
   .district-dot {
     width: 6px;
     height: 6px;
     border-radius: 1px;
     background-color: var(--tossup-pure);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: transform 0.12s ease-out, background-color 0.15s;
   }
+
   .district-dot:hover {
-    transform: scale(2.5);
-    z-index: 100;
+    transform: scale(2.4);
+    z-index: 20;
     border: 1px solid white;
   }
 
   /* SENATE SPECTRUM (VERTICAL SNAKE) */
+  .senate-spectrum-wrapper {
+    padding: 14px 14px 18px;
+  }
+
+  .senate-label-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding: 0 2px 4px;
+    border-bottom: 1px solid #242938;
+  }
+
+  .senate-label-row strong {
+    color: #e5e7eb;
+  }
+
   .senate-spectrum {
-    display: grid; 
-    /* UPDATED: 5 Rows fixed */
-    grid-template-rows: repeat(5, 1fr); 
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
     gap: 8px;
-    padding: 20px;
+    padding-top: 6px;
     justify-content: center;
     grid-auto-columns: 40px;
   }
+
   .senate-seat {
     width: 36px;
     height: 36px;
@@ -335,282 +737,667 @@
     justify-content: center;
     font-size: 10px;
     font-weight: 700;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.86);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.16s ease-out;
     border: 2px solid transparent;
-    position: relative; 
-  }
-  .senate-seat:hover {
-    transform: scale(1.3);
-    border-color: white;
-    z-index: 10;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  }
-  .senate-label-row {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 5px;
-    padding: 0 10px;
-    border-bottom: 1px solid #333;
+    position: relative;
   }
 
-  /* Responsive Breakpoint */
-  @media (max-width: 1000px) {
-    .vis-container { grid-template-columns: 1fr; }
-    .us-grid { gap: 4px; }
-    
-    .breakdown-grid { 
-      grid-template-columns: repeat(5, 1fr); 
-      grid-template-rows: auto auto auto;
-    }
-    .sc-t { grid-column: 1 / -1; margin: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 5px 0;}
-    .chamber-label { margin-bottom: 15px; }
-    
-    .senate-spectrum { overflow-x: auto; justify-content: flex-start; }
+  .senate-seat:hover {
+    transform: scale(1.26);
+    border-color: white;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.65);
+  }
+
+  .senate-seat.tipping {
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.8),
+      0 0 20px rgba(250, 204, 21, 0.4);
+    border-color: var(--accent-gold);
+  }
+
+  .senate-seat.tipping::after {
+    content: "★";
+    position: absolute;
+    bottom: -12px;
+    font-size: 0.55rem;
+    color: var(--accent-gold);
   }
 
   /* --- Tooltip --- */
   #tooltip {
     position: fixed;
-    background: rgba(20, 23, 29, 0.98);
-    border: 1px solid #444;
-    padding: 10px;
-    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid #4b5563;
+    padding: 9px 10px 8px;
+    border-radius: 7px;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.1s;
+    transition: opacity 0.08s ease-out;
     z-index: 1000;
     font-size: 11px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-    min-width: 140px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+    min-width: 155px;
+    max-width: 230px;
   }
-  #tooltip strong { color: white; display: block; margin-bottom: 5px; font-size: 13px; border-bottom: 1px solid #333; padding-bottom: 3px;}
-  #tooltip .row { display: flex; justify-content: space-between; color: #999; margin-bottom: 2px; }
-  #tooltip .val { color: #eee; font-weight: 600; }
-  
-  /* --- Logic Classes (New Expanded) --- */
-  .r-safe   { background-color: var(--rep-safe); }
-  .r-solid  { background-color: var(--rep-solid); }
-  .r-likely { background-color: var(--rep-likely); }
-  .r-lean   { background-color: var(--rep-lean); }
-  .r-tilt   { background-color: var(--rep-tilt); }
-  
-  .pure-toss { background-color: var(--tossup-pure); }
-  
-  .d-tilt   { background-color: var(--dem-tilt); }
-  .d-lean   { background-color: var(--dem-lean); }
-  .d-likely { background-color: var(--dem-likely); }
-  .d-solid  { background-color: var(--dem-solid); }
-  .d-safe   { background-color: var(--dem-safe); }
 
+  #tooltip strong.tt-title {
+    color: #f9fafb;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  #tooltip .tt-subtitle {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  #tooltip .tt-divider {
+    border-top: 1px solid #374151;
+    margin: 4px 0;
+  }
+
+  #tooltip .row {
+    display: flex;
+    justify-content: space-between;
+    color: #9ca3af;
+    margin-bottom: 2px;
+  }
+
+  #tooltip .val {
+    color: #e5e7eb;
+    font-weight: 600;
+  }
+
+  #tooltip .pill {
+    display: inline-block;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    color: #e5e7eb;
+  }
+
+  /* --- Logic Classes (colors) --- */
+  .r-safe {
+    background-color: var(--rep-safe);
+  }
+  .r-solid {
+    background-color: var(--rep-solid);
+  }
+  .r-likely {
+    background-color: var(--rep-likely);
+  }
+  .r-lean {
+    background-color: var(--rep-lean);
+  }
+  .r-tilt {
+    background-color: var(--rep-tilt);
+  }
+
+  .pure-toss {
+    background-color: var(--tossup-pure);
+  }
+
+  .d-tilt {
+    background-color: var(--dem-tilt);
+  }
+  .d-lean {
+    background-color: var(--dem-lean);
+  }
+  .d-likely {
+    background-color: var(--dem-likely);
+  }
+  .d-solid {
+    background-color: var(--dem-solid);
+  }
+  .d-safe {
+    background-color: var(--dem-safe);
+  }
 </style>
 </head>
 <body>
-
   <header>
-    <h1>2024 Congress Swingometer</h1>
-    
-    <div class="scoreboard-wrapper">
-      
-      <div class="scoreboard">
-        <div class="chamber-label">US House <span>218 to win</span></div>
-        
-        <div class="totals-bar">
-           <div class="total-box">
-             <div class="total-num t-rep" id="h-total-r">0</div>
-             <div class="total-label">Republicans</div>
-           </div>
-           <div class="total-box">
-             <div class="total-num t-dem" id="h-total-d">0</div>
-             <div class="total-label">Democrats</div>
-           </div>
+    <div class="header-top">
+      <h1>
+        2024 Congress Swingometer
+        <span class="badge-year">5x7 Snake Grid</span>
+      </h1>
+      <div class="header-sub">
+        Interactive national swing model for the House and Senate. Drag the
+        slider or tap a preset to see how a uniform shift in the vote breaks
+        the chamber.
+        <div class="meta-pill-row">
+          <div class="meta-pill">National popular vote → seats</div>
+          <div class="meta-pill">House districts by margin</div>
+          <div class="meta-pill">Senate vertical snake</div>
         </div>
+      </div>
+    </div>
 
-        <div class="breakdown-grid">
-            <div class="score-card sc-r-safe"><div class="score-value" id="h-r-safe">0</div><div class="score-label">Safe R</div></div>
-            <div class="score-card sc-r-solid"><div class="score-value" id="h-r-solid">0</div><div class="score-label">Solid R</div></div>
-            <div class="score-card sc-r-likely"><div class="score-value" id="h-r-likely">0</div><div class="score-label">Likely R</div></div>
-            <div class="score-card sc-r-lean"><div class="score-value" id="h-r-lean">0</div><div class="score-label">Lean R</div></div>
-            <div class="score-card sc-r-tilt"><div class="score-value" id="h-r-tilt">0</div><div class="score-label">Tilt R</div></div>
-            
-            <div class="score-card sc-t"><div class="score-value" id="h-tie">0</div><div class="score-label">Tie</div></div>
-            
-            <div class="score-card sc-d-tilt"><div class="score-value" id="h-d-tilt">0</div><div class="score-label">Tilt D</div></div>
-            <div class="score-card sc-d-lean"><div class="score-value" id="h-d-lean">0</div><div class="score-label">Lean D</div></div>
-            <div class="score-card sc-d-likely"><div class="score-value" id="h-d-likely">0</div><div class="score-label">Likely D</div></div>
-            <div class="score-card sc-d-solid"><div class="score-value" id="h-d-solid">0</div><div class="score-label">Solid D</div></div>
-            <div class="score-card sc-d-safe"><div class="score-value" id="h-d-safe">0</div><div class="score-label">Safe D</div></div>
+    <div class="scoreboard-wrapper">
+      <!-- HOUSE SCOREBOARD -->
+      <div class="scoreboard">
+        <div class="scoreboard-inner">
+          <div class="chamber-label">
+            US House
+            <span>218 for majority</span>
+          </div>
+
+          <div class="totals-bar">
+            <div class="total-box">
+              <div class="total-num t-rep" id="h-total-r">0</div>
+              <div class="total-label">Republicans</div>
+            </div>
+            <div class="total-box">
+              <div class="total-num t-dem" id="h-total-d">0</div>
+              <div class="total-label">Democrats</div>
+            </div>
+          </div>
+
+          <div class="majority-bar-wrapper">
+            <div class="majority-bar" id="house-majority-bar">
+              <div
+                class="majority-segment rep"
+                id="house-bar-r"
+                style="width: 0%"
+              ></div>
+              <div
+                class="majority-segment dem"
+                id="house-bar-d"
+                style="width: 0%"
+              ></div>
+              <div
+                class="majority-marker"
+                id="house-majority-marker"
+              ></div>
+            </div>
+            <div class="majority-labels">
+              <span>0</span>
+              <span>435</span>
+            </div>
+          </div>
+
+          <div class="status-line">
+            <div class="status-primary" id="house-status-primary">
+              –
+            </div>
+            <div class="status-secondary" id="house-status-secondary">
+              –
+            </div>
+          </div>
+
+          <div class="breakdown-grid">
+            <div class="score-card sc-r-safe">
+              <div class="score-value" id="h-r-safe">0</div>
+              <div class="score-label">Safe R</div>
+            </div>
+            <div class="score-card sc-r-solid">
+              <div class="score-value" id="h-r-solid">0</div>
+              <div class="score-label">Solid R</div>
+            </div>
+            <div class="score-card sc-r-likely">
+              <div class="score-value" id="h-r-likely">0</div>
+              <div class="score-label">Likely R</div>
+            </div>
+            <div class="score-card sc-r-lean">
+              <div class="score-value" id="h-r-lean">0</div>
+              <div class="score-label">Lean R</div>
+            </div>
+            <div class="score-card sc-r-tilt">
+              <div class="score-value" id="h-r-tilt">0</div>
+              <div class="score-label">Tilt R</div>
+            </div>
+
+            <div class="score-card sc-t">
+              <div class="score-value" id="h-tie">0</div>
+              <div class="score-label">Tossup</div>
+            </div>
+
+            <div class="score-card sc-d-tilt">
+              <div class="score-value" id="h-d-tilt">0</div>
+              <div class="score-label">Tilt D</div>
+            </div>
+            <div class="score-card sc-d-lean">
+              <div class="score-value" id="h-d-lean">0</div>
+              <div class="score-label">Lean D</div>
+            </div>
+            <div class="score-card sc-d-likely">
+              <div class="score-value" id="h-d-likely">0</div>
+              <div class="score-label">Likely D</div>
+            </div>
+            <div class="score-card sc-d-solid">
+              <div class="score-value" id="h-d-solid">0</div>
+              <div class="score-label">Solid D</div>
+            </div>
+            <div class="score-card sc-d-safe">
+              <div class="score-value" id="h-d-safe">0</div>
+              <div class="score-label">Safe D</div>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- SENATE SCOREBOARD -->
       <div class="scoreboard">
-        <div class="chamber-label">US Senate <span>51 to win (50+VP)</span></div>
-        
-        <div class="totals-bar">
+        <div class="scoreboard-inner">
+          <div class="chamber-label">
+            US Senate
+            <span>51 for full control (50+VP)</span>
+          </div>
+
+          <div class="totals-bar">
             <div class="total-box">
               <div class="total-num t-rep" id="s-total-r">0</div>
               <div class="total-label">Republicans</div>
             </div>
             <div class="total-box">
               <div class="total-num t-dem" id="s-total-d">0</div>
-              <div class="total-label">Democrats</div>
+              <div class="total-label">Democrats &amp; caucus</div>
             </div>
-         </div>
+          </div>
 
-        <div class="breakdown-grid">
-            <div class="score-card sc-r-safe"><div class="score-value" id="s-r-safe">0</div><div class="score-label">Safe R</div></div>
-            <div class="score-card sc-r-solid"><div class="score-value" id="s-r-solid">0</div><div class="score-label">Solid R</div></div>
-            <div class="score-card sc-r-likely"><div class="score-value" id="s-r-likely">0</div><div class="score-label">Likely R</div></div>
-            <div class="score-card sc-r-lean"><div class="score-value" id="s-r-lean">0</div><div class="score-label">Lean R</div></div>
-            <div class="score-card sc-r-tilt"><div class="score-value" id="s-r-tilt">0</div><div class="score-label">Tilt R</div></div>
-            
-            <div class="score-card sc-t"><div class="score-value" id="s-tie">0</div><div class="score-label">Tie</div></div>
-            
-            <div class="score-card sc-d-tilt"><div class="score-value" id="s-d-tilt">0</div><div class="score-label">Tilt D</div></div>
-            <div class="score-card sc-d-lean"><div class="score-value" id="s-d-lean">0</div><div class="score-label">Lean D</div></div>
-            <div class="score-card sc-d-likely"><div class="score-value" id="s-d-likely">0</div><div class="score-label">Likely D</div></div>
-            <div class="score-card sc-d-solid"><div class="score-value" id="s-d-solid">0</div><div class="score-label">Solid D</div></div>
-            <div class="score-card sc-d-safe"><div class="score-value" id="s-d-safe">0</div><div class="score-label">Safe D</div></div>
+          <div class="majority-bar-wrapper">
+            <div class="majority-bar" id="senate-majority-bar">
+              <div
+                class="majority-segment rep"
+                id="senate-bar-r"
+                style="width: 0%"
+              ></div>
+              <div
+                class="majority-segment dem"
+                id="senate-bar-d"
+                style="width: 0%"
+              ></div>
+              <div
+                class="majority-marker"
+                id="senate-majority-marker"
+              ></div>
+            </div>
+            <div class="majority-labels">
+              <span>0</span>
+              <span>100</span>
+            </div>
+          </div>
+
+          <div class="status-line">
+            <div class="status-primary" id="senate-status-primary">
+              –
+            </div>
+            <div class="status-secondary" id="senate-status-secondary">
+              –
+            </div>
+          </div>
+
+          <div class="breakdown-grid">
+            <div class="score-card sc-r-safe">
+              <div class="score-value" id="s-r-safe">0</div>
+              <div class="score-label">Safe R</div>
+            </div>
+            <div class="score-card sc-r-solid">
+              <div class="score-value" id="s-r-solid">0</div>
+              <div class="score-label">Solid R</div>
+            </div>
+            <div class="score-card sc-r-likely">
+              <div class="score-value" id="s-r-likely">0</div>
+              <div class="score-label">Likely R</div>
+            </div>
+            <div class="score-card sc-r-lean">
+              <div class="score-value" id="s-r-lean">0</div>
+              <div class="score-label">Lean R</div>
+            </div>
+            <div class="score-card sc-r-tilt">
+              <div class="score-value" id="s-r-tilt">0</div>
+              <div class="score-label">Tilt R</div>
+            </div>
+
+            <div class="score-card sc-t">
+              <div class="score-value" id="s-tie">0</div>
+              <div class="score-label">Tossup</div>
+            </div>
+
+            <div class="score-card sc-d-tilt">
+              <div class="score-value" id="s-d-tilt">0</div>
+              <div class="score-label">Tilt D</div>
+            </div>
+            <div class="score-card sc-d-lean">
+              <div class="score-value" id="s-d-lean">0</div>
+              <div class="score-label">Lean D</div>
+            </div>
+            <div class="score-card sc-d-likely">
+              <div class="score-value" id="s-d-likely">0</div>
+              <div class="score-label">Likely D</div>
+            </div>
+            <div class="score-card sc-d-solid">
+              <div class="score-value" id="s-d-solid">0</div>
+              <div class="score-label">Solid D</div>
+            </div>
+            <div class="score-card sc-d-safe">
+              <div class="score-value" id="s-d-safe">0</div>
+              <div class="score-label">Safe D</div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   </header>
 
+  <!-- CONTROLS -->
   <div class="controls-container">
-    <div class="slider-header">
-      <span id="margin-display">National Environment: Even</span>
+    <div class="controls-header-row">
+      <div class="slider-header">
+        National Environment:
+        <span id="margin-display">Even</span>
+      </div>
+      <div class="slider-caption">Uniform two-party swing (national popular vote)</div>
     </div>
-    <input type="range" id="swing-slider" min="-15" max="15" step="0.1" value="0">
-    
+    <div class="slider-row">
+      <input
+        type="range"
+        id="swing-slider"
+        min="-15"
+        max="15"
+        step="0.1"
+        value="0"
+      />
+    </div>
+    <div class="slider-scale">
+      <span>D+15</span>
+      <span>D+5</span>
+      <span class="center">Even</span>
+      <span>R+5</span>
+      <span>R+15</span>
+    </div>
+
+    <div class="preset-buttons">
+      <button class="preset-btn" data-swing="-5">
+        D+5
+        <span class="badge">Blue wave</span>
+      </button>
+      <button class="preset-btn active" data-swing="0">
+        Even
+        <span class="badge">Baseline</span>
+      </button>
+      <button class="preset-btn" data-swing="5">
+        R+5
+        <span class="badge">Red wave</span>
+      </button>
+      <button class="preset-btn" data-swing="-2">
+        D+2
+      </button>
+      <button class="preset-btn" data-swing="2">
+        R+2
+      </button>
+      <button class="preset-btn" data-swing="-8">
+        D+8
+      </button>
+      <button class="preset-btn" data-swing="8">
+        R+8
+      </button>
+    </div>
+
     <div class="legend">
-      <div class="legend-item"><div class="dot r-safe"></div> >15</div>
-      <div class="legend-item"><div class="dot r-solid"></div> 5-15</div>
-      <div class="legend-item"><div class="dot r-likely"></div> 2.5-5</div>
-      <div class="legend-item"><div class="dot r-lean"></div> 1-2.5</div>
-      <div class="legend-item"><div class="dot r-tilt"></div> <1</div>
-      <div class="legend-item"><div class="dot pure-toss"></div> Tie</div>
-      <div class="legend-item"><div class="dot d-tilt"></div> <1</div>
-      <div class="legend-item"><div class="dot d-lean"></div> 1-2.5</div>
-      <div class="legend-item"><div class="dot d-likely"></div> 2.5-5</div>
-      <div class="legend-item"><div class="dot d-solid"></div> 5-15</div>
-      <div class="legend-item"><div class="dot d-safe"></div> >15</div>
+      <div class="legend-item"><div class="dot r-safe"></div>Safe R &gt; 15</div>
+      <div class="legend-item"><div class="dot r-solid"></div>Solid R 5–15</div>
+      <div class="legend-item"><div class="dot r-likely"></div>Likely R 2.5–5</div>
+      <div class="legend-item"><div class="dot r-lean"></div>Lean R 1–2.5</div>
+      <div class="legend-item"><div class="dot r-tilt"></div>Tilt R &lt; 1</div>
+      <div class="legend-item"><div class="dot pure-toss"></div>Tossup</div>
+      <div class="legend-item"><div class="dot d-tilt"></div>Tilt D &lt; 1</div>
+      <div class="legend-item"><div class="dot d-lean"></div>Lean D 1–2.5</div>
+      <div class="legend-item"><div class="dot d-likely"></div>Likely D 2.5–5</div>
+      <div class="legend-item"><div class="dot d-solid"></div>Solid D 5–15</div>
+      <div class="legend-item"><div class="dot d-safe"></div>Safe D &gt; 15</div>
     </div>
   </div>
 
   <div class="vis-container">
-    
     <div class="panel">
-      <h2 class="section-title">House of Representatives</h2>
+      <h2 class="section-title">
+        House of Representatives
+        <span class="sub">435 single-member districts, shaded by projected margin</span>
+      </h2>
       <div class="map-wrapper">
         <div id="us-map" class="us-grid"></div>
       </div>
     </div>
 
     <div class="panel">
-      <h2 class="section-title">Senate Battleground</h2>
-      <div class="senate-label-row">
-        <span>&#8592; Democrat</span>
-        <span>Tipping Point</span>
-        <span>Republican &#8594;</span>
+      <h2 class="section-title">
+        Senate Battleground
+        <span class="sub">Vertical snake: closest to 50–50 in the center</span>
+      </h2>
+      <div class="senate-spectrum-wrapper">
+        <div class="senate-label-row">
+          <span>&larr; <strong>Democratic</strong> seats</span>
+          <span>Tipping point highlighted ★</span>
+          <span><strong>Republican</strong> seats &rarr;</span>
+        </div>
+        <div id="senate-grid" class="senate-spectrum"></div>
       </div>
-      <div id="senate-grid" class="senate-spectrum"></div>
     </div>
-
   </div>
 
-  <div id="tooltip"></div>
-
+  <!-- RAW DATA (unchanged model) -->
   <script id="raw-house-string" type="text/plain">
 -state-district-R-D--Alabama-1-1.57631-0.45551--Alabama-2-0.91165-1.15678--Alabama-3-2.00803-0.00000--Alabama-4-2.00803-0.00000--Alabama-5-2.00803-0.00000--Alabama-6-1.41365-0.62712--Alabama-7-0.72892-1.34958--Alaska-at-large-1.03012-1.03178--Arizona-1-1.04217-1.01907--Arizona-2-1.09438-0.96398--Arizona-3-0.53414-1.50212--Arizona-4-0.91365-1.11653--Arizona-5-1.21285-0.83898--Arizona-6-1.00402-1.00636--Arizona-7-0.73494-1.34322--Arizona-8-1.13454-0.92161--Arizona-9-1.31124-0.73517--Arkansas-1-1.46386-0.50847--Arkansas-2-1.18273-0.87076--Arkansas-3-1.28112-0.67373--Arkansas-4-1.46386-0.57415--California-1-1.31124-0.73517--California-2-0.56426-1.52331--California-3-1.11446-0.94280--California-4-0.67269-1.40890--California-5-1.24096-0.80932--California-6-0.85141-1.22034--California-7-0.66667-1.41525--California-8-0.52209-1.56780--California-9-0.96787-1.09746--California-10-0.67269-1.40890--California-11-0.38153-1.71610--California-12-0.00000-2.11864--California-13-1.00321-1.06017--California-14-0.64659-1.43644--California-15-0.54016-1.54873--California-16-0.00000-2.11864--California-17-0.64859-1.43432--California-18-0.71084-1.36864--California-19-0.61647-1.46822--California-20-2.00803-0.00000--California-21-0.95181-1.11441--California-22-1.07229-0.98729--California-23-1.20683-0.84534--California-24-0.74900-1.32839--California-25-0.87751-1.19280--California-26-0.88153-1.18856--California-27-0.97791-1.08686--California-28-0.70482-1.37500--California-29-0.60643-1.47881--California-30-0.63454-1.44915--California-31-0.80924-1.26483--California-32-0.67871-1.40254--California-33-0.82731-1.24576--California-34-0.00000-2.11864--California-35-0.83534-1.23729--California-36-0.62851-1.45551--California-37-0.00000-2.11864--California-38-0.80723-1.26695--California-39-0.86948-1.20127--California-40-1.11044-0.94703--California-41-1.03815-1.02331--California-42-0.64056-1.44280--California-43-0.50000-1.59110--California-44-0.57430-1.51271--California-45-1.00201-1.06144--California-46-0.73494-1.34322--California-47-0.97590-1.08898--California-48-1.19076-0.86229--California-49-0.95984-1.10593--California-50-0.71687-1.36229--California-51-0.78916-1.28602--California-52-0.67671-1.40466--Colorado-1-0.43373-1.62288--Colorado-2-0.58032-1.44915--Colorado-3-1.02008-0.97034--Colorado-4-1.07631-0.88983--Colorado-5-1.09839-0.86653--Colorado-6-0.77309-1.25000--Colorado-7-0.82731-1.17161--Colorado-8-0.98394-1.02119--Connecticut-1-0.69880-1.33686--Connecticut-2-0.84337-1.22881--Connecticut-3-0.82530-1.24788--Connecticut-4-0.74900-1.29449--Connecticut-5-0.93574-1.13136--Delaware-at-large-0.84538-1.22669--Florida-1-1.32530-0.72034--Florida-2-1.23695-0.81356--Florida-3-1.23695-0.81356--Florida-4-1.15060-0.90466--Florida-5-1.26707-0.78178--Florida-6-1.33534-0.70975--Florida-7-1.13454-0.92161--Florida-8-1.24900-0.80085--Florida-9-0.85542-1.16737--Florida-10-0.75502-1.32203--Florida-11-1.21285-0.83898--Florida-12-1.42570-0.61441--Florida-13-1.10040-0.95763--Florida-14-0.83534-1.20551--Florida-15-1.12851-0.92797--Florida-16-1.19478-0.85805--Florida-17-1.28313-0.76483--Florida-18-1.31124-0.73517--Florida-19-1.33133-0.71398--Florida-20-0.00000-2.11864--Florida-21-1.24096-0.80932--Florida-22-0.90361-1.16525--Florida-23-0.95582-1.11017--Florida-24-0.63855-1.44492--Florida-25-0.91365-1.15466--Florida-26-1.42369-0.61653--Florida-27-1.21285-0.83898--Florida-28-1.29719-0.75000--Georgia-1-1.24498-0.80508--Georgia-2-0.87751-1.19280--Georgia-3-1.33133-0.71398--Georgia-4-0.48996-1.60169--Georgia-5-0.28715-1.81568--Georgia-6-0.50803-1.58263--Georgia-7-1.30321-0.74364--Georgia-8-1.38353-0.65890--Georgia-9-1.38554-0.65678--Georgia-10-1.26707-0.78178--Georgia-11-1.35141-0.69280--Georgia-12-1.21084-0.84110--Georgia-13-0.56627-1.52119--Georgia-14-1.29317-0.75424--Hawaii-1-0.56627-1.52119--Hawaii-2-0.60643-1.40890--Idaho-1-1.42570-0.53814--Idaho-2-1.23293-0.65678--Illinois-1-0.68474-1.39619--Illinois-2-0.65060-1.43220--Illinois-3-0.65663-1.42585--Illinois-4-0.54819-1.43008--Illinois-5-0.62249-1.46186--Illinois-6-0.91968-1.14831--Illinois-7-0.33534-1.76483--Illinois-8-0.86145-1.20975--Illinois-9-0.63454-1.44915--Illinois-10-0.80321-1.27119--Illinois-11-0.89157-1.17797--Illinois-12-1.48996-0.54661--Illinois-13-0.84137-1.23093--Illinois-14-0.90161-1.16737--Illinois-15-2.00803-0.00000--Illinois-16-2.00803-0.00000--Illinois-17-0.91566-1.15254--Indiana-1-0.90161-1.13136--Indiana-2-1.25904-0.73305--Indiana-3-1.30522-0.66525--Indiana-4-1.30120-0.65466--Indiana-5-1.13655-0.80508--Indiana-6-1.28313-0.67161--Indiana-7-0.58233-1.44703--Indiana-8-1.36546-0.62500--Indiana-9-1.29518-0.69492--Iowa-1-1.00602-1.05720--Iowa-2-1.14659-0.88136--Iowa-3-1.04217-1.01907--Iowa-4-1.34940-0.69492--Kansas-1-1.38755-0.65466--Kansas-2-1.14659-0.80932--Kansas-3-0.85542-1.13136--Kansas-4-1.30522-0.74153--Kentucky-1-1.50000-0.53602--Kentucky-2-1.46787-0.56992--Kentucky-3-0.76305-1.31356--Kentucky-4-2.00803-0.00000--Kentucky-5-2.00803-0.00000--Kentucky-6-1.27309-0.77542--Louisiana-1-1.48795-0.50847--Louisiana-2-0.58233-1.50212--Louisiana-3-1.50000-0.53814--Louisiana-4-2.00803-0.00000--Louisiana-5-1.48795-0.54873--Louisiana-6-0.75703-1.31780--Maine-1-0.73092-1.24364--Maine-2-0.99799-1.06568--Maryland-1-1.19277-0.79237--Maryland-2-0.79317-1.23305--Maryland-3-0.76104-1.25636--Maryland-4-0.22490-1.87288--Maryland-5-0.64257-1.43644--Maryland-6-0.93775-1.12500--Maryland-7-0.34538-1.70127--Maryland-8-0.41165-1.62712--Massachusetts-1-0.00000-1.32627--Massachusetts-2-0.00000-1.45763--Massachusetts-3-0.00000-2.11864--Massachusetts-4-0.00000-2.11864--Massachusetts-5-0.00000-2.11864--Massachusetts-6-0.00000-2.11864--Massachusetts-7-0.00000-2.11864--Massachusetts-8-0.59237-1.49364--Massachusetts-9-0.87349-1.19703--Michigan-1-1.18675-0.80297--Michigan-2-1.30723-0.67161--Michigan-3-0.87952-1.13771--Michigan-4-1.10643-0.91949--Michigan-5-1.31928-0.69492--Michigan-6-0.70281-1.31356--Michigan-7-1.01004-0.98729--Michigan-8-0.89558-1.08475--Michigan-9-1.34137-0.62500--Michigan-10-1.02610-0.95339--Michigan-11-0.79518-1.23305--Michigan-12-0.51004-1.47669--Michigan-13-0.49197-1.45339--Minnesota-1-1.17470-0.87924--Minnesota-2-0.84538-1.17797--Minnesota-3-0.83333-1.23941--Minnesota-4-0.65462-1.42797--Minnesota-5-0.49799-1.59322--Minnesota-6-1.25502-0.79449--Minnesota-7-1.41566-0.62500--Minnesota-8-1.16466-0.88983--Mississippi-1-1.40161-0.63983--Mississippi-2-0.76305-1.31356--Mississippi-3-2.00803-0.00000--Mississippi-4-1.48594-0.55297--Missouri-1-0.36948-1.60805--Missouri-2-1.09438-0.90042--Missouri-3-1.23092-0.74788--Missouri-4-1.42771-0.55932--Missouri-5-0.73092-1.27542--Missouri-6-1.41968-0.56992--Missouri-7-1.43775-0.55720--Missouri-8-1.53012-0.46186--Montana-1-1.05020-0.94492--Montana-2-1.32530-0.72034--Nebraska-1-1.20683-0.84534--Nebraska-2-1.02209-1.04025--Nebraska-3-1.61446-0.41525--Nevada-1-0.89357-1.10169--Nevada-2-1.10442-0.00000--Nevada-3-0.97590-1.08898--Nevada-4-0.89558-1.11653--New Hampshire-1-0.92369-1.14407--New Hampshire-2-0.94378-1.12288--New Jersey-1-0.80321-1.22458--New Jersey-2-1.16667-0.87288--New Jersey-3-0.89558-1.12712--New Jersey-4-1.35341-0.67161--New Jersey-5-0.86948-1.15678--New Jersey-6-0.80924-1.18856--New Jersey-7-1.04016-0.98305--New Jersey-8-0.69478-1.25847--New Jersey-9-0.92169-1.07627--New Jersey-10-0.44578-1.57627--New Jersey-11-0.82731-1.19703--New Jersey-12-0.73092-1.29661--New Mexico-1-0.87550-1.19492--New Mexico-2-0.96185-1.10381--New Mexico-3-0.87751-1.19280--New York-1-1.10843-0.94915--New York-2-1.18876-0.86441--New York-3-0.96787-1.09746--New York-4-0.98193-1.08263--New York-5-0.54418-1.54449--New York-6-0.75502-1.28602--New York-7-0.43976-1.65466--New York-8-0.49398-1.59746--New York-9-0.51606-1.57415--New York-10-0.30120-1.74788--New York-11-1.28715-0.76059--New York-12-0.39157-1.70551--New York-13-0.33133-1.76907--New York-14-0.61847-1.46610--New York-15-0.42972-1.62076--New York-16-0.57028-1.51695--New York-17-1.04819-0.97034--New York-18-0.85944-1.21186--New York-19-0.98193-1.08263--New York-20-0.78112-1.29449--New York-21-1.24498-0.80508--New York-22-0.91165-1.15678--New York-23-1.32129-0.72458--New York-24-1.31928-0.72669--New York-25-0.78715-1.28814--New York-26-0.69880-1.38136--North Carolina-1-0.95984-1.04873--North Carolina-2-0.63454-1.40466--North Carolina-3-1.55422-0.00000--North Carolina-4-0.52410-1.52119--North Carolina-5-1.19478-0.85805--North Carolina-6-1.38956-0.00000--North Carolina-7-1.17671-0.87712--North Carolina-8-1.19679-0.85593--North Carolina-9-1.13052-0.80085--North Carolina-10-1.15462-0.80932--North Carolina-11-1.14056-0.91525--North Carolina-12-0.52209-1.56780--North Carolina-13-1.17671-0.87712--North Carolina-14-1.16667-0.88771--North Dakota-at-large-1.39558-0.64619--Ohio-1-0.91165-1.15678--Ohio-2-1.47791-0.55932--Ohio-3-0.58835-1.49788--Ohio-4-1.37550-0.66737--Ohio-5-1.35542-0.68856--Ohio-6-1.33936-0.70551--Ohio-7-1.02610-0.76483--Ohio-8-1.26104-0.78814--Ohio-9-0.95582-1.02331--Ohio-10-1.15663-0.83051--Ohio-11-0.39357-1.65890--Ohio-12-1.37550-0.66737--Ohio-13-0.98193-1.08263--Ohio-14-1.27309-0.77542--Ohio-15-1.13454-0.92161--Oklahoma-1-1.21285-0.73093--Oklahoma-2-1.48996-0.45339--Oklahoma-3-2.00803-0.00000--Oklahoma-4-1.30924-0.59958--Oklahoma-5-1.21888-0.83263--Oregon-1-0.56627-1.45763--Oregon-2-1.28514-0.69492--Oregon-3-0.50803-1.43856--Oregon-4-0.88353-1.09746--Oregon-5-0.90361-1.01059--Oregon-6-0.93574-1.13136--Pennsylvania-1-1.13253-0.92373--Pennsylvania-2-0.57430-1.51483--Pennsylvania-3-0.00000-2.11864--Pennsylvania-4-0.82129-1.25212--Pennsylvania-5-0.69679-1.38347--Pennsylvania-6-0.87952-1.19068--Pennsylvania-7-1.01406-1.04873--Pennsylvania-8-1.02008-1.04237--Pennsylvania-9-1.41566-0.62500--Pennsylvania-10-1.01606-1.04661--Pennsylvania-11-1.26305-0.78602--Pennsylvania-12-0.87550-1.19492--Pennsylvania-13-1.48996-0.54661--Pennsylvania-14-1.33735-0.70763--Pennsylvania-15-1.43574-0.60381--Pennsylvania-16-1.27711-0.77119--Pennsylvania-17-0.92570-1.14195--Rhode Island-1-0.64458-1.33898--Rhode Island-2-0.83534-1.23729--South Carolina-1-1.17068-0.88347--South Carolina-2-1.19880-0.85381--South Carolina-3-1.44177-0.53814--South Carolina-4-1.20281-0.79025--South Carolina-5-1.27711-0.77119--South Carolina-6-0.73896-1.26271--South Carolina-7-1.30522-0.74153--South Dakota-at-large-1.44578-0.59322--Tennessee-1-1.57430-0.40466--Tennessee-2-1.39157-0.65042--Tennessee-3-1.35542-0.62288--Tennessee-4-1.40562-0.56780--Tennessee-5-1.14257-0.83686--Tennessee-6-1.36546-0.67797--Tennessee-7-1.19478-0.80508--Tennessee-8-1.45181-0.54237--Tennessee-9-0.51606-1.51059--Texas-1-2.00803-0.00000--Texas-2-1.31928-0.72669--Texas-3-1.25502-0.79449--Texas-4-1.37349-0.66949--Texas-5-1.28715-0.76059--Texas-6-1.31928-0.72669--Texas-7-0.77711-1.29873--Texas-8-1.36948-0.67373--Texas-9-0.00000-2.11864--Texas-10-1.27711-0.72034--Texas-11-2.00803-0.00000--Texas-12-1.27510-0.77331--Texas-13-2.00803-0.00000--Texas-14-1.37952-0.66314--Texas-15-1.14659-0.90890--Texas-16-0.81325-1.26059--Texas-17-1.33133-0.71398--Texas-18-0.61446-1.47034--Texas-19-1.62048-0.00000--Texas-20-0.00000-2.11864--Texas-21-1.24297-0.76483--Texas-22-1.24699-0.80297--Texas-23-1.25100-0.79873--Texas-24-1.21084-0.84110--Texas-25-2.00803-0.00000--Texas-26-1.24699-0.75636--Texas-27-1.32530-0.72034--Texas-28-0.94779-1.11864--Texas-29-0.69679-1.38347--Texas-30-0.00000-1.79873--Texas-31-1.29317-0.75424--Texas-32-0.74297-1.28178--Texas-33-0.62651-1.45763--Texas-34-0.97791-1.08686--Texas-35-0.65462-1.42797--Texas-36-1.39357-0.64831--Texas-37-0.47390-1.57203--Texas-38-1.25904-0.78814--Utah-1-1.26707-0.68008--Utah-2-1.16466-0.72458--Utah-3-1.33333-0.71186--Utah-4-1.27309-0.63983--Vermont-at-large-0.60040-1.32415--Virginia-1-1.13253-0.92373--Virginia-2-1.02008-0.99576--Virginia-3-0.60040-1.48517--Virginia-4-0.65261-1.43008--Virginia-5-1.15462-0.90042--Virginia-6-1.26908-0.73729--Virginia-7-0.97791-1.08686--Virginia-8-0.49598-1.51907--Virginia-9-1.45783-0.58051--Virginia-10-0.95783-1.10805--Virginia-11-0.66265-1.41949--Washington-1-0.73896-1.33898--Washington-2-0.72289-1.35593--Washington-3-0.96185-1.09534--Washington-4-2.00803-0.00000--Washington-5-1.21888-0.83263--Washington-6-0.86747-1.20339--Washington-7-0.31727-1.78390--Washington-8-0.92169-1.14619--Washington-9-0.00000-2.11864--Washington-10-0.82932-1.24364--West Virginia-1-1.33333-0.51271--West Virginia-2-1.42169-0.61864--Wisconsin-1-1.08635-0.93008--Wisconsin-2-0.60040-1.48517--Wisconsin-3-1.03213-1.02966--Wisconsin-4-0.44980-1.58686--Wisconsin-5-1.29518-0.75212--Wisconsin-6-1.23092-0.81992--Wisconsin-7-1.27711-0.77119--Wisconsin-8-1.15060-0.90466--Wyoming-at-large-1.42570-0.49576-
   </script>
 
   <script id="raw-senate-string" type="text/plain">
-State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.6971-1.2832AL-0.7065-1.2758KY-0.7052-1.2697TN-0.7150-1.2746SD-0.7142-1.2636MS-0.7698-1.2148LA-0.7922-1.1845MT-0.7992-1.1639SC-0.8328-1.1638NE-0.8435-1.1573FL-0.8402-1.1431IA-0.8757-1.1229TX-0.8788-1.1232KS-0.8970-1.1057AK-0.8901-1.0915OH-0.9058-1.1085NC-0.9868-1.0058MI-0.9989-0.9968GA-1.0223-0.9746NH-1.0715-0.9454NJ-1.0497-0.9260MN-1.0853-0.9273NM-1.0933-0.9284VA-1.0805-0.9138ME-1.1288-0.9105IL-1.1201-0.8808RI-1.1505-0.8378CO-1.1729-0.8348OR-1.1845-0.8213DE-1.1839-0.8145MA-1.2744-0.7194
+State-D-R
+WY-0.5657-1.4364
+WV-0.5896-1.3696
+ID-0.6339-1.3495
+OK-0.6824-1.2748
+AR-0.6971-1.2832
+AL-0.7065-1.2758
+KY-0.7052-1.2697
+TN-0.7150-1.2746
+SD-0.7142-1.2636
+MS-0.7698-1.2148
+LA-0.7922-1.1845
+MT-0.7992-1.1639
+SC-0.8328-1.1638
+NE-0.8435-1.1573
+FL-0.8402-1.1431
+IA-0.8757-1.1229
+TX-0.8788-1.1232
+KS-0.8970-1.1057
+AK-0.8901-1.0915
+OH-0.9058-1.1085
+NC-0.9868-1.0058
+MI-0.9989-0.9968
+GA-1.0223-0.9746
+NH-1.0715-0.9454
+NJ-1.0497-0.9260
+MN-1.0853-0.9273
+NM-1.0933-0.9284
+VA-1.0805-0.9138
+ME-1.1288-0.9105
+IL-1.1201-0.8808
+RI-1.1505-0.8378
+CO-1.1729-0.8348
+OR-1.1845-0.8213
+DE-1.1839-0.8145
+MA-1.2744-0.7194
   </script>
 
+  <div id="tooltip"></div>
+
   <script>
-    // --- House Map Grid Layout ---
+    // --- House map grid layout (same positions as before) ---
     const stateLayout = {
-      'Alaska': {r:1, c:1}, 'Maine': {r:1, c:11},
-      'Washington': {r:2, c:2}, 'Idaho': {r:2, c:3}, 'Montana': {r:2, c:4}, 'North Dakota': {r:2, c:5}, 'Minnesota': {r:2, c:6}, 'Wisconsin': {r:2, c:8}, 'Michigan': {r:2, c:9}, 'New York': {r:1, c:10}, 'Vermont': {r:2, c:11}, 'New Hampshire': {r:2, c:12},
-      'Oregon': {r:3, c:2}, 'Nevada': {r:3, c:3}, 'Wyoming': {r:3, c:4}, 'South Dakota': {r:3, c:5}, 'Iowa': {r:3, c:6}, 'Illinois': {r:3, c:7}, 'Indiana': {r:3, c:8}, 'Ohio': {r:3, c:9}, 'Pennsylvania': {r:3, c:10}, 'New Jersey': {r:3, c:11}, 'Connecticut': {r:3, c:12},
-      'California': {r:4, c:2}, 'Utah': {r:4, c:3}, 'Colorado': {r:4, c:4}, 'Nebraska': {r:4, c:5}, 'Missouri': {r:4, c:6}, 'Kentucky': {r:4, c:7}, 'West Virginia': {r:4, c:8}, 'Virginia': {r:4, c:9}, 'Maryland': {r:4, c:10}, 'Delaware': {r:4, c:11}, 'Rhode Island': {r:4, c:12},
-      'Arizona': {r:5, c:3}, 'New Mexico': {r:5, c:4}, 'Kansas': {r:5, c:5}, 'Arkansas': {r:5, c:6}, 'Tennessee': {r:5, c:7}, 'North Carolina': {r:5, c:8}, 'South Carolina': {r:5, c:9},
-      'Oklahoma': {r:6, c:5}, 'Louisiana': {r:6, c:6}, 'Mississippi': {r:6, c:7}, 'Alabama': {r:6, c:8}, 'Georgia': {r:6, c:9},
-      'Hawaii': {r:7, c:1}, 'Texas': {r:7, c:5}, 'Florida': {r:7, c:9}, 'Massachusetts': {r:2, c:11}
-    };
-    
-    // Correct USGS/USPS Abbreviations Mapping
-    const stateAbbreviations = {
-      'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-      'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
-      'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
-      'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
-      'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
-      'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-      'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
-      'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
-      'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
-      'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+      Alaska: { r: 1, c: 1 },
+      Maine: { r: 1, c: 11 },
+      Washington: { r: 2, c: 2 },
+      Idaho: { r: 2, c: 3 },
+      Montana: { r: 2, c: 4 },
+      "North Dakota": { r: 2, c: 5 },
+      Minnesota: { r: 2, c: 6 },
+      Wisconsin: { r: 2, c: 8 },
+      Michigan: { r: 2, c: 9 },
+      "New York": { r: 1, c: 10 },
+      Vermont: { r: 2, c: 11 },
+      "New Hampshire": { r: 2, c: 12 },
+
+      Oregon: { r: 3, c: 2 },
+      Nevada: { r: 3, c: 3 },
+      Wyoming: { r: 3, c: 4 },
+      "South Dakota": { r: 3, c: 5 },
+      Iowa: { r: 3, c: 6 },
+      Illinois: { r: 3, c: 7 },
+      Indiana: { r: 3, c: 8 },
+      Ohio: { r: 3, c: 9 },
+      Pennsylvania: { r: 3, c: 10 },
+      "New Jersey": { r: 3, c: 11 },
+      Connecticut: { r: 3, c: 12 },
+
+      California: { r: 4, c: 2 },
+      Utah: { r: 4, c: 3 },
+      Colorado: { r: 4, c: 4 },
+      Nebraska: { r: 4, c: 5 },
+      Missouri: { r: 4, c: 6 },
+      Kentucky: { r: 4, c: 7 },
+      "West Virginia": { r: 4, c: 8 },
+      Virginia: { r: 4, c: 9 },
+      Maryland: { r: 4, c: 10 },
+      Delaware: { r: 4, c: 11 },
+      "Rhode Island": { r: 4, c: 12 },
+
+      Arizona: { r: 5, c: 3 },
+      "New Mexico": { r: 5, c: 4 },
+      Kansas: { r: 5, c: 5 },
+      Arkansas: { r: 5, c: 6 },
+      Tennessee: { r: 5, c: 7 },
+      "North Carolina": { r: 5, c: 8 },
+      "South Carolina": { r: 5, c: 9 },
+
+      Oklahoma: { r: 6, c: 5 },
+      Louisiana: { r: 6, c: 6 },
+      Mississippi: { r: 6, c: 7 },
+      Alabama: { r: 6, c: 8 },
+      Georgia: { r: 6, c: 9 },
+
+      Hawaii: { r: 7, c: 1 },
+      Texas: { r: 7, c: 5 },
+      Florida: { r: 7, c: 9 },
+      Massachusetts: { r: 2, c: 11 }
     };
 
-    // Baselines for Senate (Not up for election)
+    const stateAbbreviations = {
+      Alabama: "AL",
+      Alaska: "AK",
+      Arizona: "AZ",
+      Arkansas: "AR",
+      California: "CA",
+      Colorado: "CO",
+      Connecticut: "CT",
+      Delaware: "DE",
+      Florida: "FL",
+      Georgia: "GA",
+      Hawaii: "HI",
+      Idaho: "ID",
+      Illinois: "IL",
+      Indiana: "IN",
+      Iowa: "IA",
+      Kansas: "KS",
+      Kentucky: "KY",
+      Louisiana: "LA",
+      Maine: "ME",
+      Maryland: "MD",
+      Massachusetts: "MA",
+      Michigan: "MI",
+      Minnesota: "MN",
+      Mississippi: "MS",
+      Missouri: "MO",
+      Montana: "MT",
+      Nebraska: "NE",
+      Nevada: "NV",
+      "New Hampshire": "NH",
+      "New Jersey": "NJ",
+      "New Mexico": "NM",
+      "New York": "NY",
+      "North Carolina": "NC",
+      "North Dakota": "ND",
+      Ohio: "OH",
+      Oklahoma: "OK",
+      Oregon: "OR",
+      Pennsylvania: "PA",
+      "Rhode Island": "RI",
+      "South Carolina": "SC",
+      "South Dakota": "SD",
+      Tennessee: "TN",
+      Texas: "TX",
+      Utah: "UT",
+      Vermont: "VT",
+      Virginia: "VA",
+      Washington: "WA",
+      "West Virginia": "WV",
+      Wisconsin: "WI",
+      Wyoming: "WY"
+    };
+
+    // Baseline: seats not up in Senate this cycle
     const BASE_SENATE_D = 34;
     const BASE_SENATE_R = 31;
 
-    // --- Helper Functions ---
     function getWinCategory(margin) {
       const absM = Math.abs(margin);
-      if(absM < 0.05) return { code: 'pure-toss', type: 'Tie' };
-      
-      if(margin > 0) { // R
-        if(absM >= 15) return { code: 'r-safe', type: 'Safe R' };
-        if(absM >= 5)  return { code: 'r-solid', type: 'Solid R' };
-        if(absM >= 2.5) return { code: 'r-likely', type: 'Likely R' };
-        if(absM >= 1)   return { code: 'r-lean', type: 'Lean R' };
-        return { code: 'r-tilt', type: 'Tilt R' };
-      } else { // D
-        if(absM >= 15) return { code: 'd-safe', type: 'Safe D' };
-        if(absM >= 5)  return { code: 'd-solid', type: 'Solid D' };
-        if(absM >= 2.5) return { code: 'd-likely', type: 'Likely D' };
-        if(absM >= 1)   return { code: 'd-lean', type: 'Lean D' };
-        return { code: 'd-tilt', type: 'Tilt D' };
+      if (absM < 0.05) return { code: "pure-toss", type: "Tossup" };
+
+      if (margin > 0) {
+        if (absM >= 15) return { code: "r-safe", type: "Safe R" };
+        if (absM >= 5) return { code: "r-solid", type: "Solid R" };
+        if (absM >= 2.5) return { code: "r-likely", type: "Likely R" };
+        if (absM >= 1) return { code: "r-lean", type: "Lean R" };
+        return { code: "r-tilt", type: "Tilt R" };
+      } else {
+        if (absM >= 15) return { code: "d-safe", type: "Safe D" };
+        if (absM >= 5) return { code: "d-solid", type: "Solid D" };
+        if (absM >= 2.5) return { code: "d-likely", type: "Likely D" };
+        if (absM >= 1) return { code: "d-lean", type: "Lean D" };
+        return { code: "d-tilt", type: "Tilt D" };
       }
     }
 
-    // --- DATA PARSING ---
-
     function parseSenateData() {
-      const raw = document.getElementById('raw-senate-string').textContent.trim();
-      const regex = /([A-Z]{2})-([\d\.]+)-([\d\.]+)/g;
+      const raw = document
+        .getElementById("raw-senate-string")
+        .textContent.trim();
+      const lines = raw.split(/[\r\n]+/).filter(
+        (l) => l && !l.toLowerCase().startsWith("state")
+      );
       const results = [];
-      let match;
-      while ((match = regex.exec(raw)) !== null) {
-        results.push({
-          s: match[1], 
-          d: parseFloat(match[2]), 
-          r: parseFloat(match[3])
-        });
+      for (const line of lines) {
+        const parts = line.split("-");
+        if (parts.length >= 3) {
+          results.push({
+            s: parts[0],
+            d: parseFloat(parts[1]),
+            r: parseFloat(parts[2])
+          });
+        }
       }
       return results;
     }
 
     function parseHouseData() {
-      const raw = document.getElementById('raw-house-string').textContent.trim();
-      const rows = raw.split('--'); 
+      const raw = document
+        .getElementById("raw-house-string")
+        .textContent.trim();
+      const rows = raw.split("--");
       const districts = [];
-      const rowRegex = /^(.*?)-(\d+|at-large)-([\d\.]+)-([\d\.]+)$/;
+      const rowRegex = /^(.*?)-(\d+|at-large)-([\d.]+)-([\d.]+)$/;
 
       for (let row of rows) {
         row = row.trim();
-        if (!row || row.startsWith('state')) continue;
-        if (row.startsWith('-')) row = row.substring(1);
+        if (!row || row.toLowerCase().startsWith("state")) continue;
+        if (row.startsWith("-")) row = row.substring(1);
         const match = row.match(rowRegex);
         if (match) {
           districts.push({
@@ -624,278 +1411,482 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       return districts;
     }
 
-    // --- INIT HOUSE MAP ---
-    const mapEl = document.getElementById('us-map');
+    const mapEl = document.getElementById("us-map");
     let allHouseDistricts = [];
+    let senateData = [];
 
     function buildHouseMap() {
       allHouseDistricts = parseHouseData();
-      
       const stateGroups = {};
-      allHouseDistricts.forEach(d => {
+
+      allHouseDistricts.forEach((d) => {
         if (!stateGroups[d.state]) stateGroups[d.state] = [];
         stateGroups[d.state].push(d);
       });
-      
-      Object.values(stateGroups).forEach(g => g.sort((a,b) => (a.id==='at-large'?-1:(b.id==='at-large'?1:parseInt(a.id)-parseInt(b.id)))));
+
+      Object.values(stateGroups).forEach((g) =>
+        g.sort((a, b) => {
+          if (a.id === "at-large") return -1;
+          if (b.id === "at-large") return 1;
+          return parseInt(a.id) - parseInt(b.id);
+        })
+      );
 
       for (const [state, districts] of Object.entries(stateGroups)) {
-        const pos = stateLayout[state] || {r: 8, c: 1};
-        const wrapper = document.createElement('div');
-        wrapper.className = 'state-wrapper';
+        const pos = stateLayout[state] || { r: 8, c: 1 };
+        const wrapper = document.createElement("div");
+        wrapper.className = "state-wrapper";
         wrapper.style.gridRow = pos.r;
         wrapper.style.gridColumn = pos.c;
-        
-        if (state === 'Massachusetts') { wrapper.style.transform = 'translate(15px, 15px)'; wrapper.style.zIndex = 10; }
 
-        const label = document.createElement('div');
-        label.className = 'state-label';
-        
-        label.textContent = stateAbbreviations[state] || state.substring(0,2).toUpperCase();
-        
+        if (state === "Massachusetts") {
+          wrapper.style.transform = "translate(15px, 15px)";
+          wrapper.style.zIndex = 10;
+        }
+
+        const label = document.createElement("div");
+        label.className = "state-label";
+        label.textContent =
+          stateAbbreviations[state] || state.substring(0, 2).toUpperCase();
         wrapper.appendChild(label);
 
-        const container = document.createElement('div');
-        container.className = 'districts-container';
-        
-        districts.forEach(d => {
-          const dot = document.createElement('div');
-          dot.className = 'district-dot';
+        const container = document.createElement("div");
+        container.className = "districts-container";
+
+        districts.forEach((d) => {
+          const dot = document.createElement("div");
+          dot.className = "district-dot";
           d.element = dot;
-          d.type = 'house';
-          
-          dot.addEventListener('mousemove', (e) => showTooltip(e, d));
-          dot.addEventListener('mouseleave', hideTooltip);
+          d.type = "house";
+
+          dot.addEventListener("mousemove", (e) => showTooltip(e, d));
+          dot.addEventListener("mouseleave", hideTooltip);
           container.appendChild(dot);
         });
+
         wrapper.appendChild(container);
         mapEl.appendChild(wrapper);
       }
     }
 
-    // --- INIT SENATE SPECTRUM ---
-    const senateGrid = document.getElementById('senate-grid');
-    let senateData = [];
-
     function buildSenateSpectrum() {
       senateData = parseSenateData();
-      // We do not append dots yet, we wait for updateDashboard to sort and place them
+      // elements are created later during update
     }
 
-    // --- MAIN UPDATE LOGIC ---
-    const slider = document.getElementById('swing-slider');
-    const marginDisp = document.getElementById('margin-display');
+    const slider = document.getElementById("swing-slider");
+    const marginDisp = document.getElementById("margin-display");
+
+    const houseStatusPrimary = document.getElementById(
+      "house-status-primary"
+    );
+    const houseStatusSecondary = document.getElementById(
+      "house-status-secondary"
+    );
+    const senateStatusPrimary = document.getElementById(
+      "senate-status-primary"
+    );
+    const senateStatusSecondary = document.getElementById(
+      "senate-status-secondary"
+    );
+
+    const houseBarR = document.getElementById("house-bar-r");
+    const houseBarD = document.getElementById("house-bar-d");
+    const houseMajorityMarker = document.getElementById(
+      "house-majority-marker"
+    );
+
+    const senateBarR = document.getElementById("senate-bar-r");
+    const senateBarD = document.getElementById("senate-bar-d");
+    const senateMajorityMarker = document.getElementById(
+      "senate-majority-marker"
+    );
+
+    const senateGrid = document.getElementById("senate-grid");
 
     function updateDashboard() {
       const swing = parseFloat(slider.value);
-      
+
+      // Display national environment
       if (swing > 0) {
-        marginDisp.innerHTML = `National: <span style="color:var(--rep-lean)">R+${swing.toFixed(1)}</span>`;
+        marginDisp.innerHTML = `<span style="color:var(--rep-lean)">R+${swing.toFixed(
+          1
+        )}</span>`;
       } else if (swing < 0) {
-        marginDisp.innerHTML = `National: <span style="color:var(--dem-lean)">D+${Math.abs(swing).toFixed(1)}</span>`;
+        marginDisp.innerHTML = `<span style="color:var(--dem-lean)">D+${Math.abs(
+          swing
+        ).toFixed(1)}</span>`;
       } else {
-        marginDisp.innerHTML = `National: Even`;
+        marginDisp.textContent = "Even";
       }
 
-      const natR = 50 + (swing / 2);
-      const natD = 50 - (swing / 2);
+      const natR = 50 + swing / 2;
+      const natD = 50 - swing / 2;
 
-      // --- HOUSE CALCULATIONS ---
-      let hC = { 
-        rSafe:0, rSolid:0, rLikely:0, rLean:0, rTilt:0, 
-        tie:0, 
-        dTilt:0, dLean:0, dLikely:0, dSolid:0, dSafe:0 
+      // --- HOUSE ---
+      const hC = {
+        rSafe: 0,
+        rSolid: 0,
+        rLikely: 0,
+        rLean: 0,
+        rTilt: 0,
+        tie: 0,
+        dTilt: 0,
+        dLean: 0,
+        dLikely: 0,
+        dSolid: 0,
+        dSafe: 0
       };
-      
-      allHouseDistricts.forEach(d => {
+
+      allHouseDistricts.forEach((d) => {
         const rPts = d.rRatio * natR;
         const dPts = d.dRatio * natD;
         const total = rPts + dPts;
-        const rShare = (rPts/total)*100;
-        const margin = rShare - (100 - rShare);
-        
+        const rShare = (rPts / total) * 100;
+        const dShare = 100 - rShare;
+        const margin = rShare - dShare;
+
         d.currR = rShare;
+        d.currD = dShare;
         d.currMargin = margin;
 
         const cat = getWinCategory(margin);
         d.element.className = `district-dot ${cat.code}`;
-        
-        if(cat.code === 'pure-toss') hC.tie++;
-        else if(cat.code === 'r-safe') hC.rSafe++;
-        else if(cat.code === 'r-solid') hC.rSolid++;
-        else if(cat.code === 'r-likely') hC.rLikely++;
-        else if(cat.code === 'r-lean') hC.rLean++;
-        else if(cat.code === 'r-tilt') hC.rTilt++;
-        else if(cat.code === 'd-safe') hC.dSafe++;
-        else if(cat.code === 'd-solid') hC.dSolid++;
-        else if(cat.code === 'd-likely') hC.dLikely++;
-        else if(cat.code === 'd-lean') hC.dLean++;
-        else if(cat.code === 'd-tilt') hC.dTilt++;
+        d.category = cat.type;
+
+        if (cat.code === "pure-toss") hC.tie++;
+        else if (cat.code === "r-safe") hC.rSafe++;
+        else if (cat.code === "r-solid") hC.rSolid++;
+        else if (cat.code === "r-likely") hC.rLikely++;
+        else if (cat.code === "r-lean") hC.rLean++;
+        else if (cat.code === "r-tilt") hC.rTilt++;
+        else if (cat.code === "d-safe") hC.dSafe++;
+        else if (cat.code === "d-solid") hC.dSolid++;
+        else if (cat.code === "d-likely") hC.dLikely++;
+        else if (cat.code === "d-lean") hC.dLean++;
+        else if (cat.code === "d-tilt") hC.dTilt++;
       });
 
-      document.getElementById('h-r-safe').textContent = hC.rSafe;
-      document.getElementById('h-r-solid').textContent = hC.rSolid;
-      document.getElementById('h-r-likely').textContent = hC.rLikely;
-      document.getElementById('h-r-lean').textContent = hC.rLean;
-      document.getElementById('h-r-tilt').textContent = hC.rTilt;
-      document.getElementById('h-tie').textContent = hC.tie;
-      document.getElementById('h-d-tilt').textContent = hC.dTilt;
-      document.getElementById('h-d-lean').textContent = hC.dLean;
-      document.getElementById('h-d-likely').textContent = hC.dLikely;
-      document.getElementById('h-d-solid').textContent = hC.dSolid;
-      document.getElementById('h-d-safe').textContent = hC.dSafe;
+      document.getElementById("h-r-safe").textContent = hC.rSafe;
+      document.getElementById("h-r-solid").textContent = hC.rSolid;
+      document.getElementById("h-r-likely").textContent = hC.rLikely;
+      document.getElementById("h-r-lean").textContent = hC.rLean;
+      document.getElementById("h-r-tilt").textContent = hC.rTilt;
+      document.getElementById("h-tie").textContent = hC.tie;
+      document.getElementById("h-d-tilt").textContent = hC.dTilt;
+      document.getElementById("h-d-lean").textContent = hC.dLean;
+      document.getElementById("h-d-likely").textContent = hC.dLikely;
+      document.getElementById("h-d-solid").textContent = hC.dSolid;
+      document.getElementById("h-d-safe").textContent = hC.dSafe;
 
-      const hTotalR = hC.rSafe + hC.rSolid + hC.rLikely + hC.rLean + hC.rTilt;
-      const hTotalD = hC.dSafe + hC.dSolid + hC.dLikely + hC.dLean + hC.dTilt;
-      document.getElementById('h-total-r').textContent = hTotalR;
-      document.getElementById('h-total-d').textContent = hTotalD;
+      const hTotalR =
+        hC.rSafe + hC.rSolid + hC.rLikely + hC.rLean + hC.rTilt;
+      const hTotalD =
+        hC.dSafe + hC.dSolid + hC.dLikely + hC.dLean + hC.dTilt;
+      document.getElementById("h-total-r").textContent = hTotalR;
+      document.getElementById("h-total-d").textContent = hTotalD;
 
-      // --- SENATE CALCULATIONS & SNAKE GRID PLACEMENT ---
-      let sC = { 
-        rSafe: BASE_SENATE_R, rSolid:0, rLikely:0, rLean:0, rTilt:0, 
-        tie:0, 
-        dTilt:0, dLean:0, dLikely:0, dSolid:0, dSafe: BASE_SENATE_D 
+      // House majority bar (0–435)
+      const houseTotalSeats = hTotalR + hTotalD + hC.tie;
+      const houseSeatScale = 435; // we know this, but keep explicit
+      const rPct = (hTotalR / houseSeatScale) * 100;
+      const dPct = (hTotalD / houseSeatScale) * 100;
+
+      houseBarR.style.width = `${rPct}%`;
+      houseBarD.style.width = `${dPct}%`;
+
+      const houseMajorityThreshold = 218;
+      const majorityPosPct = (houseMajorityThreshold / houseSeatScale) * 100;
+      houseMajorityMarker.style.left = `${majorityPosPct}%`;
+
+      // House status text
+      const houseDiff = hTotalR - hTotalD;
+      let houseLeaderText, houseDetailText;
+      if (hTotalR > hTotalD) {
+        const marginSeats = hTotalR - hTotalD;
+        const aboveMaj = hTotalR - houseMajorityThreshold;
+        houseLeaderText = `<span class="party rep">Republicans</span> lead, ${hTotalR}-${hTotalD}`;
+        houseDetailText =
+          aboveMaj >= 0
+            ? `Projected GOP majority by <strong>${marginSeats}</strong> seats (${aboveMaj} above 218)`
+            : `GOP ahead in seats but below majority by <strong>${Math.abs(
+                aboveMaj
+              )}</strong>`;
+      } else if (hTotalD > hTotalR) {
+        const marginSeats = hTotalD - hTotalR;
+        const aboveMaj = hTotalD - houseMajorityThreshold;
+        houseLeaderText = `<span class="party dem">Democrats</span> lead, ${hTotalD}-${hTotalR}`;
+        houseDetailText =
+          aboveMaj >= 0
+            ? `Projected Democratic majority by <strong>${marginSeats}</strong> seats (${aboveMaj} above 218)`
+            : `Democrats ahead in seats but below majority by <strong>${Math.abs(
+                aboveMaj
+              )}</strong>`;
+      } else {
+        houseLeaderText = `Chamber locked at <span class="party">${hTotalD}</span>-<span class="party">${hTotalR}</span>`;
+        houseDetailText = `No clear majority – tossups decide control`;
+      }
+
+      houseStatusPrimary.innerHTML = houseLeaderText;
+      houseStatusSecondary.innerHTML = houseDetailText;
+
+      // --- SENATE ---
+      const sC = {
+        rSafe: BASE_SENATE_R,
+        rSolid: 0,
+        rLikely: 0,
+        rLean: 0,
+        rTilt: 0,
+        tie: 0,
+        dTilt: 0,
+        dLean: 0,
+        dLikely: 0,
+        dSolid: 0,
+        dSafe: BASE_SENATE_D
       };
-      
-      senateData.forEach(s => {
+
+      senateData.forEach((s) => {
         const rPts = s.r * natR;
         const dPts = s.d * natD;
         const total = rPts + dPts;
-        const rShare = (rPts/total)*100;
-        const margin = rShare - (100 - rShare);
-        
+        const rShare = (rPts / total) * 100;
+        const dShare = 100 - rShare;
+        const margin = rShare - dShare;
+
         s.currR = rShare;
+        s.currD = dShare;
         s.currMargin = margin;
-        
-        // Re-create element if needed or use existing
+
         if (!s.element) {
-          const dot = document.createElement('div');
-          dot.className = 'senate-seat';
-          dot.textContent = s.s; 
-          s.type = 'senate';
-          s.id = 'Sen';
-          dot.addEventListener('mousemove', (e) => showTooltip(e, s));
-          dot.addEventListener('mouseleave', hideTooltip);
+          const dot = document.createElement("div");
+          dot.className = "senate-seat";
+          dot.textContent = s.s;
+          s.type = "senate";
+          s.id = "Sen";
+          dot.addEventListener("mousemove", (e) => showTooltip(e, s));
+          dot.addEventListener("mouseleave", hideTooltip);
           s.element = dot;
         }
       });
 
-      const sortedSenate = [...senateData].sort((a,b) => a.currMargin - b.currMargin);
-      
-      // Clear Grid
-      senateGrid.innerHTML = '';
+      const sortedSenate = [...senateData].sort(
+        (a, b) => a.currMargin - b.currMargin
+      );
 
-      // VERTICAL SNAKE LOGIC (5x7)
-      const ROWS = 5; // Must match CSS grid-template-rows
-      
-      sortedSenate.forEach((s, i) => {
-        senateGrid.appendChild(s.element); 
-        const cat = getWinCategory(s.currMargin);
-        s.element.className = `senate-seat ${cat.code}`;
-        
-        // GRID PLACEMENT
-        // Determine Column Index (0, 1, 2...)
-        const colIndex = Math.floor(i / ROWS);
-        // Determine Position within that column (0 to 4)
-        const remainder = i % ROWS;
-        
-        let rowIndex;
-        
-        if (colIndex % 2 === 0) {
-            // Even Columns: Top -> Bottom (0 -> 4)
-            rowIndex = remainder;
-        } else {
-            // Odd Columns: Bottom -> Top (4 -> 0)
-            rowIndex = (ROWS - 1) - remainder;
-        }
-
-        // Apply CSS Grid Position (1-based)
-        s.element.style.gridColumn = colIndex + 1;
-        s.element.style.gridRow = rowIndex + 1;
-        
-        // Stats Counting
-        if(cat.code === 'pure-toss') sC.tie++;
-        else if(cat.code === 'r-safe') sC.rSafe++;
-        else if(cat.code === 'r-solid') sC.rSolid++;
-        else if(cat.code === 'r-likely') sC.rLikely++;
-        else if(cat.code === 'r-lean') sC.rLean++;
-        else if(cat.code === 'r-tilt') sC.rTilt++;
-        else if(cat.code === 'd-safe') sC.dSafe++;
-        else if(cat.code === 'd-solid') sC.dSolid++;
-        else if(cat.code === 'd-likely') sC.dLikely++;
-        else if(cat.code === 'd-lean') sC.dLean++;
-        else if(cat.code === 'd-tilt') sC.dTilt++;
+      senateGrid.innerHTML = "";
+      sortedSenate.forEach((s) => {
+        senateGrid.appendChild(s.element);
       });
 
-      document.getElementById('s-r-safe').textContent = sC.rSafe;
-      document.getElementById('s-r-solid').textContent = sC.rSolid;
-      document.getElementById('s-r-likely').textContent = sC.rLikely;
-      document.getElementById('s-r-lean').textContent = sC.rLean;
-      document.getElementById('s-r-tilt').textContent = sC.rTilt;
-      document.getElementById('s-tie').textContent = sC.tie;
-      document.getElementById('s-d-tilt').textContent = sC.dTilt;
-      document.getElementById('s-d-lean').textContent = sC.dLean;
-      document.getElementById('s-d-likely').textContent = sC.dLikely;
-      document.getElementById('s-d-solid').textContent = sC.dSolid;
-      document.getElementById('s-d-safe').textContent = sC.dSafe;
+      const ROWS = 5;
+      sortedSenate.forEach((s, i) => {
+        const cat = getWinCategory(s.currMargin);
+        s.element.className = `senate-seat ${cat.code}`;
+        s.category = cat.type;
 
-      const sTotalR = sC.rSafe + sC.rSolid + sC.rLikely + sC.rLean + sC.rTilt;
-      const sTotalD = sC.dSafe + sC.dSolid + sC.dLikely + sC.dLean + sC.dTilt;
-      document.getElementById('s-total-r').textContent = sTotalR;
-      document.getElementById('s-total-d').textContent = sTotalD;
+        const colIndex = Math.floor(i / ROWS);
+        const remainder = i % ROWS;
+        const rowIndex =
+          colIndex % 2 === 0 ? remainder : ROWS - 1 - remainder;
 
+        s.element.style.gridColumn = colIndex + 1;
+        s.element.style.gridRow = rowIndex + 1;
+
+        if (cat.code === "pure-toss") sC.tie++;
+        else if (cat.code === "r-safe") sC.rSafe++;
+        else if (cat.code === "r-solid") sC.rSolid++;
+        else if (cat.code === "r-likely") sC.rLikely++;
+        else if (cat.code === "r-lean") sC.rLean++;
+        else if (cat.code === "r-tilt") sC.rTilt++;
+        else if (cat.code === "d-safe") sC.dSafe++;
+        else if (cat.code === "d-solid") sC.dSolid++;
+        else if (cat.code === "d-likely") sC.dLikely++;
+        else if (cat.code === "d-lean") sC.dLean++;
+        else if (cat.code === "d-tilt") sC.dTilt++;
+      });
+
+      document.getElementById("s-r-safe").textContent = sC.rSafe;
+      document.getElementById("s-r-solid").textContent = sC.rSolid;
+      document.getElementById("s-r-likely").textContent = sC.rLikely;
+      document.getElementById("s-r-lean").textContent = sC.rLean;
+      document.getElementById("s-r-tilt").textContent = sC.rTilt;
+      document.getElementById("s-tie").textContent = sC.tie;
+      document.getElementById("s-d-tilt").textContent = sC.dTilt;
+      document.getElementById("s-d-lean").textContent = sC.dLean;
+      document.getElementById("s-d-likely").textContent = sC.dLikely;
+      document.getElementById("s-d-solid").textContent = sC.dSolid;
+      document.getElementById("s-d-safe").textContent = sC.dSafe;
+
+      const sTotalR =
+        sC.rSafe + sC.rSolid + sC.rLikely + sC.rLean + sC.rTilt;
+      const sTotalD =
+        sC.dSafe + sC.dSolid + sC.dLikely + sC.dLean + sC.dTilt;
+
+      document.getElementById("s-total-r").textContent = sTotalR;
+      document.getElementById("s-total-d").textContent = sTotalD;
+
+      // Senate majority bar
+      const senateSeatScale = 100;
+      const sRPct = (sTotalR / senateSeatScale) * 100;
+      const sDPct = (sTotalD / senateSeatScale) * 100;
+
+      senateBarR.style.width = `${sRPct}%`;
+      senateBarD.style.width = `${sDPct}%`;
+
+      const senateMajorityThreshold = 51;
+      const senateMajorityPosPct =
+        (senateMajorityThreshold / senateSeatScale) * 100;
+      senateMajorityMarker.style.left = `${senateMajorityPosPct}%`;
+
+      // Senate status text
+      let senateLeaderText, senateDetailText;
+      const senateDiff = sTotalR - sTotalD;
+
+      if (sTotalR > sTotalD) {
+        const marginSeats = sTotalR - sTotalD;
+        const aboveMaj = sTotalR - senateMajorityThreshold;
+        senateLeaderText = `<span class="party rep">Republicans</span> lead, ${sTotalR}-${sTotalD}`;
+        senateDetailText =
+          aboveMaj >= 0
+            ? `Projected GOP control by <strong>${marginSeats}</strong> seats (${aboveMaj} above 51)`
+            : `GOP ahead in seats but below control by <strong>${Math.abs(
+                aboveMaj
+              )}</strong>`;
+      } else if (sTotalD > sTotalR) {
+        const marginSeats = sTotalD - sTotalR;
+        const aboveMaj = sTotalD - senateMajorityThreshold;
+        senateLeaderText = `<span class="party dem">Democrats</span> lead, ${sTotalD}-${sTotalR}`;
+        senateDetailText =
+          aboveMaj >= 0
+            ? `Projected Democratic control by <strong>${marginSeats}</strong> seats (${aboveMaj} above 51)`
+            : `Democrats ahead in seats but below control by <strong>${Math.abs(
+                aboveMaj
+              )}</strong>`;
+      } else {
+        senateLeaderText = `Chamber tied at <span class="party">${sTotalD}</span>-<span class="party">${sTotalR}</span>`;
+        senateDetailText = `Vice President would break ties if either side reaches 50`;
+      }
+
+      senateStatusPrimary.innerHTML = senateLeaderText;
+      senateStatusSecondary.innerHTML = senateDetailText;
+
+      // Mark tipping-point Senate seat: closest to 50–50
+      let tipping = null;
+      let bestAbs = Infinity;
+      sortedSenate.forEach((s) => {
+        const absM = Math.abs(s.currMargin);
+        if (absM < bestAbs) {
+          bestAbs = absM;
+          tipping = s;
+        }
+      });
+
+      sortedSenate.forEach((s) => {
+        s.element.classList.remove("tipping");
+      });
+      if (tipping) tipping.element.classList.add("tipping");
     }
 
-    // --- TOOLTIP ---
-    const tooltip = document.getElementById('tooltip');
+    // Tooltip
+    const tooltip = document.getElementById("tooltip");
 
     function showTooltip(e, data) {
-      const m = data.currMargin;
-      const cat = getWinCategory(m);
-      let color = "white";
-      if(m > 0) color = "var(--rep-lean)";
-      if(m < 0) color = "var(--dem-lean)";
-      if(Math.abs(m) < 0.05) color = "#999";
-      
-      const title = data.type === 'house' 
-        ? `${data.state} ${data.id==='at-large'?'AL':data.id}`
-        : `Senate: ${data.s}`;
+      const margin = data.currMargin ?? 0;
+      const cat = getWinCategory(margin);
+      const absMargin = Math.abs(margin);
+      const winner =
+        absMargin < 0.05 ? "Tossup" : margin > 0 ? "Republican" : "Democrat";
+
+      let color = "var(--text-main)";
+      if (margin > 0) color = "var(--rep-lean)";
+      if (margin < 0) color = "var(--dem-lean)";
+      if (absMargin < 0.05) color = "#9ca3af";
+
+      const title =
+        data.type === "house"
+          ? `${data.state} ${
+              data.id === "at-large" ? "At-Large" : "District " + data.id
+            }`
+          : `Senate – ${data.s}`;
+
+      const rShare = data.currR ?? 50;
+      const dShare = data.currD ?? 50;
 
       tooltip.innerHTML = `
-        <strong>${title}</strong>
-        <div class="row" style="border-bottom:1px solid #444; padding-bottom:4px; margin-bottom:4px;">
-           <span style="color:${color}">${cat.type}</span> 
-           <span class="val">${m > 0 ? 'R+':'D+'}${Math.abs(m).toFixed(1)}</span>
+        <strong class="tt-title">${title}</strong>
+        <div class="tt-subtitle">
+          <span class="pill" style="border-color:${color};color:${color}">
+            ${cat.type}
+          </span>
         </div>
-        <div class="row"><span>GOP</span> <span class="val">${data.currR.toFixed(1)}%</span></div>
-        <div class="row"><span>DEM</span> <span class="val">${(100-data.currR).toFixed(1)}%</span></div>
+        <div class="row">
+          <span>Projected winner</span>
+          <span class="val" style="color:${color}">${winner}</span>
+        </div>
+        <div class="row">
+          <span>Margin</span>
+          <span class="val" style="color:${color}">
+            ${
+              absMargin < 0.05
+                ? "≈ EVEN"
+                : `${margin > 0 ? "R" : "D"}+${absMargin.toFixed(1)}`
+            }
+          </span>
+        </div>
+        <div class="tt-divider"></div>
+        <div class="row">
+          <span>Republican share</span>
+          <span class="val">${rShare.toFixed(1)}%</span>
+        </div>
+        <div class="row">
+          <span>Democratic share</span>
+          <span class="val">${dShare.toFixed(1)}%</span>
+        </div>
       `;
-      tooltip.style.opacity = 1;
-      moveTooltip(e);
-    }
 
-    function moveTooltip(e) {
-      const x = e.clientX;
-      const y = e.clientY;
-      let top = y + 15;
-      let left = x + 15;
-      if(left + 150 > window.innerWidth) left = x - 160;
-      if(top + 100 > window.innerHeight) top = y - 110;
-      
-      tooltip.style.top = top + 'px';
-      tooltip.style.left = left + 'px';
+      const offset = 14;
+      const x = e.clientX + offset;
+      const y = e.clientY + offset;
+
+      tooltip.style.left = x + "px";
+      tooltip.style.top = y + "px";
+      tooltip.style.opacity = 1;
     }
 
     function hideTooltip() {
       tooltip.style.opacity = 0;
     }
 
-    // --- BOOT ---
+    // Preset buttons
+    const presetButtons = Array.from(
+      document.querySelectorAll(".preset-btn")
+    );
+    presetButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const swing = parseFloat(btn.getAttribute("data-swing"));
+        slider.value = swing;
+        presetButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        updateDashboard();
+      });
+    });
+
+    slider.addEventListener("input", () => {
+      presetButtons.forEach((b) => b.classList.remove("active"));
+      // Rehighlight the 0 preset when appropriate
+      const zeroBtn = presetButtons.find(
+        (b) => parseFloat(b.getAttribute("data-swing")) === 0
+      );
+      if (parseFloat(slider.value) === 0 && zeroBtn) {
+        zeroBtn.classList.add("active");
+      }
+      updateDashboard();
+    });
+
+    // Init
     buildHouseMap();
     buildSenateSpectrum();
-    
-    slider.addEventListener('input', updateDashboard);
-    updateDashboard(); 
+    updateDashboard();
   </script>
 </body>
 </html>
