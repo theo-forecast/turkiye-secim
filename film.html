@@ -2,750 +2,1743 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>The Observer | Jameel Tolga</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jameel Tolga | The Observer</title>
-    
+
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/phosphor-icons/1.4.2/src/css/icons.css" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         :root {
-            /* THEME: Quantum Dark */
+            /* THEME: Quantum Dark 2.0 */
             --bg: #050507;
             --surface: #0f0f13;
+            --surface-soft: #101018;
             --surface-hover: #181820;
             --border: rgba(255, 255, 255, 0.08);
-            --border-light: rgba(255, 255, 255, 0.15);
-            
-            /* ACCENTS */
-            --primary: #FFFFFF;
-            --secondary: #8B8B93;
-            --accent: #64D2FF; /* Science Blue */
-            --accent-glow: rgba(100, 210, 255, 0.15);
-            
-            /* SCORING COLORS */
+            --border-light: rgba(255, 255, 255, 0.18);
+
+            --primary: #ffffff;
+            --secondary: #8b8b93;
+            --muted: #4c4c55;
+
+            --accent: #64D2FF;
+            --accent-soft: rgba(100, 210, 255, 0.12);
+
             --s-high: #30D158;
             --s-mid: #FFD60A;
             --s-low: #FF453A;
 
-            /* TYPOGRAPHY */
             --font-ui: 'Manrope', sans-serif;
             --font-mono: 'Space Mono', monospace;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
-            background-color: var(--bg);
+            background: radial-gradient(circle at top, #151528 0, #050507 60%);
+            min-height: 100vh;
             color: var(--primary);
             font-family: var(--font-ui);
-            height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        /* --- BACKGROUND PARTICLES --- */
+        /* Background */
         #canvas-bg {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            opacity: 0.4;
+            opacity: 0.35;
+            z-index: 0;
         }
 
-        /* --- NAVIGATION (SIDEBAR) --- */
+        /* Shell */
         #app-shell {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            height: 100%;
             position: relative;
-            z-index: 10;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+            height: 100vh;
         }
 
         aside {
-            background: rgba(10, 10, 14, 0.8);
+            background: rgba(4, 4, 8, 0.9);
             backdrop-filter: blur(20px);
             border-right: 1px solid var(--border);
-            padding: 30px 20px;
+            padding: 22px 18px 18px;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 18px;
         }
 
+        /* Profile */
         .profile {
-            padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
+            padding-bottom: 18px;
+            margin-bottom: 4px;
         }
-        .profile h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
-        .profile p { font-size: 0.75rem; color: var(--secondary); font-family: var(--font-mono); margin-top: 5px; }
-
-        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
-        .nav-btn {
-            background: transparent;
-            border: none;
+        .profile-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .profile h1 {
+            font-size: 1.05rem;
+            letter-spacing: 0.18em;
+            font-weight: 800;
+        }
+        .profile-tag {
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
             color: var(--secondary);
-            padding: 12px 15px;
-            border-radius: 8px;
-            text-align: left;
+            margin-top: 6px;
+            letter-spacing: 0.14em;
+        }
+        .profile-chip {
+            font-size: 0.6rem;
+            border-radius: 999px;
+            border: 1px solid var(--accent-soft);
+            padding: 4px 7px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-family: var(--font-mono);
+        }
+
+        /* Nav */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .nav-btn {
+            border: none;
+            outline: none;
             cursor: pointer;
-            font-family: var(--font-ui);
+            border-radius: var(--radius-md);
+            padding: 9px 10px;
+            background: transparent;
+            color: var(--secondary);
+            font-size: 0.86rem;
             font-weight: 600;
-            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: 0.2s;
+            transition: background 0.16s ease, color 0.16s ease, transform 0.12s ease;
         }
-        .nav-btn:hover { background: var(--surface); color: var(--primary); }
-        .nav-btn.active { background: var(--surface-hover); color: var(--accent); }
-        .nav-btn i { font-size: 1.1rem; }
+        .nav-btn i {
+            font-size: 1.1rem;
+        }
+        .nav-btn:hover {
+            background: var(--surface-soft);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .nav-btn.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid var(--border-light);
+        }
 
-        .stats-mini {
-            margin-top: auto;
-            background: var(--surface);
-            padding: 15px;
-            border-radius: 12px;
+        /* Filters */
+        .filters {
+            margin-top: 6px;
+            padding: 10px 10px 12px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(13, 13, 20, 0.95), rgba(16, 20, 30, 0.95));
             border: 1px solid var(--border);
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
-        .stat-row:last-child { margin-bottom: 0; }
-        .stat-label { color: var(--secondary); }
-        .stat-val { font-family: var(--font-mono); font-weight: 700; color: var(--primary); }
-
-        /* --- MAIN VIEWPORT --- */
-        main {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            background: rgba(5, 5, 7, 0.5);
+            gap: 8px;
         }
-
-        /* TOOLBAR */
-        .toolbar {
-            padding: 20px 30px;
+        .filters-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2px;
+        }
+        .filters-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+        .filters-chip {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-family: var(--font-mono);
+        }
+        .filter-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .filter-label {
+            font-size: 0.7rem;
+            color: var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-label span {
+            opacity: 0.85;
+        }
+        .filter-label small {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+        .filter-range {
+            width: 100%;
+        }
+        .filter-range input[type="range"] {
+            width: 100%;
+        }
+        .filter-years {
+            display: flex;
+            gap: 6px;
+        }
+        .filter-years input {
+            width: 50%;
+            background: rgba(10, 10, 16, 0.9);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 4px 6px;
+            font-size: 0.7rem;
+            color: var(--primary);
+            font-family: var(--font-mono);
+            outline: none;
+        }
+        .filter-years input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-soft);
+        }
+        .filter-reset-btn {
+            align-self: flex-end;
+            margin-top: 2px;
+            border-radius: 999px;
+            border: none;
+            padding: 4px 9px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.04);
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+        }
+        .filter-reset-btn:hover {
+            background: rgba(255,255,255,0.09);
+            color: var(--primary);
+            transform: translateY(-0.5px);
+        }
+
+        /* Sidebar stats & insights */
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        .stats-mini {
+            margin-top: auto;
+            padding: 12px 10px 10px;
+            border-radius: var(--radius-md);
+            background: rgba(8,8,14,0.96);
+            border: 1px solid var(--border);
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+        .stat-label {
+            color: var(--secondary);
+        }
+        .stat-val {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .insights {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            border: 1px dashed rgba(255,255,255,0.08);
+            background: rgba(8, 10, 16, 0.9);
+        }
+        .insights-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .insights-list li {
+            font-size: 0.76rem;
+            color: var(--secondary);
+            line-height: 1.4;
+        }
+        .insights-list strong {
+            color: var(--primary);
+        }
+
+        /* MAIN */
+        main {
+            display: flex;
+            flex-direction: column;
+            background: rgba(5,5,7,0.5);
+        }
+
+        .toolbar {
+            padding: 16px 22px;
             border-bottom: 1px solid var(--border);
-            background: rgba(5, 5, 7, 0.9);
+            background: linear-gradient(90deg, rgba(6,6,12,0.96), rgba(10,10,18,0.96));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
         }
 
         .search-container {
             position: relative;
-            width: 350px;
+            width: min(360px, 60vw);
         }
         .search-container i {
             position: absolute;
-            left: 12px; top: 50%;
+            left: 10px;
+            top: 50%;
             transform: translateY(-50%);
-            color: var(--secondary);
+            color: var(--muted);
+            font-size: 1rem;
         }
-        input[type="text"] {
+        #searchInput {
             width: 100%;
-            background: var(--surface);
+            padding: 8px 10px 8px 32px;
+            border-radius: var(--radius-md);
             border: 1px solid var(--border);
-            padding: 10px 10px 10px 35px;
-            border-radius: 6px;
+            background: rgba(7,7,12,0.96);
             color: var(--primary);
             font-family: var(--font-ui);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             outline: none;
-            transition: 0.2s;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
         }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+        #searchInput::placeholder {
+            color: var(--muted);
+        }
+        #searchInput:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-soft);
+            background: #080812;
+        }
 
-        .view-toggles {
-            display: flex;
-            background: var(--surface);
-            padding: 4px;
-            border-radius: 6px;
+        .toolbar-pill {
+            border-radius: 999px;
             border: 1px solid var(--border);
-        }
-        .view-btn {
-            background: transparent;
-            border: none;
-            padding: 6px 10px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
             color: var(--secondary);
-            cursor: pointer;
-            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
-        .view-btn.active { background: var(--surface-hover); color: var(--primary); }
+        .toolbar-pill i {
+            font-size: 0.85rem;
+        }
 
-        /* CONTENT AREA */
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-toggle-group {
+            display: inline-flex;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: 2px;
+            background: rgba(4,4,8,0.96);
+        }
+        .view-toggle-btn {
+            border: none;
+            background: transparent;
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+        }
+        .view-toggle-btn i {
+            font-size: 0.9rem;
+        }
+        .view-toggle-btn.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            transform: translateY(-0.5px);
+        }
+
+        .sort-group {
+            display: inline-flex;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: 2px;
+            background: rgba(4,4,8,0.96);
+        }
+        .sort-btn {
+            border: none;
+            background: transparent;
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .sort-btn i {
+            font-size: 0.9rem;
+        }
+        .sort-btn.active {
+            background: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        /* Content area */
         .content-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 30px;
+            padding: 18px 22px 22px;
         }
 
-        /* --- VIEW: GRID --- */
-        .grid-view {
+        /* Grid view */
+        #grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
         }
 
         .card {
-            background: var(--surface);
+            background: radial-gradient(circle at top left, rgba(100, 210, 255, 0.08) 0, rgba(8, 8, 12, 0.98) 45%);
+            border-radius: var(--radius-lg);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: 0.2s;
-            cursor: pointer;
+            padding: 14px 14px 12px;
             display: flex;
             flex-direction: column;
-            height: 220px;
+            gap: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.2s ease;
         }
-        .card:hover { transform: translateY(-3px); border-color: var(--border-light); }
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(100, 210, 255, 0.07), transparent 40%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-light);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
 
-        .card-top {
-            padding: 20px;
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            gap: 8px;
         }
-        .c-title { font-weight: 700; font-size: 1rem; line-height: 1.3; }
-        .c-year { font-family: var(--font-mono); font-size: 0.75rem; color: var(--secondary); margin-top: 4px; }
-        
-        .c-score {
+        .card-title-block {
+            min-width: 0;
+        }
+        .card-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .card-meta {
+            margin-top: 3px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            font-family: var(--font-mono);
+        }
+        .card-score {
             font-family: var(--font-mono);
             font-weight: 700;
-            font-size: 1.2rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.05);
+            font-size: 1.1rem;
+            padding: 3px 7px;
+            border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.04);
+            min-width: 3ch;
+            text-align: right;
         }
 
-        .c-body {
-            padding: 0 20px 20px;
-            flex: 1;
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
         }
-        .c-summary {
-            font-size: 0.85rem;
+        .tag-pill {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--muted);
+            font-family: var(--font-mono);
+        }
+
+        .card-summary {
+            font-size: 0.82rem;
             color: var(--secondary);
+            line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            line-height: 1.5;
         }
 
-        /* --- VIEW: TABLE --- */
-        .table-view { display: none; width: 100%; border-collapse: collapse; }
-        .table-view th { text-align: left; padding: 10px 20px; border-bottom: 1px solid var(--border); color: var(--secondary); font-size: 0.8rem; text-transform: uppercase; cursor: pointer; }
-        .table-view td { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        .table-view tr:hover { background: var(--surface); cursor: pointer; }
-        .t-score { font-family: var(--font-mono); font-weight: 700; }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            margin-top: 4px;
+            color: var(--muted);
+        }
+        .card-footer .zval {
+            font-family: var(--font-mono);
+        }
+        .card-footer .percentile {
+            font-family: var(--font-mono);
+        }
 
-        /* --- VIEW: GRAPH --- */
-        .graph-view { display: none; width: 100%; height: 100%; position: relative; }
-        #chart-canvas { width: 100%; height: 100%; cursor: crosshair; }
+        /* Table view */
+        #table-container {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+            display: none;
+        }
+        #table-container thead {
+            position: sticky;
+            top: 0;
+            background: rgba(7,7,12,0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+        #table-container th,
+        #table-container td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+        #table-container th {
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        #table-container th span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        #table-container tbody tr {
+            cursor: pointer;
+        }
+        #table-container tbody tr:hover {
+            background: var(--surface-soft);
+        }
+        .t-score {
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+        .t-z {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+        .t-percentile {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
 
-        /* --- MODAL (DOSSIER) --- */
+        /* Graph view */
+        #graph-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 140px);
+            display: none;
+        }
+        #chart-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .graph-legend {
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius-md);
+            background: rgba(5,5,9,0.92);
+            border: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--secondary);
+            backdrop-filter: blur(10px);
+        }
+        .graph-legend-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        /* Modal */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            inset: 0;
             background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 100;
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0; pointer-events: none;
-            transition: 0.3s;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.24s ease;
+            z-index: 20;
         }
-        .modal-overlay.open { opacity: 1; pointer-events: auto; }
-
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
         .dossier {
-            background: #0E0E12;
-            width: 600px;
-            max-width: 90vw;
+            width: min(640px, 92vw);
+            max-height: 90vh;
+            background: radial-gradient(circle at top, rgba(100,210,255,0.18) 0, #06060a 55%);
+            border-radius: 18px;
             border: 1px solid var(--border-light);
-            border-radius: 16px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transform: scale(0.95);
-            transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.8);
             overflow: hidden;
+            transform: translateY(12px) scale(0.97);
+            transition: transform 0.24s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative;
         }
-        .modal-overlay.open .dossier { transform: scale(1); }
-
+        .modal-overlay.open .dossier {
+            transform: translateY(0) scale(1);
+        }
+        .btn-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            border: none;
+            background: transparent;
+            color: var(--secondary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .btn-close:hover {
+            color: var(--primary);
+        }
         .dossier-header {
-            padding: 30px;
+            padding: 26px 26px 18px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            align-items: start;
+            gap: 16px;
         }
-        .d-title { font-size: 1.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 5px; }
-        .d-meta { color: var(--secondary); font-family: var(--font-mono); font-size: 0.9rem; }
-        
+        .d-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+        .d-meta {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            font-family: var(--font-mono);
+        }
         .d-score-badge {
-            text-align: center;
+            text-align: right;
         }
-        .d-score-val { font-size: 2.5rem; font-weight: 800; line-height: 1; display: block; }
-        .d-z { font-size: 0.75rem; color: var(--secondary); font-family: var(--font-mono); }
-
-        .dossier-body { padding: 30px; }
-        .d-summary { font-size: 1rem; line-height: 1.6; color: #ddd; margin-bottom: 30px; }
-        
+        .d-score-val {
+            font-size: 2.4rem;
+            font-weight: 800;
+            display: block;
+            font-family: var(--font-mono);
+        }
+        .d-z {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            font-family: var(--font-mono);
+        }
+        .dossier-body {
+            padding: 18px 26px 20px;
+            overflow-y: auto;
+            max-height: calc(90vh - 120px);
+        }
         .d-stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
         }
-        .d-stat-box { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
-        .d-stat-label { font-size: 0.7rem; color: var(--secondary); text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .d-stat-num { font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent); }
-
+        .d-stat-box {
+            padding: 10px 10px;
+            border-radius: var(--radius-md);
+            background: rgba(6,6,12,0.96);
+            border: 1px solid var(--border);
+        }
+        .d-stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--secondary);
+        }
+        .d-stat-num {
+            margin-top: 4px;
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
+            color: var(--accent);
+        }
+        .d-summary {
+            font-size: 0.9rem;
+            color: #dddddd;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
         .d-actions {
-            padding: 20px 30px;
-            background: var(--surface);
+            margin-top: 6px;
+            padding-top: 10px;
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
         }
         .btn-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 999px;
             text-decoration: none;
+            border: 1px solid var(--border-light);
             color: var(--primary);
-            background: rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            transition: 0.2s;
+            background: rgba(8,8,16,0.96);
+            transition: background 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
         }
-        .btn-link:hover { background: var(--accent); color: #000; }
-        .btn-close {
-            position: absolute; top: 20px; right: 20px;
-            background: transparent; border: none; color: var(--secondary);
-            font-size: 1.5rem; cursor: pointer;
+        .btn-link i {
+            font-size: 0.98rem;
+        }
+        .btn-link:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: transparent;
+            transform: translateY(-1px);
+        }
+        .btn-link[aria-disabled="true"] {
+            opacity: 0.5;
+            cursor: default;
+            pointer-events: none;
         }
 
-        /* --- LOADER --- */
+        /* Loader */
         #loader {
-            position: fixed; inset: 0; background: var(--bg); z-index: 999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: fixed;
+            inset: 0;
+            background: #050507;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
         }
-        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
-            #app-shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-            aside { display: none; } /* Hide sidebar on mobile for simplicity */
-            main { height: 100vh; }
-            .dossier { width: 100%; height: 100%; border-radius: 0; max-width: none; overflow-y: auto; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 14px;
+        }
+        .loader-text {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--secondary);
+        }
+        .loader-sub {
+            margin-top: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
+        /* Responsive */
+        @media (max-width: 840px) {
+            #app-shell {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            aside {
+                display: none;
+            }
+            .toolbar {
+                padding-inline: 14px;
+            }
+            .content-scroll {
+                padding-inline: 14px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .toolbar-right {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            #graph-container {
+                height: calc(100vh - 154px);
+            }
+        }
     </style>
 </head>
 <body>
+<canvas id="canvas-bg"></canvas>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--secondary);">INITIALIZING OBSERVER...</div>
-    </div>
+<div id="loader">
+    <div class="spinner"></div>
+    <div class="loader-text">INITIALIZING OBSERVER CORE...</div>
+    <div class="loader-sub">parsing ratings.txt | fitting normal distribution</div>
+</div>
 
-    <canvas id="canvas-bg"></canvas>
-
-    <div id="app-shell">
-        
-        <aside>
-            <div class="profile">
+<div id="app-shell">
+    <!-- Sidebar -->
+    <aside>
+        <div class="profile">
+            <div class="profile-title">
                 <h1>JAMEEL TOLGA</h1>
-                <p>PHYSICIST // CRITIC</p>
+                <span class="profile-chip">Observer v2</span>
+            </div>
+            <div class="profile-tag">PHYSICIST // CRITIC</div>
+        </div>
+
+        <div class="nav-menu">
+            <button class="nav-btn active" data-view="grid" onclick="setView('grid')">
+                <i class="ph ph-squares-four"></i>
+                <span>Grid View</span>
+            </button>
+            <button class="nav-btn" data-view="table" onclick="setView('table')">
+                <i class="ph ph-table"></i>
+                <span>Data Ledger</span>
+            </button>
+            <button class="nav-btn" data-view="graph" onclick="setView('graph')">
+                <i class="ph ph-chart-scatter"></i>
+                <span>Phase Space</span>
+            </button>
+        </div>
+
+        <div class="filters">
+            <div class="filters-header">
+                <div class="filters-title">Filters</div>
+                <div class="filters-chip" id="filter-summary-chip">—</div>
             </div>
 
-            <div class="nav-menu">
-                <button class="nav-btn active" onclick="setView('grid')"><i class="ph ph-squares-four"></i> Grid View</button>
-                <button class="nav-btn" onclick="setView('table')"><i class="ph ph-table"></i> Data Ledger</button>
-                <button class="nav-btn" onclick="setView('graph')"><i class="ph ph-chart-scatter"></i> Phase Space</button>
+            <div class="filter-block">
+                <label class="filter-label" for="score-slider">
+                    <span>Score ≥</span>
+                    <small id="score-slider-val">0</small>
+                </label>
+                <div class="filter-range">
+                    <input type="range" id="score-slider" min="0" max="100" value="0">
+                </div>
             </div>
 
-            <div class="stats-mini">
-                <div class="stat-row"><span class="stat-label">N (Count)</span><span class="stat-val" id="mini-n">0</span></div>
-                <div class="stat-row"><span class="stat-label">&mu; (Mean)</span><span class="stat-val" id="mini-mean">0.0</span></div>
-                <div class="stat-row"><span class="stat-label">&sigma; (Dev)</span><span class="stat-val" id="mini-sigma">0.0</span></div>
+            <div class="filter-block">
+                <label class="filter-label" for="year-min">
+                    <span>Year window</span>
+                    <small id="year-window-label">—</small>
+                </label>
+                <div class="filter-years">
+                    <input type="number" id="year-min" placeholder="min">
+                    <input type="number" id="year-max" placeholder="max">
+                </div>
             </div>
-        </aside>
 
-        <main>
-            <div class="toolbar">
+            <button class="filter-reset-btn" type="button" id="reset-filters">
+                <i class="ph ph-arrow-counter-clockwise"></i>
+                Reset
+            </button>
+        </div>
+
+        <div class="insights">
+            <div class="sidebar-section-title">Observer Notes</div>
+            <ul class="insights-list">
+                <li id="insight-top">Highest rated: —</li>
+                <li id="insight-spread">Spread: —</li>
+                <li id="insight-year-span">Temporal span: —</li>
+                <li id="insight-density">Density: —</li>
+            </ul>
+        </div>
+
+        <div class="stats-mini">
+            <div class="sidebar-section-title">Distribution</div>
+            <div class="stat-row">
+                <span class="stat-label">N (count)</span>
+                <span class="stat-val" id="mini-n">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">μ (mean)</span>
+                <span class="stat-val" id="mini-mean">0.0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">σ (spread)</span>
+                <span class="stat-val" id="mini-sigma">0.0</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main>
+        <div class="toolbar">
+            <div class="toolbar-left">
                 <div class="search-container">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="Query database...">
+                    <input id="searchInput" type="text" placeholder="Search title, theme, or summary...">
                 </div>
-
-                <div class="view-toggles">
-                    <button class="view-btn" onclick="sortData('score')"><i class="ph ph-sort-ascending"></i> Score</button>
-                    <button class="view-btn" onclick="sortData('year')"><i class="ph ph-calendar"></i> Year</button>
-                </div>
-            </div>
-
-            <div class="content-scroll" id="content-area">
-                
-                <div id="grid-container" class="grid-view"></div>
-                
-                <table id="table-container" class="table-view">
-                    <thead>
-                        <tr>
-                            <th onclick="sortData('title')">Title</th>
-                            <th onclick="sortData('year')">Year</th>
-                            <th onclick="sortData('score')">Score</th>
-                            <th>Deviation</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body"></tbody>
-                </table>
-
-                <div id="graph-container" class="graph-view">
-                    <canvas id="chart-canvas"></canvas>
-                </div>
-
-            </div>
-        </main>
-
-    </div>
-
-    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
-        <div class="dossier">
-            <button class="btn-close" onclick="closeModalDirect()">&times;</button>
-            <div class="dossier-header">
-                <div>
-                    <div class="d-title" id="m-title">Title</div>
-                    <div class="d-meta" id="m-meta">Year</div>
-                </div>
-                <div class="d-score-badge">
-                    <span class="d-score-val" id="m-score">00</span>
-                    <span class="d-z" id="m-z">0.0σ</span>
+                <div class="toolbar-pill">
+                    <i class="ph ph-sigma"></i>
+                    <span id="toolbar-distribution">No data loaded</span>
                 </div>
             </div>
-            <div class="dossier-body">
-                <div class="d-stats-grid">
-                    <div class="d-stat-box">
-                        <span class="d-stat-label">Percentile Rank</span>
-                        <span class="d-stat-num" id="m-rank">Top 10%</span>
-                    </div>
-                    <div class="d-stat-box">
-                        <span class="d-stat-label">Category</span>
-                        <span class="d-stat-num" id="m-cat">Essential</span>
-                    </div>
+
+            <div class="toolbar-right">
+                <div class="view-toggle-group">
+                    <button class="view-toggle-btn active" id="view-toggle-grid" onclick="setView('grid')">
+                        <i class="ph ph-squares-four"></i><span>Grid</span>
+                    </button>
+                    <button class="view-toggle-btn" id="view-toggle-table" onclick="setView('table')">
+                        <i class="ph ph-table"></i><span>Table</span>
+                    </button>
+                    <button class="view-toggle-btn" id="view-toggle-graph" onclick="setView('graph')">
+                        <i class="ph ph-chart-scatter"></i><span>Graph</span>
+                    </button>
                 </div>
-                <div class="d-summary" id="m-summary">
-                    Summary text...
-                </div>
-                <div class="d-actions">
-                    <a href="#" target="_blank" class="btn-link" id="m-link">Access Source Data <i class="ph ph-arrow-up-right"></i></a>
+                <div class="sort-group">
+                    <button class="sort-btn active" data-sort="score" onclick="sortData('score')">
+                        <i class="ph ph-sort-descending"></i><span>Score</span>
+                    </button>
+                    <button class="sort-btn" data-sort="year" onclick="sortData('year')">
+                        <i class="ph ph-calendar"></i><span>Year</span>
+                    </button>
+                    <button class="sort-btn" data-sort="title" onclick="sortData('title')">
+                        <i class="ph ph-text-t"></i><span>Title</span>
+                    </button>
                 </div>
             </div>
         </div>
+
+        <div class="content-scroll" id="content-area">
+            <div id="grid-container"></div>
+
+            <table id="table-container">
+                <thead>
+                <tr>
+                    <th onclick="sortData('title')"><span>Title</span></th>
+                    <th onclick="sortData('year')"><span>Year</span></th>
+                    <th onclick="sortData('score')"><span>Score</span></th>
+                    <th><span>z-score</span></th>
+                    <th><span>Percentile</span></th>
+                    <th><span>Bucket</span></th>
+                </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+
+            <div id="graph-container">
+                <canvas id="chart-canvas"></canvas>
+                <div class="graph-legend">
+                    <div>Score vs Year</div>
+                    <div class="graph-legend-row">
+                        <span class="dot" style="background: var(--s-high);"></span>
+                        <span>≥ 80</span>
+                    </div>
+                    <div class="graph-legend-row">
+                        <span class="dot" style="background: var(--s-mid);"></span>
+                        <span>65 – 79</span>
+                    </div>
+                    <div class="graph-legend-row">
+                        <span class="dot" style="background: var(--s-low);"></span>
+                        <span>&lt; 65</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <div class="dossier">
+        <button class="btn-close" onclick="closeModalDirect()">&times;</button>
+        <div class="dossier-header">
+            <div>
+                <div class="d-title" id="m-title">Title</div>
+                <div class="d-meta" id="m-meta">—</div>
+            </div>
+            <div class="d-score-badge">
+                <span class="d-score-val" id="m-score">00</span>
+                <span class="d-z" id="m-z">0.0σ from μ</span>
+            </div>
+        </div>
+        <div class="dossier-body">
+            <div class="d-stats-grid">
+                <div class="d-stat-box">
+                    <div class="d-stat-label">Percentile rank</div>
+                    <div class="d-stat-num" id="m-rank">—</div>
+                </div>
+                <div class="d-stat-box">
+                    <div class="d-stat-label">Bucket</div>
+                    <div class="d-stat-num" id="m-cat">—</div>
+                </div>
+                <div class="d-stat-box">
+                    <div class="d-stat-label">Relative position</div>
+                    <div class="d-stat-num" id="m-pos">—</div>
+                </div>
+                <div class="d-stat-box">
+                    <div class="d-stat-label">Raw score</div>
+                    <div class="d-stat-num" id="m-raw">—</div>
+                </div>
+            </div>
+            <div class="d-summary" id="m-summary">
+                Summary text...
+            </div>
+            <div class="d-actions">
+                <a href="#" target="_blank" class="btn-link" id="m-link" aria-disabled="true">
+                    Access source data
+                    <i class="ph ph-arrow-up-right"></i>
+                </a>
+            </div>
+        </div>
     </div>
+</div>
 
-    <script>
-        // CONFIG
-        const FILE = 'ratings.txt';
-        
-        // STATE
-        let DB = [];
-        let FILTERED = [];
-        let STATS = { mean:0, sigma:0, n:0 };
-        let CURRENT_VIEW = 'grid';
+<script>
+    // --- CONFIG ---
+    const FILE = 'ratings.txt';
 
-        // --- INIT ---
-        async function init() {
-            initBackground();
-            try {
-                const res = await fetch(FILE);
-                if(!res.ok) throw new Error("Missing ratings.txt");
-                const text = await res.text();
-                parse(text);
-                document.getElementById('loader').style.display = 'none';
-            } catch(e) {
-                console.error(e);
-                alert("Please ensure 'ratings.txt' is in the same folder.");
-            }
+    // --- STATE ---
+    let DB = [];
+    let FILTERED = [];
+    let STATS = { n: 0, mean: 0, sigma: 0, minYear: null, maxYear: null };
+    let CURRENT_VIEW = 'grid';
+    let SORT_KEY = 'score';
+    let SORT_DIR = 'desc';
+    let GRAPH_POINTS = [];
+
+    // --- INIT ---
+    window.addEventListener('load', () => {
+        initBackground();
+        initApp();
+    });
+
+    async function initApp() {
+        try {
+            const res = await fetch(FILE);
+            if (!res.ok) throw new Error('ratings.txt not found');
+            const text = await res.text();
+            parseRatings(text);
+            computeStats();
+            enrichItems();
+            updateSidebarStats();
+            setDefaultsAndFilters();
+            attachEvents();
+            applyFilters();
+            hideLoader();
+        } catch (err) {
+            console.error(err);
+            const loaderText = document.querySelector('.loader-text');
+            const loaderSub = document.querySelector('.loader-sub');
+            loaderText.textContent = 'FAILED TO LOAD ratings.txt';
+            loaderSub.textContent = 'Check file location and reload.';
+        }
+    }
+
+    // --- BACKGROUND CANVAS ---
+    function initBackground() {
+        const canvas = document.getElementById('canvas-bg');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width = 0, height = 0, dpr = window.devicePixelRatio || 1;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
         }
 
-        // --- PARSER ---
-        function parse(text) {
-            const lines = text.split('\n');
-            const regex = /^(\d+)\t(.*?)\s\((\d{4})\)$/;
-            let current = null;
+        resize();
+        window.addEventListener('resize', resize);
 
-            lines.forEach(line => {
-                line = line.trim();
-                if(!line) return;
-                const match = line.match(regex);
-                if(match) {
-                    if(current) DB.push(current);
-                    current = {
-                        score: parseInt(match[1]),
-                        title: match[2],
-                        year: parseInt(match[3]),
-                        summary: '',
-                        link: ''
-                    };
-                } else if(current) {
-                    if(line.startsWith('http')) current.link = line;
-                    else if(!line.startsWith('[source')) {
-                        current.summary += (current.summary ? ' ' : '') + line.replace('Summary:', '').trim();
+        const N = 90;
+        const particles = [];
+        for (let i = 0; i < N; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.16,
+                vy: (Math.random() - 0.5) * 0.16,
+                r: Math.random() * 1.4 + 0.4,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+
+        function tick() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            for (const p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.phase += 0.02;
+                const alpha = 0.3 + 0.3 * Math.sin(p.phase);
+
+                if (p.x < -5) p.x = width + 5;
+                if (p.x > width + 5) p.x = -5;
+                if (p.y < -5) p.y = height + 5;
+                if (p.y > height + 5) p.y = -5;
+
+                ctx.globalAlpha = alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(tick);
+        }
+        tick();
+    }
+
+    // --- PARSING ---
+    function parseRatings(text) {
+        const lines = text.split(/\r?\n/);
+        let current = null;
+        const headRegex = /^(\d+)\s+(.*?)\s\((\d{4})\)/;
+
+        for (let raw of lines) {
+            const line = raw.trim();
+            if (!line) continue;
+
+            const match = line.match(headRegex);
+            if (match) {
+                if (current) DB.push(current);
+                current = {
+                    id: DB.length,
+                    score: parseInt(match[1], 10),
+                    title: match[2].trim(),
+                    year: parseInt(match[3], 10),
+                    summary: '',
+                    link: '',
+                    z: 0,
+                    percentile: 0,
+                    bucket: ''
+                };
+            } else if (current) {
+                if (line.startsWith('http')) {
+                    current.link = line.trim();
+                } else if (!line.startsWith('[source')) {
+                    const cleaned = line.replace(/^Summary\s*:/i, '').trim();
+                    if (cleaned) {
+                        current.summary += (current.summary ? ' ' : '') + cleaned;
                     }
                 }
-            });
-            if(current) DB.push(current);
+            }
+        }
+        if (current) DB.push(current);
+    }
 
-            // Calc Stats
-            STATS.n = DB.length;
-            const sum = DB.reduce((a,b)=>a+b.score,0);
-            STATS.mean = sum / STATS.n;
-            const variance = DB.reduce((a,b)=>a+Math.pow(b.score-STATS.mean,2),0)/STATS.n;
-            STATS.sigma = Math.sqrt(variance);
+    // --- STATS & ENRICHMENT ---
+    function computeStats() {
+        const n = DB.length;
+        STATS.n = n;
+        if (n === 0) {
+            STATS.mean = 0;
+            STATS.sigma = 0;
+            return;
+        }
+        const scores = DB.map(m => m.score);
+        const sum = scores.reduce((a, b) => a + b, 0);
+        STATS.mean = sum / n;
+        const variance = scores.reduce((acc, s) => acc + Math.pow(s - STATS.mean, 2), 0) / n;
+        STATS.sigma = Math.sqrt(variance) || 1;
 
-            // Hydrate Data with Physics
-            DB.forEach(m => {
-                m.z = (m.score - STATS.mean) / STATS.sigma;
-                // Calculate percentile (simple)
-                const worse = DB.filter(x => x.score < m.score).length;
-                m.percentile = Math.round((worse / STATS.n) * 100);
-            });
+        const years = DB.map(m => m.year);
+        STATS.minYear = Math.min(...years);
+        STATS.maxYear = Math.max(...years);
+    }
 
-            // Update Sidebar Stats
-            document.getElementById('mini-n').innerText = STATS.n;
-            document.getElementById('mini-mean').innerText = STATS.mean.toFixed(1);
-            document.getElementById('mini-sigma').innerText = STATS.sigma.toFixed(2);
+    function bucketForScore(score) {
+        if (score >= 82) return 'Essential';
+        if (score >= 75) return 'Core Canon';
+        if (score >= 68) return 'Strong';
+        if (score >= 60) return 'Solid';
+        return 'Peripheral';
+    }
 
-            FILTERED = [...DB];
-            render();
+    function enrichItems() {
+        const n = STATS.n || 1;
+        for (const m of DB) {
+            m.z = (m.score - STATS.mean) / (STATS.sigma || 1);
+            const worse = DB.filter(x => x.score < m.score).length;
+            m.percentile = Math.round((worse / n) * 100);
+            m.bucket = bucketForScore(m.score);
+        }
+    }
+
+    // --- UI: Sidebar stats & insights ---
+    function updateSidebarStats() {
+        document.getElementById('mini-n').textContent = STATS.n;
+        document.getElementById('mini-mean').textContent = STATS.mean.toFixed(1);
+        document.getElementById('mini-sigma').textContent = STATS.sigma.toFixed(2);
+
+        const toolbarDist = document.getElementById('toolbar-distribution');
+        if (STATS.n > 0) {
+            toolbarDist.textContent = `μ = ${STATS.mean.toFixed(1)} | σ = ${STATS.sigma.toFixed(2)} | N = ${STATS.n}`;
+        } else {
+            toolbarDist.textContent = 'No data loaded';
         }
 
-        // --- RENDER DISPATCHER ---
-        function render() {
-            if(CURRENT_VIEW === 'grid') renderGrid();
-            if(CURRENT_VIEW === 'table') renderTable();
-            if(CURRENT_VIEW === 'graph') drawGraph();
+        const insightTop = document.getElementById('insight-top');
+        const insightSpread = document.getElementById('insight-spread');
+        const insightYearSpan = document.getElementById('insight-year-span');
+        const insightDensity = document.getElementById('insight-density');
+
+        if (STATS.n === 0) {
+            insightTop.textContent = 'Highest rated: —';
+            insightSpread.textContent = 'Spread: —';
+            insightYearSpan.textContent = 'Temporal span: —';
+            insightDensity.textContent = 'Density: —';
+            return;
         }
 
-        // --- RENDERERS ---
-        function renderGrid() {
-            const container = document.getElementById('grid-container');
-            container.innerHTML = '';
-            
-            FILTERED.forEach(m => {
-                let color = 'var(--secondary)';
-                if(m.score >= 80) color = 'var(--s-high)';
-                else if(m.score >= 60) color = 'var(--s-mid)';
-                else if(m.score < 50) color = 'var(--s-low)';
+        const sortedByScore = [...DB].sort((a, b) => b.score - a.score);
+        const top = sortedByScore[0];
+        const bottom = sortedByScore[sortedByScore.length - 1];
+        const span = STATS.maxYear - STATS.minYear || 1;
+        const density = (STATS.n / span).toFixed(2);
 
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => openModal(m);
-                card.innerHTML = `
-                    <div class="card-top">
-                        <div>
-                            <div class="c-title">${m.title}</div>
-                            <div class="c-year">${m.year}</div>
-                        </div>
-                        <div class="c-score" style="color:${color}">${m.score}</div>
-                    </div>
-                    <div class="c-body">
-                        <div class="c-summary">${m.summary || "No summary available."}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+        insightTop.innerHTML = `Highest rated: <strong>${top.title}</strong> (${top.year}, ${top.score})`;
+        insightSpread.innerHTML = `Spread: <strong>${bottom.score}</strong> → <strong>${top.score}</strong>`;
+        insightYearSpan.innerHTML = `Temporal span: <strong>${STATS.minYear}</strong> → <strong>${STATS.maxYear}</strong>`;
+        insightDensity.innerHTML = `Density: <strong>${density}</strong> items / year window`;
+    }
+
+    // --- Filters & defaults ---
+    function setDefaultsAndFilters() {
+        const scoreSlider = document.getElementById('score-slider');
+        const scoreVal = document.getElementById('score-slider-val');
+        const yearMinInput = document.getElementById('year-min');
+        const yearMaxInput = document.getElementById('year-max');
+        const yearWindowLabel = document.getElementById('year-window-label');
+        const filterChip = document.getElementById('filter-summary-chip');
+
+        if (STATS.n === 0) return;
+
+        scoreSlider.value = 0;
+        scoreVal.textContent = '0';
+
+        yearMinInput.value = STATS.minYear;
+        yearMaxInput.value = STATS.maxYear;
+        yearWindowLabel.textContent = `${STATS.minYear}–${STATS.maxYear}`;
+
+        filterChip.textContent = 'All scores · full span';
+    }
+
+    function attachEvents() {
+        const searchInput = document.getElementById('searchInput');
+        const scoreSlider = document.getElementById('score-slider');
+        const yearMinInput = document.getElementById('year-min');
+        const yearMaxInput = document.getElementById('year-max');
+        const resetBtn = document.getElementById('reset-filters');
+
+        searchInput.addEventListener('input', () => applyFilters());
+        scoreSlider.addEventListener('input', () => {
+            document.getElementById('score-slider-val').textContent = scoreSlider.value;
+            applyFilters();
+        });
+        yearMinInput.addEventListener('change', applyFilters);
+        yearMaxInput.addEventListener('change', applyFilters);
+        resetBtn.addEventListener('click', resetFilters);
+
+        window.addEventListener('resize', () => {
+            if (CURRENT_VIEW === 'graph') drawGraph();
+        });
+    }
+
+    function resetFilters() {
+        if (STATS.n === 0) return;
+        document.getElementById('score-slider').value = 0;
+        document.getElementById('score-slider-val').textContent = '0';
+        document.getElementById('year-min').value = STATS.minYear;
+        document.getElementById('year-max').value = STATS.maxYear;
+        document.getElementById('searchInput').value = '';
+        applyFilters();
+    }
+
+    function applyFilters() {
+        let dataset = DB.slice();
+        const term = document.getElementById('searchInput').value.trim().toLowerCase();
+        const scoreMin = parseInt(document.getElementById('score-slider').value, 10) || 0;
+
+        let yearMin = parseInt(document.getElementById('year-min').value, 10);
+        let yearMax = parseInt(document.getElementById('year-max').value, 10);
+
+        if (!Number.isFinite(yearMin)) yearMin = STATS.minYear;
+        if (!Number.isFinite(yearMax)) yearMax = STATS.maxYear;
+        if (yearMin > yearMax) {
+            const tmp = yearMin;
+            yearMin = yearMax;
+            yearMax = tmp;
         }
 
-        function renderTable() {
-            const body = document.getElementById('table-body');
-            body.innerHTML = '';
-            
-            FILTERED.forEach(m => {
-                const tr = document.createElement('tr');
-                tr.onclick = () => openModal(m);
-                let color = '#fff';
-                if(m.score >= 80) color = 'var(--s-high)';
-                
-                tr.innerHTML = `
-                    <td>${m.title}</td>
-                    <td style="font-family:var(--font-mono)">${m.year}</td>
-                    <td class="t-score" style="color:${color}">${m.score}</td>
-                    <td style="font-family:var(--font-mono); color:var(--secondary)">${m.z > 0 ? '+' : ''}${m.z.toFixed(2)}σ</td>
-                `;
-                body.appendChild(tr);
-            });
-        }
-
-        function drawGraph() {
-            const canvas = document.getElementById('chart-canvas');
-            const ctx = canvas.getContext('2d');
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-
-            // Clear
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            
-            // Margins
-            const pad = 40;
-            const w = canvas.width - pad*2;
-            const h = canvas.height - pad*2;
-
-            // Ranges
-            const years = FILTERED.map(m=>m.year);
-            const minY = Math.min(...years);
-            const maxY = Math.max(...years);
-            const rangeY = maxY - minY + 2;
-
-            // Draw Axis
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-            ctx.beginPath();
-            ctx.moveTo(pad, pad); ctx.lineTo(pad, h+pad); // Y axis (Score)
-            ctx.lineTo(w+pad, h+pad); // X axis (Year)
-            ctx.stroke();
-
-            // Plot Points
-            FILTERED.forEach(m => {
-                const x = pad + ((m.year - (minY-1)) / rangeY) * w;
-                const y = (pad+h) - ((m.score / 100) * h);
-
-                let color = '#555';
-                if(m.score >= 80) color = '#30D158';
-                else if(m.score < 50) color = '#FF453A';
-
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI*2);
-                ctx.fill();
-            });
-        }
-
-        // --- INTERACTION ---
-        function setView(view) {
-            CURRENT_VIEW = view;
-            
-            // UI Toggle
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active')); // Reset top toggles if any
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); // Reset sidebar
-            
-            // Simple mapping for this demo
-            document.getElementById('grid-container').style.display = view === 'grid' ? 'grid' : 'none';
-            document.getElementById('table-container').style.display = view === 'table' ? 'table' : 'none';
-            document.getElementById('graph-container').style.display = view === 'graph' ? 'block' : 'none';
-            
-            if(view === 'graph') setTimeout(drawGraph, 50); // Delay for layout
-        }
-
-        function sortData(key) {
-            FILTERED.sort((a,b) => {
-                if(key === 'score') return b.score - a.score;
-                if(key === 'year') return b.year - a.year;
-                if(key === 'title') return a.title.localeCompare(b.title);
-            });
-            render();
-        }
-
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            FILTERED = DB.filter(m => 
-                m.title.toLowerCase().includes(term) || 
-                (m.summary && m.summary.toLowerCase().includes(term))
-            );
-            render();
+        dataset = dataset.filter(m => {
+            if (m.score < scoreMin) return false;
+            if (m.year < yearMin || m.year > yearMax) return false;
+            if (!term) return true;
+            const blob = (m.title + ' ' + m.summary).toLowerCase();
+            return blob.includes(term);
         });
 
-        // --- MODAL SYSTEM ---
-        function openModal(m) {
-            const modal = document.getElementById('modal');
-            
-            document.getElementById('m-title').innerText = m.title;
-            document.getElementById('m-meta').innerText = `${m.year} // ID: ${1000+DB.indexOf(m)}`;
-            document.getElementById('m-score').innerText = m.score;
-            document.getElementById('m-z').innerText = `${m.z > 0 ? '+' : ''}${m.z.toFixed(2)}σ`;
-            document.getElementById('m-summary').innerText = m.summary || "No data.";
-            document.getElementById('m-link').href = m.link;
-            document.getElementById('m-rank').innerText = `Top ${100 - m.percentile}%`;
-            
-            // Category
-            let cat = "Standard";
-            if(m.score >= 85) cat = "Masterpiece";
-            else if(m.score >= 80) cat = "Essential";
-            else if(m.score < 50) cat = "Avoid";
-            document.getElementById('m-cat').innerText = cat;
+        FILTERED = dataset;
+        applySort();
+        updateFilterSummary(scoreMin, yearMin, yearMax);
+        render();
+    }
 
-            // Color code score
-            const scoreEl = document.getElementById('m-score');
-            if(m.score >= 80) scoreEl.style.color = 'var(--s-high)';
-            else if(m.score < 50) scoreEl.style.color = 'var(--s-low)';
-            else scoreEl.style.color = 'var(--primary)';
+    function updateFilterSummary(scoreMin, yearMin, yearMax) {
+        const chip = document.getElementById('filter-summary-chip');
+        const yearLabel = document.getElementById('year-window-label');
 
-            modal.classList.add('open');
+        yearLabel.textContent = `${yearMin}–${yearMax}`;
+
+        if (STATS.n === 0) {
+            chip.textContent = 'No data';
+            return;
         }
 
-        function closeModal(e) {
-            if(e.target.id === 'modal') {
-                document.getElementById('modal').classList.remove('open');
-            }
+        const parts = [];
+        if (scoreMin > 0) {
+            parts.push(`score ≥ ${scoreMin}`);
+        } else {
+            parts.push('all scores');
         }
-        function closeModalDirect() {
-            document.getElementById('modal').classList.remove('open');
+        if (yearMin > STATS.minYear || yearMax < STATS.maxYear) {
+            parts.push(`${yearMin}–${yearMax}`);
+        } else {
+            parts.push('full span');
         }
+        chip.textContent = parts.join(' · ');
+    }
 
-        // --- BACKGROUND FX ---
-        function initBackground() {
-            const cvs = document.getElementById('canvas-bg');
-            const ctx = cvs.getContext('2d');
-            
-            let particles = [];
-            
-            function resize() {
-                cvs.width = window.innerWidth;
-                cvs.height = window.innerHeight;
+    // --- Sorting ---
+    function applySort() {
+        FILTERED.sort((a, b) => {
+            let av = a[SORT_KEY];
+            let bv = b[SORT_KEY];
+            if (SORT_KEY === 'title') {
+                av = av.toLowerCase();
+                bv = bv.toLowerCase();
+                if (av < bv) return SORT_DIR === 'asc' ? -1 : 1;
+                if (av > bv) return SORT_DIR === 'asc' ? 1 : -1;
+                return 0;
             }
-            window.addEventListener('resize', resize);
-            resize();
+            if (SORT_DIR === 'asc') return av - bv;
+            return bv - av;
+        });
+    }
 
-            // Create Particles
-            for(let i=0; i<50; i++) {
-                particles.push({
-                    x: Math.random() * cvs.width,
-                    y: Math.random() * cvs.height,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    size: Math.random() * 2
-                });
-            }
-
-            function animate() {
-                ctx.clearRect(0,0,cvs.width, cvs.height);
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    
-                    if(p.x < 0) p.x = cvs.width;
-                    if(p.x > cvs.width) p.x = 0;
-                    if(p.y < 0) p.y = cvs.height;
-                    if(p.y > cvs.height) p.y = 0;
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                    ctx.fill();
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
+    function sortData(key) {
+        if (SORT_KEY === key) {
+            SORT_DIR = SORT_DIR === 'asc' ? 'desc' : 'asc';
+        } else {
+            SORT_KEY = key;
+            SORT_DIR = (key === 'title') ? 'asc' : 'desc';
         }
 
-        // BOOT
-        init();
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            const k = btn.getAttribute('data-sort');
+            btn.classList.toggle('active', k === SORT_KEY);
+        });
 
-    </script>
+        applySort();
+        render();
+    }
+
+    // --- Views ---
+    function setView(view) {
+        CURRENT_VIEW = view;
+
+        const grid = document.getElementById('grid-container');
+        const table = document.getElementById('table-container');
+        const graph = document.getElementById('graph-container');
+
+        grid.style.display = view === 'grid' ? 'grid' : 'none';
+        table.style.display = view === 'table' ? 'table' : 'none';
+        graph.style.display = view === 'graph' ? 'block' : 'none';
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-view') === view);
+        });
+
+        document.getElementById('view-toggle-grid').classList.toggle('active', view === 'grid');
+        document.getElementById('view-toggle-table').classList.toggle('active', view === 'table');
+        document.getElementById('view-toggle-graph').classList.toggle('active', view === 'graph');
+
+        if (view === 'graph') drawGraph();
+    }
+
+    // --- Render dispatcher ---
+    function render() {
+        if (CURRENT_VIEW === 'grid') renderGrid();
+        else if (CURRENT_VIEW === 'table') renderTable();
+        else if (CURRENT_VIEW === 'graph') drawGraph();
+    }
+
+    // --- Grid renderer ---
+    function renderGrid() {
+        const container = document.getElementById('grid-container');
+        container.innerHTML = '';
+
+        if (FILTERED.length === 0) {
+            const empty = document.createElement('div');
+            empty.style.fontSize = '0.85rem';
+            empty.style.color = 'var(--secondary)';
+            empty.textContent = 'No results for this filter. Relax constraints or change query.';
+            container.appendChild(empty);
+            return;
+        }
+
+        for (const m of FILTERED) {
+            let color = 'var(--secondary)';
+            if (m.score >= 80) color = 'var(--s-high)';
+            else if (m.score >= 65) color = 'var(--s-mid)';
+            else color = 'var(--s-low)';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => openModal(m);
+
+            const zLabel = `${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}σ`;
+            const percentileTop = 100 - m.percentile;
+            const percentLabel = `Top ${percentileTop || 100}%`;
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-title-block">
+                        <div class="card-title">${m.title}</div>
+                        <div class="card-meta">${m.year} · ${m.bucket}</div>
+                        <div class="card-tags">
+                            <span class="tag-pill">${percentLabel}</span>
+                            <span class="tag-pill">z: ${zLabel}</span>
+                        </div>
+                    </div>
+                    <div class="card-score" style="color:${color}">${m.score}</div>
+                </div>
+                <div class="card-summary">${m.summary || 'No summary available.'}</div>
+                <div class="card-footer">
+                    <span class="zval">z = ${zLabel}</span>
+                    <span class="percentile">${percentLabel}</span>
+                </div>
+            `;
+
+            container.appendChild(card);
+        }
+    }
+
+    // --- Table renderer ---
+    function renderTable() {
+        const body = document.getElementById('table-body');
+        body.innerHTML = '';
+
+        if (FILTERED.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.textContent = 'No results for this filter.';
+            cell.style.color = 'var(--secondary)';
+            body.appendChild(row);
+            row.appendChild(cell);
+            return;
+        }
+
+        for (const m of FILTERED) {
+            const tr = document.createElement('tr');
+            tr.onclick = () => openModal(m);
+
+            let color = 'var(--secondary)';
+            if (m.score >= 80) color = 'var(--s-high)';
+            else if (m.score >= 65) color = 'var(--s-mid)';
+            else color = 'var(--s-low)';
+
+            const percentileTop = 100 - m.percentile;
+            const percentLabel = `Top ${percentileTop || 100}%`;
+
+            tr.innerHTML = `
+                <td>${m.title}</td>
+                <td>${m.year}</td>
+                <td class="t-score" style="color:${color}">${m.score}</td>
+                <td class="t-z">${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}</td>
+                <td class="t-percentile">${percentLabel}</td>
+                <td>${m.bucket}</td>
+            `;
+            body.appendChild(tr);
+        }
+    }
+
+    // --- Graph ---
+    function drawGraph() {
+        const canvas = document.getElementById('chart-canvas');
+        const container = document.getElementById('graph-container');
+        if (!canvas || !container) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const rect = container.getBoundingClientRect();
+        const widthCSS = rect.width;
+        const heightCSS = rect.height;
+        canvas.width = widthCSS * dpr;
+        canvas.height = heightCSS * dpr;
+
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, widthCSS, heightCSS);
+
+        const padding = { left: 50, right: 20, top: 24, bottom: 40 };
+        const w = widthCSS - padding.left - padding.right;
+        const h = heightCSS - padding.top - padding.bottom;
+
+        if (STATS.n === 0 || !w || !h) return;
+
+        const data = FILTERED.length ? FILTERED : DB;
+        const years = data.map(m => m.year);
+        const scores = data.map(m => m.score);
+        const minYear = Math.min(...years);
+        const maxYear = Math.max(...years);
+        const minScore = Math.min(...scores);
+        const maxScore = Math.max(...scores);
+
+        // Axes
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, padding.top);
+        ctx.lineTo(padding.left, padding.top + h);
+        ctx.lineTo(padding.left + w, padding.top + h);
+        ctx.stroke();
+
+        ctx.fillStyle = 'var(--secondary)';
+        ctx.font = '10px var(--font-mono)';
+
+        // Y labels
+        const ySteps = 5;
+        for (let i = 0; i <= ySteps; i++) {
+            const t = i / ySteps;
+            const score = minScore + (maxScore - minScore) * (1 - t);
+            const y = padding.top + h * t;
+            ctx.fillText(score.toFixed(0), 10, y + 3);
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(padding.left + w, y);
+            ctx.stroke();
+        }
+
+        // X labels
+        const xSteps = Math.min(6, Math.max(3, Math.floor(w / 100)));
+        for (let i = 0; i <= xSteps; i++) {
+            const t = i / xSteps;
+            const year = Math.round(minYear + (maxYear - minYear) * t);
+            const x = padding.left + w * t;
+            ctx.fillText(year.toString(), x - 12, padding.top + h + 16);
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.beginPath();
+            ctx.moveTo(x, padding.top);
+            ctx.lineTo(x, padding.top + h);
+            ctx.stroke();
+        }
+
+        // Points
+        GRAPH_POINTS = [];
+        for (const m of data) {
+            const tX = (m.year - minYear) / (maxYear - minYear || 1);
+            const tY = (m.score - minScore) / (maxScore - minScore || 1);
+            const x = padding.left + w * tX;
+            const y = padding.top + h * (1 - tY);
+
+            let color;
+            if (m.score >= 80) color = getCSSColor('--s-high');
+            else if (m.score >= 65) color = getCSSColor('--s-mid');
+            else color = getCSSColor('--s-low');
+
+            const r = 4 + Math.min(Math.abs(m.z), 2);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            GRAPH_POINTS.push({ x, y, r, item: m });
+        }
+
+        // Title
+        ctx.fillStyle = 'var(--secondary)';
+        ctx.font = '11px var(--font-ui)';
+        ctx.fillText('Score vs. Year (click a point for details)', padding.left, padding.top - 8);
+
+        // Click handling
+        canvas.onclick = (ev) => {
+            const rect2 = canvas.getBoundingClientRect();
+            const cx = (ev.clientX - rect2.left);
+            const cy = (ev.clientY - rect2.top);
+
+            let best = null;
+            let bestDist = Infinity;
+            for (const p of GRAPH_POINTS) {
+                const dx = cx - p.x;
+                const dy = cy - p.y;
+                const dist2 = dx * dx + dy * dy;
+                if (dist2 < bestDist) {
+                    bestDist = dist2;
+                    best = p;
+                }
+            }
+            if (best && bestDist <= (best.r + 6) * (best.r + 6)) {
+                openModal(best.item);
+            }
+        };
+    }
+
+    function getCSSColor(varName) {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(varName);
+        return value || '#ffffff';
+    }
+
+    // --- Modal ---
+    function openModal(m) {
+        const modal = document.getElementById('modal');
+        modal.classList.add('open');
+
+        document.getElementById('m-title').textContent = m.title;
+        document.getElementById('m-meta').textContent = `${m.year} · ${m.bucket}`;
+        document.getElementById('m-score').textContent = m.score;
+        document.getElementById('m-z').textContent = `${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}σ from μ`;
+
+        const percentileTop = 100 - m.percentile;
+        const rankLabel = `Top ${percentileTop || 100}% of ${STATS.n}`;
+        document.getElementById('m-rank').textContent = rankLabel;
+        document.getElementById('m-cat').textContent = m.bucket;
+
+        const rel = m.score >= STATS.mean
+            ? `${(m.score - STATS.mean).toFixed(1)} above μ`
+            : `${(STATS.mean - m.score).toFixed(1)} below μ`;
+        document.getElementById('m-pos').textContent = rel;
+        document.getElementById('m-raw').textContent = `Score ${m.score}, z = ${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}`;
+
+        document.getElementById('m-summary').textContent = m.summary || 'No summary available.';
+
+        const linkEl = document.getElementById('m-link');
+        if (m.link) {
+            linkEl.href = m.link;
+            linkEl.setAttribute('aria-disabled', 'false');
+        } else {
+            linkEl.href = '#';
+            linkEl.setAttribute('aria-disabled', 'true');
+        }
+    }
+
+    function closeModal(event) {
+        if (event && event.target && event.target.id !== 'modal') return;
+        closeModalDirect();
+    }
+
+    function closeModalDirect() {
+        document.getElementById('modal').classList.remove('open');
+    }
+
+    // --- Loader ---
+    function hideLoader() {
+        const loader = document.getElementById('loader');
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 260);
+    }
+</script>
 </body>
 </html>
