@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024 Congressional Swingometer (Expanded Scoreboard)</title>
+<title>2024 Congressional Swingometer (Vertical Snake Layout)</title>
 <style>
   :root {
     --bg-app: #0f1115;
@@ -53,7 +53,7 @@
     text-align: center;
     margin-bottom: 20px;
     width: 100%;
-    max-width: 1300px; /* Widened for larger scoreboard */
+    max-width: 1300px;
   }
 
   h1 {
@@ -87,7 +87,7 @@
   }
 
   .scoreboard {
-    display: flex; /* Changed from Grid to Flex Column to stack Totals and Breakdown */
+    display: flex;
     flex-direction: column;
     background: var(--bg-panel);
     padding: 12px;
@@ -107,7 +107,7 @@
   }
   .chamber-label span { opacity: 0.6; font-weight: 400; font-size: 0.8em;}
 
-  /* --- NEW TOTALS BAR --- */
+  /* --- TOTALS BAR --- */
   .totals-bar {
     display: flex;
     justify-content: space-between;
@@ -136,7 +136,7 @@
   .t-rep { color: var(--rep-solid); text-shadow: 0 0 15px rgba(220, 38, 38, 0.2); }
   .t-dem { color: var(--dem-solid); text-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
 
-  /* --- BREAKDOWN GRID (The old scoreboard grid) --- */
+  /* --- BREAKDOWN GRID --- */
   .breakdown-grid {
     display: grid;
     /* 11 columns: 5 R, 1 Tie, 5 D */
@@ -315,14 +315,16 @@
     border: 1px solid white;
   }
 
-  /* SENATE SPECTRUM */
+  /* SENATE SPECTRUM (VERTICAL SNAKE) */
   .senate-spectrum {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: flex-start;
+    display: grid; /* Changed to Grid */
+    /* We will rely on JS to place items, but define rows here */
+    grid-template-rows: repeat(6, 1fr); /* Fixed height of 6 rows */
     gap: 8px;
     padding: 20px;
+    justify-content: center;
+    /* Ensure columns are sized for the dots */
+    grid-auto-columns: 40px;
   }
   .senate-seat {
     width: 36px;
@@ -338,6 +340,8 @@
     cursor: pointer;
     transition: all 0.2s;
     border: 2px solid transparent;
+    /* Important for explicit placement */
+    position: relative; 
   }
   .senate-seat:hover {
     transform: scale(1.3);
@@ -352,7 +356,7 @@
     font-size: 0.7rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     padding: 0 10px;
     border-bottom: 1px solid #333;
   }
@@ -362,13 +366,15 @@
     .vis-container { grid-template-columns: 1fr; }
     .us-grid { gap: 4px; }
     
-    /* Adjusted Breakpoint logic for new layout */
     .breakdown-grid { 
       grid-template-columns: repeat(5, 1fr); 
       grid-template-rows: auto auto auto;
     }
     .sc-t { grid-column: 1 / -1; margin: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 5px 0;}
     .chamber-label { margin-bottom: 15px; }
+    
+    /* On mobile, maybe standard wrapping is better, but keeping snake for now */
+    .senate-spectrum { overflow-x: auto; justify-content: flex-start; }
   }
 
   /* --- Tooltip --- */
@@ -511,14 +517,12 @@
 
     <div class="panel">
       <h2 class="section-title">Senate Battleground</h2>
-      <div class="senate-spectrum">
-        <div class="senate-label-row">
-            <span>&#8592; Democrat</span>
-            <span>Tipping Point</span>
-            <span>Republican &#8594;</span>
-        </div>
-        <div id="senate-grid" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;"></div>
+      <div class="senate-label-row">
+        <span>&#8592; Democrat</span>
+        <span>Tipping Point</span>
+        <span>Republican &#8594;</span>
       </div>
+      <div id="senate-grid" class="senate-spectrum"></div>
     </div>
 
   </div>
@@ -544,14 +548,26 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       'Oklahoma': {r:6, c:5}, 'Louisiana': {r:6, c:6}, 'Mississippi': {r:6, c:7}, 'Alabama': {r:6, c:8}, 'Georgia': {r:6, c:9},
       'Hawaii': {r:7, c:1}, 'Texas': {r:7, c:5}, 'Florida': {r:7, c:9}, 'Massachusetts': {r:2, c:11}
     };
+    
+    // Correct USGS/USPS Abbreviations Mapping
+    const stateAbbreviations = {
+      'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+      'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+      'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+      'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+      'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+      'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+      'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+      'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+      'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+      'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
 
     // Baselines for Senate (Not up for election)
-    // For simplicity in this demo, we assign them to "Safe" buckets initially.
     const BASE_SENATE_D = 34;
     const BASE_SENATE_R = 31;
 
     // --- Helper Functions ---
-    // UPDATED LOGIC FOR NEW CATEGORIES
     function getWinCategory(margin) {
       const absM = Math.abs(margin);
       if(absM < 0.05) return { code: 'pure-toss', type: 'Tie' };
@@ -637,7 +653,9 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
 
         const label = document.createElement('div');
         label.className = 'state-label';
-        label.textContent = state.substring(0,2).toUpperCase();
+        
+        label.textContent = stateAbbreviations[state] || state.substring(0,2).toUpperCase();
+        
         wrapper.appendChild(label);
 
         const container = document.createElement('div');
@@ -664,20 +682,7 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
 
     function buildSenateSpectrum() {
       senateData = parseSenateData();
-      
-      senateData.forEach(s => {
-        const dot = document.createElement('div');
-        dot.className = 'senate-seat';
-        dot.textContent = s.s; 
-        s.element = dot;
-        s.type = 'senate';
-        s.id = 'Sen';
-        
-        dot.addEventListener('mousemove', (e) => showTooltip(e, s));
-        dot.addEventListener('mouseleave', hideTooltip);
-        
-        senateGrid.appendChild(dot);
-      });
+      // We do not append dots yet, we wait for updateDashboard to sort and place them
     }
 
     // --- MAIN UPDATE LOGIC ---
@@ -699,7 +704,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       const natD = 50 - (swing / 2);
 
       // --- HOUSE CALCULATIONS ---
-      // Reset counts
       let hC = { 
         rSafe:0, rSolid:0, rLikely:0, rLean:0, rTilt:0, 
         tie:0, 
@@ -719,7 +723,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         const cat = getWinCategory(margin);
         d.element.className = `district-dot ${cat.code}`;
         
-        // Count buckets
         if(cat.code === 'pure-toss') hC.tie++;
         else if(cat.code === 'r-safe') hC.rSafe++;
         else if(cat.code === 'r-solid') hC.rSolid++;
@@ -733,7 +736,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         else if(cat.code === 'd-tilt') hC.dTilt++;
       });
 
-      // Update House DOM
       document.getElementById('h-r-safe').textContent = hC.rSafe;
       document.getElementById('h-r-solid').textContent = hC.rSolid;
       document.getElementById('h-r-likely').textContent = hC.rLikely;
@@ -746,14 +748,12 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       document.getElementById('h-d-solid').textContent = hC.dSolid;
       document.getElementById('h-d-safe').textContent = hC.dSafe;
 
-      // --- UPDATE HOUSE TOTALS ---
       const hTotalR = hC.rSafe + hC.rSolid + hC.rLikely + hC.rLean + hC.rTilt;
       const hTotalD = hC.dSafe + hC.dSolid + hC.dLikely + hC.dLean + hC.dTilt;
       document.getElementById('h-total-r').textContent = hTotalR;
       document.getElementById('h-total-d').textContent = hTotalD;
 
-      // --- SENATE CALCULATIONS ---
-      // Reset counts - Add base safe seats
+      // --- SENATE CALCULATIONS & SNAKE GRID PLACEMENT ---
       let sC = { 
         rSafe: BASE_SENATE_R, rSolid:0, rLikely:0, rLean:0, rTilt:0, 
         tie:0, 
@@ -769,15 +769,54 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         
         s.currR = rShare;
         s.currMargin = margin;
+        
+        // Re-create element if needed or use existing
+        if (!s.element) {
+          const dot = document.createElement('div');
+          dot.className = 'senate-seat';
+          dot.textContent = s.s; 
+          s.type = 'senate';
+          s.id = 'Sen';
+          dot.addEventListener('mousemove', (e) => showTooltip(e, s));
+          dot.addEventListener('mouseleave', hideTooltip);
+          s.element = dot;
+        }
       });
 
       const sortedSenate = [...senateData].sort((a,b) => a.currMargin - b.currMargin);
       
-      sortedSenate.forEach(s => {
+      // Clear Grid
+      senateGrid.innerHTML = '';
+
+      // VERTICAL SNAKE LOGIC
+      const ROWS = 6; // Must match CSS grid-template-rows
+      
+      sortedSenate.forEach((s, i) => {
         senateGrid.appendChild(s.element); 
         const cat = getWinCategory(s.currMargin);
         s.element.className = `senate-seat ${cat.code}`;
         
+        // GRID PLACEMENT
+        // Determine Column Index (0, 1, 2...)
+        const colIndex = Math.floor(i / ROWS);
+        // Determine Position within that column (0 to 5)
+        const remainder = i % ROWS;
+        
+        let rowIndex;
+        
+        if (colIndex % 2 === 0) {
+            // Even Columns: Top -> Bottom (0 -> 5)
+            rowIndex = remainder;
+        } else {
+            // Odd Columns: Bottom -> Top (5 -> 0)
+            rowIndex = (ROWS - 1) - remainder;
+        }
+
+        // Apply CSS Grid Position (1-based)
+        s.element.style.gridColumn = colIndex + 1;
+        s.element.style.gridRow = rowIndex + 1;
+        
+        // Stats Counting
         if(cat.code === 'pure-toss') sC.tie++;
         else if(cat.code === 'r-safe') sC.rSafe++;
         else if(cat.code === 'r-solid') sC.rSolid++;
@@ -791,7 +830,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         else if(cat.code === 'd-tilt') sC.dTilt++;
       });
 
-      // Update Senate DOM
       document.getElementById('s-r-safe').textContent = sC.rSafe;
       document.getElementById('s-r-solid').textContent = sC.rSolid;
       document.getElementById('s-r-likely').textContent = sC.rLikely;
@@ -804,7 +842,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       document.getElementById('s-d-solid').textContent = sC.dSolid;
       document.getElementById('s-d-safe').textContent = sC.dSafe;
 
-      // --- UPDATE SENATE TOTALS ---
       const sTotalR = sC.rSafe + sC.rSolid + sC.rLikely + sC.rLean + sC.rTilt;
       const sTotalD = sC.dSafe + sC.dSolid + sC.dLikely + sC.dLean + sC.dTilt;
       document.getElementById('s-total-r').textContent = sTotalR;
