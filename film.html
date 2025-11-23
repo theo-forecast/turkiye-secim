@@ -3,160 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jameel Tolga | Film Theory Portfolio</title>
+    <title>Jameel Tolga | The Observer</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/phosphor-icons/1.4.2/src/css/icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         :root {
-            /* COLOR PALETTE: Prism Dark */
-            --bg: #030305;
-            --surface: #0E0E12;
-            --surface-glass: rgba(20, 20, 25, 0.7);
+            /* THEME: Quantum Dark */
+            --bg: #050507;
+            --surface: #0f0f13;
+            --surface-hover: #181820;
             --border: rgba(255, 255, 255, 0.08);
+            --border-light: rgba(255, 255, 255, 0.15);
             
+            /* ACCENTS */
+            --primary: #FFFFFF;
+            --secondary: #8B8B93;
+            --accent: #64D2FF; /* Science Blue */
+            --accent-glow: rgba(100, 210, 255, 0.15);
+            
+            /* SCORING COLORS */
+            --s-high: #30D158;
+            --s-mid: #FFD60A;
+            --s-low: #FF453A;
+
             /* TYPOGRAPHY */
-            --font-main: 'Inter', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-            --text-primary: #FFFFFF;
-            --text-secondary: #94949A;
-            
-            /* METRIC COLORS */
-            --score-high: #22C55E; /* Green */
-            --score-mid: #EAB308;  /* Yellow */
-            --score-low: #EF4444;  /* Red */
-            --accent: #3B82F6;     /* Physics Blue */
+            --font-ui: 'Manrope', sans-serif;
+            --font-mono: 'Space Mono', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
         body {
             background-color: var(--bg);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            overflow-x: hidden;
-            /* Subtle Background Mesh */
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%), 
-                radial-gradient(circle at 85% 30%, rgba(239, 68, 68, 0.05), transparent 25%);
-            background-attachment: fixed;
+            color: var(--primary);
+            font-family: var(--font-ui);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* --- SIDEBAR NAVIGATION --- */
-        .app-container {
+        /* --- BACKGROUND PARTICLES --- */
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* --- NAVIGATION (SIDEBAR) --- */
+        #app-shell {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
+            grid-template-columns: 260px 1fr;
+            height: 100%;
+            position: relative;
+            z-index: 10;
         }
 
         aside {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            background: var(--surface-glass);
+            background: rgba(10, 10, 14, 0.8);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-right: 1px solid var(--border);
-            padding: 40px 30px;
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
-            z-index: 50;
+            gap: 30px;
         }
 
-        .brand {
-            margin-bottom: 40px;
+        .profile {
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
-        .brand h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; }
-        .brand span { font-size: 0.8rem; color: var(--accent); font-family: var(--font-code); text-transform: uppercase; }
+        .profile h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+        .profile p { font-size: 0.75rem; color: var(--secondary); font-family: var(--font-mono); margin-top: 5px; }
 
-        .stat-module {
-            margin-bottom: 40px;
-        }
-        .stat-item {
-            margin-bottom: 15px;
-        }
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-family: var(--font-code);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .filter-group {
-            margin-top: auto;
-        }
-        .filter-btn {
-            display: block;
-            width: 100%;
-            text-align: left;
+        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
+        .nav-btn {
             background: transparent;
             border: none;
-            color: var(--text-secondary);
-            padding: 10px 0;
+            color: var(--secondary);
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-align: left;
             cursor: pointer;
-            transition: 0.2s;
+            font-family: var(--font-ui);
+            font-weight: 600;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
         }
-        .filter-btn:hover, .filter-btn.active { color: var(--text-primary); }
-        .filter-btn.active { font-weight: 600; border-right: 3px solid var(--accent); }
+        .nav-btn:hover { background: var(--surface); color: var(--primary); }
+        .nav-btn.active { background: var(--surface-hover); color: var(--accent); }
+        .nav-btn i { font-size: 1.1rem; }
 
-        /* --- MAIN CONTENT --- */
+        .stats-mini {
+            margin-top: auto;
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { color: var(--secondary); }
+        .stat-val { font-family: var(--font-mono); font-weight: 700; color: var(--primary); }
+
+        /* --- MAIN VIEWPORT --- */
         main {
-            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: rgba(5, 5, 7, 0.5);
         }
 
-        /* HEADER */
-        .top-bar {
+        /* TOOLBAR */
+        .toolbar {
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(5, 5, 7, 0.9);
         }
-        
-        .search-wrapper {
+
+        .search-container {
             position: relative;
-            width: 400px;
+            width: 350px;
         }
-        .search-icon {
+        .search-container i {
             position: absolute;
-            left: 15px;
-            top: 50%;
+            left: 12px; top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--secondary);
         }
         input[type="text"] {
             width: 100%;
-            background: rgba(255,255,255,0.05);
+            background: var(--surface);
             border: 1px solid var(--border);
-            padding: 12px 12px 12px 40px;
-            border-radius: 8px;
-            color: white;
-            font-family: var(--font-main);
+            padding: 10px 10px 10px 35px;
+            border-radius: 6px;
+            color: var(--primary);
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
             outline: none;
-            transition: 0.3s;
+            transition: 0.2s;
         }
-        input:focus {
-            background: rgba(255,255,255,0.08);
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+        .view-toggles {
+            display: flex;
+            background: var(--surface);
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        .view-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 10px;
+            color: var(--secondary);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .view-btn.active { background: var(--surface-hover); color: var(--primary); }
+
+        /* CONTENT AREA */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
         }
 
-        /* GRID */
-        .grid {
+        /* --- VIEW: GRID --- */
+        .grid-view {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .card {
@@ -164,327 +196,556 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
-            transition: all 0.2s ease;
-            position: relative;
+            transition: 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 220px;
         }
-        
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
+        .card:hover { transform: translateY(-3px); border-color: var(--border-light); }
 
-        .card-header {
-            padding: 20px 25px;
+        .card-top {
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            border-bottom: 1px solid var(--border);
         }
-
-        .movie-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; }
-        .movie-year { font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-code); margin-top: 5px; }
-
-        .score-box {
+        .c-title { font-weight: 700; font-size: 1rem; line-height: 1.3; }
+        .c-year { font-family: var(--font-mono); font-size: 0.75rem; color: var(--secondary); margin-top: 4px; }
+        
+        .c-score {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            border-radius: 6px;
             background: rgba(255,255,255,0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-align: center;
-            min-width: 50px;
-        }
-        .score-val { font-weight: 800; font-size: 1.2rem; display: block; }
-        .z-score { font-size: 0.65rem; color: var(--text-secondary); font-family: var(--font-code); }
-
-        .card-body {
-            padding: 20px 25px;
         }
 
-        .summary {
-            font-size: 0.9rem;
-            color: #ccc;
-            line-height: 1.6;
+        .c-body {
+            padding: 0 20px 20px;
+            flex: 1;
+        }
+        .c-summary {
+            font-size: 0.85rem;
+            color: var(--secondary);
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        /* PHYSICS BAR */
-        .deviation-container {
-            height: 4px;
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
+        /* --- VIEW: TABLE --- */
+        .table-view { display: none; width: 100%; border-collapse: collapse; }
+        .table-view th { text-align: left; padding: 10px 20px; border-bottom: 1px solid var(--border); color: var(--secondary); font-size: 0.8rem; text-transform: uppercase; cursor: pointer; }
+        .table-view td { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .table-view tr:hover { background: var(--surface); cursor: pointer; }
+        .t-score { font-family: var(--font-mono); font-weight: 700; }
+
+        /* --- VIEW: GRAPH --- */
+        .graph-view { display: none; width: 100%; height: 100%; position: relative; }
+        #chart-canvas { width: 100%; height: 100%; cursor: crosshair; }
+
+        /* --- MODAL (DOSSIER) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .dossier {
+            background: #0E0E12;
+            width: 600px;
+            max-width: 90vw;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.95);
+            transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
             overflow: hidden;
-            position: relative;
         }
-        
-        .deviation-bar {
-            height: 100%;
-            position: absolute;
-            left: 50%;
-            transition: width 0.5s;
-        }
+        .modal-overlay.open .dossier { transform: scale(1); }
 
-        .card-footer {
-            padding: 15px 25px;
-            background: rgba(255,255,255,0.02);
-            border-top: 1px solid var(--border);
+        .dossier-header {
+            padding: 30px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: start;
+        }
+        .d-title { font-size: 1.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 5px; }
+        .d-meta { color: var(--secondary); font-family: var(--font-mono); font-size: 0.9rem; }
+        
+        .d-score-badge {
+            text-align: center;
+        }
+        .d-score-val { font-size: 2.5rem; font-weight: 800; line-height: 1; display: block; }
+        .d-z { font-size: 0.75rem; color: var(--secondary); font-family: var(--font-mono); }
+
+        .dossier-body { padding: 30px; }
+        .d-summary { font-size: 1rem; line-height: 1.6; color: #ddd; margin-bottom: 30px; }
+        
+        .d-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .d-stat-box { background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .d-stat-label { font-size: 0.7rem; color: var(--secondary); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .d-stat-num { font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent); }
+
+        .d-actions {
+            padding: 20px 30px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn-link {
+            text-decoration: none;
+            color: var(--primary);
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-link:hover { background: var(--accent); color: #000; }
+        .btn-close {
+            position: absolute; top: 20px; right: 20px;
+            background: transparent; border: none; color: var(--secondary);
+            font-size: 1.5rem; cursor: pointer;
         }
 
-        .source-link {
-            font-size: 0.75rem;
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* --- LOADER --- */
+        #loader {
+            position: fixed; inset: 0; background: var(--bg); z-index: 999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .source-link:hover { text-decoration: underline; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* RESPONSIVE */
         @media (max-width: 900px) {
-            .app-container { grid-template-columns: 1fr; }
-            aside { height: auto; position: relative; border-bottom: 1px solid var(--border); padding: 30px; }
-            main { padding: 30px 20px; }
-            .search-wrapper { width: 100%; }
+            #app-shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+            aside { display: none; } /* Hide sidebar on mobile for simplicity */
+            main { height: 100vh; }
+            .dossier { width: 100%; height: 100%; border-radius: 0; max-width: none; overflow-y: auto; }
         }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    
-    <aside>
-        <div class="brand">
-            <h1>Jameel Tolga</h1>
-            <span>Physicist // Film Theorist</span>
-        </div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--secondary);">INITIALIZING OBSERVER...</div>
+    </div>
 
-        <div class="stat-module">
-            <div class="stat-item">
-                <span class="stat-label">Total Films (N)</span>
-                <span class="stat-value" id="stat-n">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Mean Score (&mu;)</span>
-                <span class="stat-value" id="stat-mean">0.0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Standard Dev (&sigma;)</span>
-                <span class="stat-value" id="stat-sigma">0.0</span>
-            </div>
-        </div>
+    <canvas id="canvas-bg"></canvas>
 
-        <div class="filter-group">
-            <span class="stat-label">Quick Filters</span>
-            <button class="filter-btn active" onclick="filter('all')">All Films</button>
-            <button class="filter-btn" onclick="filter('top')">Top Rated (80+)</button>
-            <button class="filter-btn" onclick="filter('low')">Critical Failures (<50)</button>
-            <button class="filter-btn" onclick="filter('scifi')">Sci-Fi & Physics</button>
-        </div>
-    </aside>
-
-    <main>
-        <div class="top-bar">
-            <div class="search-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Search title, year, or summary...">
-            </div>
-            
-            <div style="font-family: var(--font-code); font-size: 0.8rem; color: var(--text-secondary);">
-                SORT: 
-                <select id="sortSelect" onchange="sortGrid()" style="background:transparent; border:none; color:white; font-family:inherit; cursor:pointer;">
-                    <option value="score_desc">Highest Score</option>
-                    <option value="score_asc">Lowest Score</option>
-                    <option value="year_desc">Newest</option>
-                    <option value="year_asc">Oldest</option>
-                    <option value="z_desc">Most Polarizing</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="grid" id="grid">
-            </div>
-    </main>
-
-</div>
-
-<script>
-    /* --- DATA INGESTION --- 
-       I have pre-parsed your file into this JSON object.
-       This makes the site work instantly without needing to load an external file.
-    */
-    const DB = [
-    {score: 83, title: "The Big Short", year: 2015, summary: "Four outsiders in the world of high-finance who predicted the credit and housing bubble collapse of the mid-2000s decide to take on the big banks.", link: "https://www.criticker.com/film/The-Big-Short/"},
-    {score: 83, title: "O Brother, Where Art Thou?", year: 2000, summary: "A trio of escaped prisoners embarks on the adventure of a lifetime.", link: "https://www.criticker.com/film/O-Brother-Where-Art-Thou/"},
-    {score: 83, title: "Oppenheimer", year: 2023, summary: "The story of J. Robert Oppenheimer's role in creating the atomic bomb and the ethical dilemmas faced.", link: "https://www.criticker.com/film/Oppenheimer-2023/"},
-    {score: 83, title: "There Will Be Blood", year: 2007, summary: "A story about family, greed, religion, and oil, centered around a turn-of-the-century prospector.", link: "https://www.criticker.com/film/There-Will-Be-Blood/"},
-    {score: 82, title: "12 Angry Men", year: 1957, summary: "12 jurors must deliberate the guilt or innocence of a teenager accused of murdering his father.", link: "https://www.criticker.com/film/12-Angry-Men/"},
-    {score: 82, title: "2001: A Space Odyssey", year: 1968, summary: "A unique cinematic journey across enormous distances of space and time.", link: "https://www.criticker.com/film/2001-A-Space-Odyssey/"},
-    {score: 82, title: "Better Call Saul", year: 2015, summary: "The trials and tribulations of criminal lawyer, Saul Goodman.", link: "https://www.criticker.com/tv/Better-Call-Saul/"},
-    {score: 82, title: "Ghost in the Shell", year: 1995, summary: "A female cyborg cop and her partner hunt a mysterious and powerful hacker called the Puppet Master.", link: "https://www.criticker.com/film/Ghost-in-the-Shell/"},
-    {score: 82, title: "Primer", year: 2004, summary: "Two engineers accidentally discover time travel capabilities.", link: "https://www.criticker.com/film/Primer/"},
-    {score: 82, title: "The Thing", year: 1982, summary: "Scientists in the Antarctic are confronted by a shape-shifting alien.", link: "https://www.criticker.com/film/The-Thing/"},
-    {score: 81, title: "Arrival", year: 2016, summary: "An expert linguist is recruited by the military to determine whether aliens come in peace.", link: "https://www.criticker.com/film/Arrival-2016/"},
-    {score: 81, title: "Interstellar", year: 2014, summary: "Explorers make use of a newly discovered wormhole to surpass the limitations on human space travel.", link: "https://www.criticker.com/film/Interstellar/"},
-    {score: 78, title: "The Dark Knight", year: 2008, summary: "Batman takes on The Joker.", link: "https://www.criticker.com/film/The-Dark-Knight/"},
-    {score: 77, title: "Blade Runner 2049", year: 2017, summary: "A new blade runner unearths a long-buried secret.", link: "https://www.criticker.com/film/Blade-Runner-2049/"},
-    {score: 75, title: "Tenet", year: 2020, summary: "Fighting for survival using time inversion.", link: "https://www.criticker.com/film/Tenet/"},
-    {score: 75, title: "The Social Network", year: 2010, summary: "Mark Zuckerberg creates Facebook.", link: "https://www.criticker.com/film/The-Social-Network/"},
-    {score: 72, title: "The Martian", year: 2015, summary: "An astronaut is stranded on Mars and must use science to survive.", link: "https://www.criticker.com/film/The-Martian/"},
-    {score: 0, title: "Don't Look Up", year: 2021, summary: "Two astronomers warn mankind of an approaching comet.", link: "https://www.criticker.com/film/Dont-Look-Up-2021/"},
-    {score: 0, title: "Squid Game", year: 2021, summary: "Simple children's games with deadly stakes.", link: "https://www.criticker.com/tv/Squid-Game/"}
-    // Note: I have included the most critical entries. The system is designed to handle thousands more.
-    ];
-
-    let DISPLAY_DB = [...DB];
-    let STATS = { mean: 0, sigma: 0 };
-
-    /* --- INITIALIZATION --- */
-    function init() {
-        calculateStats();
-        renderGrid();
+    <div id="app-shell">
         
-        // Listeners
+        <aside>
+            <div class="profile">
+                <h1>JAMEEL TOLGA</h1>
+                <p>PHYSICIST // CRITIC</p>
+            </div>
+
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="setView('grid')"><i class="ph ph-squares-four"></i> Grid View</button>
+                <button class="nav-btn" onclick="setView('table')"><i class="ph ph-table"></i> Data Ledger</button>
+                <button class="nav-btn" onclick="setView('graph')"><i class="ph ph-chart-scatter"></i> Phase Space</button>
+            </div>
+
+            <div class="stats-mini">
+                <div class="stat-row"><span class="stat-label">N (Count)</span><span class="stat-val" id="mini-n">0</span></div>
+                <div class="stat-row"><span class="stat-label">&mu; (Mean)</span><span class="stat-val" id="mini-mean">0.0</span></div>
+                <div class="stat-row"><span class="stat-label">&sigma; (Dev)</span><span class="stat-val" id="mini-sigma">0.0</span></div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="toolbar">
+                <div class="search-container">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Query database...">
+                </div>
+
+                <div class="view-toggles">
+                    <button class="view-btn" onclick="sortData('score')"><i class="ph ph-sort-ascending"></i> Score</button>
+                    <button class="view-btn" onclick="sortData('year')"><i class="ph ph-calendar"></i> Year</button>
+                </div>
+            </div>
+
+            <div class="content-scroll" id="content-area">
+                
+                <div id="grid-container" class="grid-view"></div>
+                
+                <table id="table-container" class="table-view">
+                    <thead>
+                        <tr>
+                            <th onclick="sortData('title')">Title</th>
+                            <th onclick="sortData('year')">Year</th>
+                            <th onclick="sortData('score')">Score</th>
+                            <th>Deviation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+
+                <div id="graph-container" class="graph-view">
+                    <canvas id="chart-canvas"></canvas>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="dossier">
+            <button class="btn-close" onclick="closeModalDirect()">&times;</button>
+            <div class="dossier-header">
+                <div>
+                    <div class="d-title" id="m-title">Title</div>
+                    <div class="d-meta" id="m-meta">Year</div>
+                </div>
+                <div class="d-score-badge">
+                    <span class="d-score-val" id="m-score">00</span>
+                    <span class="d-z" id="m-z">0.0σ</span>
+                </div>
+            </div>
+            <div class="dossier-body">
+                <div class="d-stats-grid">
+                    <div class="d-stat-box">
+                        <span class="d-stat-label">Percentile Rank</span>
+                        <span class="d-stat-num" id="m-rank">Top 10%</span>
+                    </div>
+                    <div class="d-stat-box">
+                        <span class="d-stat-label">Category</span>
+                        <span class="d-stat-num" id="m-cat">Essential</span>
+                    </div>
+                </div>
+                <div class="d-summary" id="m-summary">
+                    Summary text...
+                </div>
+                <div class="d-actions">
+                    <a href="#" target="_blank" class="btn-link" id="m-link">Access Source Data <i class="ph ph-arrow-up-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIG
+        const FILE = 'ratings.txt';
+        
+        // STATE
+        let DB = [];
+        let FILTERED = [];
+        let STATS = { mean:0, sigma:0, n:0 };
+        let CURRENT_VIEW = 'grid';
+
+        // --- INIT ---
+        async function init() {
+            initBackground();
+            try {
+                const res = await fetch(FILE);
+                if(!res.ok) throw new Error("Missing ratings.txt");
+                const text = await res.text();
+                parse(text);
+                document.getElementById('loader').style.display = 'none';
+            } catch(e) {
+                console.error(e);
+                alert("Please ensure 'ratings.txt' is in the same folder.");
+            }
+        }
+
+        // --- PARSER ---
+        function parse(text) {
+            const lines = text.split('\n');
+            const regex = /^(\d+)\t(.*?)\s\((\d{4})\)$/;
+            let current = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if(!line) return;
+                const match = line.match(regex);
+                if(match) {
+                    if(current) DB.push(current);
+                    current = {
+                        score: parseInt(match[1]),
+                        title: match[2],
+                        year: parseInt(match[3]),
+                        summary: '',
+                        link: ''
+                    };
+                } else if(current) {
+                    if(line.startsWith('http')) current.link = line;
+                    else if(!line.startsWith('[source')) {
+                        current.summary += (current.summary ? ' ' : '') + line.replace('Summary:', '').trim();
+                    }
+                }
+            });
+            if(current) DB.push(current);
+
+            // Calc Stats
+            STATS.n = DB.length;
+            const sum = DB.reduce((a,b)=>a+b.score,0);
+            STATS.mean = sum / STATS.n;
+            const variance = DB.reduce((a,b)=>a+Math.pow(b.score-STATS.mean,2),0)/STATS.n;
+            STATS.sigma = Math.sqrt(variance);
+
+            // Hydrate Data with Physics
+            DB.forEach(m => {
+                m.z = (m.score - STATS.mean) / STATS.sigma;
+                // Calculate percentile (simple)
+                const worse = DB.filter(x => x.score < m.score).length;
+                m.percentile = Math.round((worse / STATS.n) * 100);
+            });
+
+            // Update Sidebar Stats
+            document.getElementById('mini-n').innerText = STATS.n;
+            document.getElementById('mini-mean').innerText = STATS.mean.toFixed(1);
+            document.getElementById('mini-sigma').innerText = STATS.sigma.toFixed(2);
+
+            FILTERED = [...DB];
+            render();
+        }
+
+        // --- RENDER DISPATCHER ---
+        function render() {
+            if(CURRENT_VIEW === 'grid') renderGrid();
+            if(CURRENT_VIEW === 'table') renderTable();
+            if(CURRENT_VIEW === 'graph') drawGraph();
+        }
+
+        // --- RENDERERS ---
+        function renderGrid() {
+            const container = document.getElementById('grid-container');
+            container.innerHTML = '';
+            
+            FILTERED.forEach(m => {
+                let color = 'var(--secondary)';
+                if(m.score >= 80) color = 'var(--s-high)';
+                else if(m.score >= 60) color = 'var(--s-mid)';
+                else if(m.score < 50) color = 'var(--s-low)';
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openModal(m);
+                card.innerHTML = `
+                    <div class="card-top">
+                        <div>
+                            <div class="c-title">${m.title}</div>
+                            <div class="c-year">${m.year}</div>
+                        </div>
+                        <div class="c-score" style="color:${color}">${m.score}</div>
+                    </div>
+                    <div class="c-body">
+                        <div class="c-summary">${m.summary || "No summary available."}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderTable() {
+            const body = document.getElementById('table-body');
+            body.innerHTML = '';
+            
+            FILTERED.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => openModal(m);
+                let color = '#fff';
+                if(m.score >= 80) color = 'var(--s-high)';
+                
+                tr.innerHTML = `
+                    <td>${m.title}</td>
+                    <td style="font-family:var(--font-mono)">${m.year}</td>
+                    <td class="t-score" style="color:${color}">${m.score}</td>
+                    <td style="font-family:var(--font-mono); color:var(--secondary)">${m.z > 0 ? '+' : ''}${m.z.toFixed(2)}σ</td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function drawGraph() {
+            const canvas = document.getElementById('chart-canvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            // Clear
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            
+            // Margins
+            const pad = 40;
+            const w = canvas.width - pad*2;
+            const h = canvas.height - pad*2;
+
+            // Ranges
+            const years = FILTERED.map(m=>m.year);
+            const minY = Math.min(...years);
+            const maxY = Math.max(...years);
+            const rangeY = maxY - minY + 2;
+
+            // Draw Axis
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.beginPath();
+            ctx.moveTo(pad, pad); ctx.lineTo(pad, h+pad); // Y axis (Score)
+            ctx.lineTo(w+pad, h+pad); // X axis (Year)
+            ctx.stroke();
+
+            // Plot Points
+            FILTERED.forEach(m => {
+                const x = pad + ((m.year - (minY-1)) / rangeY) * w;
+                const y = (pad+h) - ((m.score / 100) * h);
+
+                let color = '#555';
+                if(m.score >= 80) color = '#30D158';
+                else if(m.score < 50) color = '#FF453A';
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI*2);
+                ctx.fill();
+            });
+        }
+
+        // --- INTERACTION ---
+        function setView(view) {
+            CURRENT_VIEW = view;
+            
+            // UI Toggle
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active')); // Reset top toggles if any
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); // Reset sidebar
+            
+            // Simple mapping for this demo
+            document.getElementById('grid-container').style.display = view === 'grid' ? 'grid' : 'none';
+            document.getElementById('table-container').style.display = view === 'table' ? 'table' : 'none';
+            document.getElementById('graph-container').style.display = view === 'graph' ? 'block' : 'none';
+            
+            if(view === 'graph') setTimeout(drawGraph, 50); // Delay for layout
+        }
+
+        function sortData(key) {
+            FILTERED.sort((a,b) => {
+                if(key === 'score') return b.score - a.score;
+                if(key === 'year') return b.year - a.year;
+                if(key === 'title') return a.title.localeCompare(b.title);
+            });
+            render();
+        }
+
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            DISPLAY_DB = DB.filter(m => 
+            FILTERED = DB.filter(m => 
                 m.title.toLowerCase().includes(term) || 
-                (m.summary && m.summary.toLowerCase().includes(term)) ||
-                m.year.toString().includes(term)
+                (m.summary && m.summary.toLowerCase().includes(term))
             );
-            renderGrid();
+            render();
         });
-    }
 
-    /* --- PHYSICS ENGINE --- */
-    function calculateStats() {
-        const n = DB.length;
-        const sum = DB.reduce((a, b) => a + b.score, 0);
-        STATS.mean = sum / n;
-        const variance = DB.reduce((a, b) => a + Math.pow(b.score - STATS.mean, 2), 0) / n;
-        STATS.sigma = Math.sqrt(variance);
-
-        // Update UI
-        document.getElementById('stat-n').innerText = n;
-        document.getElementById('stat-mean').innerText = STATS.mean.toFixed(1);
-        document.getElementById('stat-sigma').innerText = STATS.sigma.toFixed(2);
-    }
-
-    /* --- RENDERER --- */
-    function renderGrid() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
-
-        DISPLAY_DB.forEach(m => {
-            // Calculate Z-Score
-            const z = (m.score - STATS.mean) / STATS.sigma;
+        // --- MODAL SYSTEM ---
+        function openModal(m) {
+            const modal = document.getElementById('modal');
             
-            // Determine Colors
-            let color = 'var(--text-primary)';
-            if(m.score >= 80) color = 'var(--score-high)';
-            else if(m.score >= 60) color = 'var(--score-mid)';
-            else if(m.score < 50) color = 'var(--score-low)';
+            document.getElementById('m-title').innerText = m.title;
+            document.getElementById('m-meta').innerText = `${m.year} // ID: ${1000+DB.indexOf(m)}`;
+            document.getElementById('m-score').innerText = m.score;
+            document.getElementById('m-z').innerText = `${m.z > 0 ? '+' : ''}${m.z.toFixed(2)}σ`;
+            document.getElementById('m-summary').innerText = m.summary || "No data.";
+            document.getElementById('m-link').href = m.link;
+            document.getElementById('m-rank').innerText = `Top ${100 - m.percentile}%`;
+            
+            // Category
+            let cat = "Standard";
+            if(m.score >= 85) cat = "Masterpiece";
+            else if(m.score >= 80) cat = "Essential";
+            else if(m.score < 50) cat = "Avoid";
+            document.getElementById('m-cat').innerText = cat;
 
-            // Z-Score Bar Logic
-            // Map Z (-2 to +2) to width (0% to 100%) relative to center
-            // Center is 50%. 
-            // If Z is +1, bar goes from 50% to right.
-            // If Z is -1, bar goes from 50% to left.
+            // Color code score
+            const scoreEl = document.getElementById('m-score');
+            if(m.score >= 80) scoreEl.style.color = 'var(--s-high)';
+            else if(m.score < 50) scoreEl.style.color = 'var(--s-low)';
+            else scoreEl.style.color = 'var(--primary)';
+
+            modal.classList.add('open');
+        }
+
+        function closeModal(e) {
+            if(e.target.id === 'modal') {
+                document.getElementById('modal').classList.remove('open');
+            }
+        }
+        function closeModalDirect() {
+            document.getElementById('modal').classList.remove('open');
+        }
+
+        // --- BACKGROUND FX ---
+        function initBackground() {
+            const cvs = document.getElementById('canvas-bg');
+            const ctx = cvs.getContext('2d');
             
-            let barLeft = '50%';
-            let barWidth = '0%';
-            let barColor = color;
+            let particles = [];
             
-            const maxZ = 2.5; // Cap visualization
-            const percent = (Math.abs(z) / maxZ) * 50;
-            
-            if(z > 0) {
-                barLeft = '50%';
-                barWidth = Math.min(percent, 50) + '%';
-            } else {
-                barWidth = Math.min(percent, 50) + '%';
-                barLeft = (50 - parseFloat(barWidth)) + '%';
+            function resize() {
+                cvs.width = window.innerWidth;
+                cvs.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Create Particles
+            for(let i=0; i<50; i++) {
+                particles.push({
+                    x: Math.random() * cvs.width,
+                    y: Math.random() * cvs.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2
+                });
             }
 
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-header">
-                    <div>
-                        <div class="movie-title">${m.title}</div>
-                        <div class="movie-year">${m.year}</div>
-                    </div>
-                    <div class="score-box" style="border: 1px solid ${color}">
-                        <span class="score-val" style="color: ${color}">${m.score}</span>
-                        <span class="z-score">${z > 0 ? '+' : ''}${z.toFixed(1)}σ</span>
-                    </div>
-                </div>
+            function animate() {
+                ctx.clearRect(0,0,cvs.width, cvs.height);
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
                 
-                <div class="deviation-container">
-                    <div class="deviation-bar" style="left: ${barLeft}; width: ${barWidth}; background: ${color}"></div>
-                </div>
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    if(p.x < 0) p.x = cvs.width;
+                    if(p.x > cvs.width) p.x = 0;
+                    if(p.y < 0) p.y = cvs.height;
+                    if(p.y > cvs.height) p.y = 0;
 
-                <div class="card-body">
-                    <div class="summary">${m.summary || "No analysis available."}</div>
-                </div>
-                
-                <div class="card-footer">
-                    <span style="font-size:0.7rem; color:var(--text-secondary); font-family:var(--font-code);">
-                        ID: ${Math.floor(Math.random() * 9000) + 1000}
-                    </span>
-                    <a href="${m.link}" class="source-link" target="_blank">View Data <i class="fas fa-external-link-alt"></i></a>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    /* --- SORTING --- */
-    function sortGrid() {
-        const type = document.getElementById('sortSelect').value;
-        DISPLAY_DB.sort((a, b) => {
-            if(type === 'score_desc') return b.score - a.score;
-            if(type === 'score_asc') return a.score - b.score;
-            if(type === 'year_desc') return b.year - a.year;
-            if(type === 'year_asc') return a.year - b.year;
-            if(type === 'z_desc') {
-                const zA = Math.abs((a.score - STATS.mean));
-                const zB = Math.abs((b.score - STATS.mean));
-                return zB - zA;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
             }
-        });
-        renderGrid();
-    }
+            animate();
+        }
 
-    /* --- FILTER BUTTONS --- */
-    function filter(type) {
-        // Reset buttons
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
+        // BOOT
+        init();
 
-        if(type === 'all') DISPLAY_DB = [...DB];
-        if(type === 'top') DISPLAY_DB = DB.filter(m => m.score >= 80);
-        if(type === 'low') DISPLAY_DB = DB.filter(m => m.score < 50);
-        if(type === 'scifi') DISPLAY_DB = DB.filter(m => 
-            m.summary.toLowerCase().includes('space') || 
-            m.summary.toLowerCase().includes('science') || 
-            m.summary.toLowerCase().includes('alien') ||
-            m.summary.toLowerCase().includes('physics') ||
-            m.title.toLowerCase().includes('star')
-        );
-        renderGrid();
-    }
-
-    // BOOT
-    init();
-
-</script>
+    </script>
 </body>
 </html>
