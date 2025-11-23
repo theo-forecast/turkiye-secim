@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024 Congressional Swingometer (Expanded Categories)</title>
+<title>2024 Congressional Swingometer (Expanded Scoreboard)</title>
 <style>
   :root {
     --bg-app: #0f1115;
@@ -11,7 +11,7 @@
     --text-main: #ececf1;
     --text-muted: #8a8f98;
     
-    /* --- NEW EXPANDED PALETTE --- */
+    /* --- EXPANDED PALETTE --- */
     
     /* REPUBLICAN SHADES */
     --rep-safe:   #b91c1c; /* 15+ */
@@ -29,6 +29,7 @@
     --dem-solid:  #2563eb; /* 5-15 */
     --dem-safe:   #1e40af; /* 15+ */
     
+    /* Glows for main safe numbers */
     --glow-rep: rgba(220, 38, 38, 0.4);
     --glow-dem: rgba(37, 99, 235, 0.4);
   }
@@ -52,7 +53,7 @@
     text-align: center;
     margin-bottom: 20px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1300px; /* Widened for larger scoreboard */
   }
 
   h1 {
@@ -78,8 +79,8 @@
 
   /* --- Scoreboards --- */
   .scoreboard-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Side by side scoreboards */
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     width: 100%;
     margin-bottom: 25px;
@@ -87,8 +88,9 @@
 
   .scoreboard {
     display: grid;
-    grid-template-columns: 1fr 1fr 0.5fr 1fr 1fr;
-    gap: 5px;
+    /* 11 columns: 5 R, 1 Tie, 5 D */
+    grid-template-columns: repeat(5, 1fr) 0.6fr repeat(5, 1fr);
+    gap: 2px;
     background: var(--bg-panel);
     padding: 12px;
     border-radius: 8px;
@@ -98,7 +100,7 @@
 
   .chamber-label {
     grid-column: 1 / -1;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #fff;
     margin-bottom: 8px;
@@ -107,33 +109,45 @@
     border-bottom: 1px solid rgba(255,255,255,0.1);
     padding-bottom: 5px;
   }
-  .chamber-label span { opacity: 0.6; font-weight: 400; font-size: 0.7em;}
+  .chamber-label span { opacity: 0.6; font-weight: 400; font-size: 0.8em;}
 
   .score-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
+    padding: 0 5px;
   }
   
   .score-card:not(:last-child)::after {
     content: "";
     position: absolute;
-    right: -2px;
-    top: 15%;
-    height: 70%;
+    right: 0;
+    top: 20%;
+    height: 60%;
     width: 1px;
     background: rgba(255,255,255,0.05);
   }
 
-  .score-value { font-size: 1.5rem; font-weight: 800; line-height: 1; }
-  .score-label { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 4px; text-align: center;}
+  .score-value { font-size: 1.2rem; font-weight: 800; line-height: 1; }
+  .score-label { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 4px; text-align: center; white-space: nowrap;}
   
-  .sc-r-main .score-value { color: var(--rep-solid); text-shadow: 0 0 10px var(--glow-rep); }
-  .sc-r-tilt .score-value { color: var(--rep-lean); }
-  .sc-t .score-value      { color: #666; font-size: 1.2rem; } 
-  .sc-d-tilt .score-value { color: var(--dem-lean); }
-  .sc-d-main .score-value { color: var(--dem-solid); text-shadow: 0 0 10px var(--glow-dem); }
+  /* Republican text colors */
+  .sc-r-safe .score-value   { color: var(--rep-safe); text-shadow: 0 0 10px var(--glow-rep); }
+  .sc-r-solid .score-value  { color: var(--rep-solid); }
+  .sc-r-likely .score-value { color: var(--rep-likely); }
+  .sc-r-lean .score-value   { color: var(--rep-lean); }
+  .sc-r-tilt .score-value   { color: var(--rep-tilt); }
+  
+  /* Tie color */
+  .sc-t .score-value        { color: #666; font-size: 1.1rem; } 
+  
+  /* Democrat text colors */
+  .sc-d-tilt .score-value   { color: var(--dem-tilt); }
+  .sc-d-lean .score-value   { color: var(--dem-lean); }
+  .sc-d-likely .score-value { color: var(--dem-likely); }
+  .sc-d-solid .score-value  { color: var(--dem-solid); }
+  .sc-d-safe .score-value   { color: var(--dem-safe); text-shadow: 0 0 10px var(--glow-dem); }
 
   /* --- Controls --- */
   .controls-container {
@@ -200,9 +214,9 @@
   /* --- Visualizations (Side by Side Grid) --- */
   .vis-container {
     width: 100%;
-    max-width: 1400px; /* Wide container */
+    max-width: 1400px; 
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr; /* Map gets slightly more space than Senate */
+    grid-template-columns: 1.2fr 0.8fr; 
     gap: 20px;
     align-items: start;
   }
@@ -224,7 +238,6 @@
   }
   .us-grid {
     display: grid;
-    /* Reduced size to 38px per cell to fit side-by-side */
     grid-template-columns: repeat(12, 38px); 
     grid-template-rows: repeat(8, 38px);    
     gap: 3px;
@@ -250,7 +263,7 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 2px; 
-    max-width: 36px; /* Adjusted for new cell size */
+    max-width: 36px;
   }
   .district-dot {
     width: 6px;
@@ -310,9 +323,14 @@
 
   /* Responsive Breakpoint */
   @media (max-width: 1000px) {
-    .scoreboard-wrapper { grid-template-columns: 1fr; }
     .vis-container { grid-template-columns: 1fr; }
-    .us-grid { gap: 4px; } /* Relax gap on mobile */
+    .us-grid { gap: 4px; }
+    .scoreboard { 
+      grid-template-columns: repeat(5, 1fr); 
+      grid-template-rows: auto auto auto;
+    }
+    .sc-t { grid-column: 1 / -1; margin: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 5px 0;}
+    .chamber-label { margin-bottom: 15px; }
   }
 
   /* --- Tooltip --- */
@@ -361,51 +379,37 @@
       <div class="scoreboard">
         <div class="chamber-label">US House <span>218 to win</span></div>
         
-        <div class="score-card sc-r-main">
-          <div class="score-value" id="h-seat-r">0</div>
-          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
-        </div>
-        <div class="score-card sc-r-tilt">
-          <div class="score-value" id="h-seat-r-tilt">0</div>
-          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
-        </div>
-        <div class="score-card sc-t">
-          <div class="score-value" id="h-seat-t">0</div>
-          <div class="score-label">Tie</div>
-        </div>
-        <div class="score-card sc-d-tilt">
-          <div class="score-value" id="h-seat-d-tilt">0</div>
-          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
-        </div>
-        <div class="score-card sc-d-main">
-          <div class="score-value" id="h-seat-d">0</div>
-          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
-        </div>
+        <div class="score-card sc-r-safe"><div class="score-value" id="h-r-safe">0</div><div class="score-label">Safe R</div></div>
+        <div class="score-card sc-r-solid"><div class="score-value" id="h-r-solid">0</div><div class="score-label">Solid R</div></div>
+        <div class="score-card sc-r-likely"><div class="score-value" id="h-r-likely">0</div><div class="score-label">Likely R</div></div>
+        <div class="score-card sc-r-lean"><div class="score-value" id="h-r-lean">0</div><div class="score-label">Lean R</div></div>
+        <div class="score-card sc-r-tilt"><div class="score-value" id="h-r-tilt">0</div><div class="score-label">Tilt R</div></div>
+        
+        <div class="score-card sc-t"><div class="score-value" id="h-tie">0</div><div class="score-label">Tie</div></div>
+        
+        <div class="score-card sc-d-tilt"><div class="score-value" id="h-d-tilt">0</div><div class="score-label">Tilt D</div></div>
+        <div class="score-card sc-d-lean"><div class="score-value" id="h-d-lean">0</div><div class="score-label">Lean D</div></div>
+        <div class="score-card sc-d-likely"><div class="score-value" id="h-d-likely">0</div><div class="score-label">Likely D</div></div>
+        <div class="score-card sc-d-solid"><div class="score-value" id="h-d-solid">0</div><div class="score-label">Solid D</div></div>
+        <div class="score-card sc-d-safe"><div class="score-value" id="h-d-safe">0</div><div class="score-label">Safe D</div></div>
       </div>
 
       <div class="scoreboard">
         <div class="chamber-label">US Senate <span>51 to win (50+VP)</span></div>
         
-        <div class="score-card sc-r-main">
-          <div class="score-value" id="s-seat-r">31</div>
-          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
-        </div>
-        <div class="score-card sc-r-tilt">
-          <div class="score-value" id="s-seat-r-tilt">0</div>
-          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
-        </div>
-        <div class="score-card sc-t">
-          <div class="score-value" id="s-seat-t">0</div>
-          <div class="score-label">Tie</div>
-        </div>
-        <div class="score-card sc-d-tilt">
-          <div class="score-value" id="s-seat-d-tilt">0</div>
-          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
-        </div>
-        <div class="score-card sc-d-main">
-          <div class="score-value" id="s-seat-d">34</div>
-          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
-        </div>
+        <div class="score-card sc-r-safe"><div class="score-value" id="s-r-safe">0</div><div class="score-label">Safe R</div></div>
+        <div class="score-card sc-r-solid"><div class="score-value" id="s-r-solid">0</div><div class="score-label">Solid R</div></div>
+        <div class="score-card sc-r-likely"><div class="score-value" id="s-r-likely">0</div><div class="score-label">Likely R</div></div>
+        <div class="score-card sc-r-lean"><div class="score-value" id="s-r-lean">0</div><div class="score-label">Lean R</div></div>
+        <div class="score-card sc-r-tilt"><div class="score-value" id="s-r-tilt">0</div><div class="score-label">Tilt R</div></div>
+        
+        <div class="score-card sc-t"><div class="score-value" id="s-tie">0</div><div class="score-label">Tie</div></div>
+        
+        <div class="score-card sc-d-tilt"><div class="score-value" id="s-d-tilt">0</div><div class="score-label">Tilt D</div></div>
+        <div class="score-card sc-d-lean"><div class="score-value" id="s-d-lean">0</div><div class="score-label">Lean D</div></div>
+        <div class="score-card sc-d-likely"><div class="score-value" id="s-d-likely">0</div><div class="score-label">Likely D</div></div>
+        <div class="score-card sc-d-solid"><div class="score-value" id="s-d-solid">0</div><div class="score-label">Solid D</div></div>
+        <div class="score-card sc-d-safe"><div class="score-value" id="s-d-safe">0</div><div class="score-label">Safe D</div></div>
       </div>
 
     </div>
@@ -478,6 +482,7 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
     };
 
     // Baselines for Senate (Not up for election)
+    // For simplicity in this demo, we assign them to "Safe" buckets initially.
     const BASE_SENATE_D = 34;
     const BASE_SENATE_R = 31;
 
@@ -615,20 +620,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
     const slider = document.getElementById('swing-slider');
     const marginDisp = document.getElementById('margin-display');
 
-    // House DOM Elements
-    const hSeatR = document.getElementById('h-seat-r');
-    const hSeatRTilt = document.getElementById('h-seat-r-tilt');
-    const hSeatT = document.getElementById('h-seat-t');
-    const hSeatDTilt = document.getElementById('h-seat-d-tilt');
-    const hSeatD = document.getElementById('h-seat-d');
-
-    // Senate DOM Elements
-    const sSeatR = document.getElementById('s-seat-r');
-    const sSeatRTilt = document.getElementById('s-seat-r-tilt');
-    const sSeatT = document.getElementById('s-seat-t');
-    const sSeatDTilt = document.getElementById('s-seat-d-tilt');
-    const sSeatD = document.getElementById('s-seat-d');
-
     function updateDashboard() {
       const swing = parseFloat(slider.value);
       
@@ -644,10 +635,12 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       const natD = 50 - (swing / 2);
 
       // --- HOUSE CALCULATIONS ---
-      // New Counters: 
-      // safeR = Safe(15+) + Solid(5-15) + Likely(2.5-5)
-      // tiltR = Lean(1-2.5) + Tilt(0-1)
-      let hCounts = { safeR:0, tiltR:0, tie:0, tiltD:0, safeD:0 };
+      // Reset counts
+      let hC = { 
+        rSafe:0, rSolid:0, rLikely:0, rLean:0, rTilt:0, 
+        tie:0, 
+        dTilt:0, dLean:0, dLikely:0, dSolid:0, dSafe:0 
+      };
       
       allHouseDistricts.forEach(d => {
         const rPts = d.rRatio * natR;
@@ -662,34 +655,40 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         const cat = getWinCategory(margin);
         d.element.className = `district-dot ${cat.code}`;
         
-        // Grouping for scoreboard
-        if(cat.code === 'pure-toss') {
-            hCounts.tie++;
-        } else if (margin > 0) {
-            // Republican
-            if (cat.code === 'r-safe' || cat.code === 'r-solid' || cat.code === 'r-likely') {
-                hCounts.safeR++;
-            } else {
-                hCounts.tiltR++;
-            }
-        } else {
-            // Democrat
-            if (cat.code === 'd-safe' || cat.code === 'd-solid' || cat.code === 'd-likely') {
-                hCounts.safeD++;
-            } else {
-                hCounts.tiltD++;
-            }
-        }
+        // Count buckets
+        if(cat.code === 'pure-toss') hC.tie++;
+        else if(cat.code === 'r-safe') hC.rSafe++;
+        else if(cat.code === 'r-solid') hC.rSolid++;
+        else if(cat.code === 'r-likely') hC.rLikely++;
+        else if(cat.code === 'r-lean') hC.rLean++;
+        else if(cat.code === 'r-tilt') hC.rTilt++;
+        else if(cat.code === 'd-safe') hC.dSafe++;
+        else if(cat.code === 'd-solid') hC.dSolid++;
+        else if(cat.code === 'd-likely') hC.dLikely++;
+        else if(cat.code === 'd-lean') hC.dLean++;
+        else if(cat.code === 'd-tilt') hC.dTilt++;
       });
 
-      hSeatR.textContent = hCounts.safeR;
-      hSeatRTilt.textContent = hCounts.tiltR;
-      hSeatT.textContent = hCounts.tie;
-      hSeatDTilt.textContent = hCounts.tiltD;
-      hSeatD.textContent = hCounts.safeD;
+      // Update House DOM
+      document.getElementById('h-r-safe').textContent = hC.rSafe;
+      document.getElementById('h-r-solid').textContent = hC.rSolid;
+      document.getElementById('h-r-likely').textContent = hC.rLikely;
+      document.getElementById('h-r-lean').textContent = hC.rLean;
+      document.getElementById('h-r-tilt').textContent = hC.rTilt;
+      document.getElementById('h-tie').textContent = hC.tie;
+      document.getElementById('h-d-tilt').textContent = hC.dTilt;
+      document.getElementById('h-d-lean').textContent = hC.dLean;
+      document.getElementById('h-d-likely').textContent = hC.dLikely;
+      document.getElementById('h-d-solid').textContent = hC.dSolid;
+      document.getElementById('h-d-safe').textContent = hC.dSafe;
 
       // --- SENATE CALCULATIONS ---
-      let sCounts = { safeR: BASE_SENATE_R, tiltR:0, tie:0, tiltD:0, safeD: BASE_SENATE_D };
+      // Reset counts - Add base safe seats
+      let sC = { 
+        rSafe: BASE_SENATE_R, rSolid:0, rLikely:0, rLean:0, rTilt:0, 
+        tie:0, 
+        dTilt:0, dLean:0, dLikely:0, dSolid:0, dSafe: BASE_SENATE_D 
+      };
       
       senateData.forEach(s => {
         const rPts = s.r * natR;
@@ -709,28 +708,31 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         const cat = getWinCategory(s.currMargin);
         s.element.className = `senate-seat ${cat.code}`;
         
-        if(cat.code === 'pure-toss') {
-            sCounts.tie++;
-        } else if (s.currMargin > 0) {
-            if (cat.code === 'r-safe' || cat.code === 'r-solid' || cat.code === 'r-likely') {
-                sCounts.safeR++;
-            } else {
-                sCounts.tiltR++;
-            }
-        } else {
-            if (cat.code === 'd-safe' || cat.code === 'd-solid' || cat.code === 'd-likely') {
-                sCounts.safeD++;
-            } else {
-                sCounts.tiltD++;
-            }
-        }
+        if(cat.code === 'pure-toss') sC.tie++;
+        else if(cat.code === 'r-safe') sC.rSafe++;
+        else if(cat.code === 'r-solid') sC.rSolid++;
+        else if(cat.code === 'r-likely') sC.rLikely++;
+        else if(cat.code === 'r-lean') sC.rLean++;
+        else if(cat.code === 'r-tilt') sC.rTilt++;
+        else if(cat.code === 'd-safe') sC.dSafe++;
+        else if(cat.code === 'd-solid') sC.dSolid++;
+        else if(cat.code === 'd-likely') sC.dLikely++;
+        else if(cat.code === 'd-lean') sC.dLean++;
+        else if(cat.code === 'd-tilt') sC.dTilt++;
       });
 
-      sSeatR.textContent = sCounts.safeR;
-      sSeatRTilt.textContent = sCounts.tiltR;
-      sSeatT.textContent = sCounts.tie;
-      sSeatDTilt.textContent = sCounts.tiltD;
-      sSeatD.textContent = sCounts.safeD;
+      // Update Senate DOM
+      document.getElementById('s-r-safe').textContent = sC.rSafe;
+      document.getElementById('s-r-solid').textContent = sC.rSolid;
+      document.getElementById('s-r-likely').textContent = sC.rLikely;
+      document.getElementById('s-r-lean').textContent = sC.rLean;
+      document.getElementById('s-r-tilt').textContent = sC.rTilt;
+      document.getElementById('s-tie').textContent = sC.tie;
+      document.getElementById('s-d-tilt').textContent = sC.dTilt;
+      document.getElementById('s-d-lean').textContent = sC.dLean;
+      document.getElementById('s-d-likely').textContent = sC.dLikely;
+      document.getElementById('s-d-solid').textContent = sC.dSolid;
+      document.getElementById('s-d-safe').textContent = sC.dSafe;
     }
 
     // --- TOOLTIP ---
