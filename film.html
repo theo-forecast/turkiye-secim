@@ -13,7 +13,6 @@
 
     <style>
         :root {
-            /* THEME: Quantum Dark 2.0 */
             --bg: #050507;
             --surface: #0f0f13;
             --surface-soft: #101018;
@@ -57,7 +56,6 @@
             overflow: hidden;
         }
 
-        /* Background */
         #canvas-bg {
             position: fixed;
             inset: 0;
@@ -68,7 +66,6 @@
             z-index: 0;
         }
 
-        /* Shell */
         #app-shell {
             position: relative;
             z-index: 1;
@@ -87,7 +84,7 @@
             gap: 18px;
         }
 
-        /* Profile */
+        /* PROFILE */
         .profile {
             border-bottom: 1px solid var(--border);
             padding-bottom: 18px;
@@ -121,14 +118,13 @@
             font-family: var(--font-mono);
         }
 
-        /* Nav */
+        /* NAV */
         .nav-menu {
             display: flex;
             flex-direction: column;
             gap: 6px;
             margin-top: 2px;
         }
-
         .nav-btn {
             border: none;
             outline: none;
@@ -158,7 +154,7 @@
             border: 1px solid var(--border-light);
         }
 
-        /* Filters */
+        /* FILTERS */
         .filters {
             margin-top: 6px;
             padding: 10px 10px 12px;
@@ -232,6 +228,53 @@
             border-color: var(--accent);
             box-shadow: 0 0 0 1px var(--accent-soft);
         }
+
+        .filter-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pill-toggle {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.11em;
+            color: var(--secondary);
+            background: rgba(5,5,10,0.8);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+        }
+        .pill-toggle i {
+            font-size: 0.8rem;
+        }
+        .pill-toggle.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--border-light);
+            transform: translateY(-0.5px);
+        }
+
+        .bucket-select {
+            width: 100%;
+            background: rgba(10,10,16,0.9);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 4px 6px;
+            font-size: 0.7rem;
+            color: var(--primary);
+            font-family: var(--font-mono);
+            outline: none;
+        }
+        .bucket-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-soft);
+        }
+
         .filter-reset-btn {
             align-self: flex-end;
             margin-top: 2px;
@@ -254,7 +297,6 @@
             transform: translateY(-0.5px);
         }
 
-        /* Sidebar stats & insights */
         .sidebar-section-title {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -263,8 +305,8 @@
             margin-bottom: 4px;
         }
 
+        /* STATS */
         .stats-mini {
-            margin-top: auto;
             padding: 12px 10px 10px;
             border-radius: var(--radius-md);
             background: rgba(8,8,14,0.96);
@@ -287,6 +329,19 @@
             font-family: var(--font-mono);
             font-size: 0.8rem;
             font-weight: 700;
+        }
+
+        .histogram-wrapper {
+            margin-top: 8px;
+            padding: 4px 2px 2px;
+            border-radius: var(--radius-sm);
+            background: radial-gradient(circle at top, rgba(255,255,255,0.03), transparent 60%);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        #histogram {
+            width: 100%;
+            height: 70px;
+            display: block;
         }
 
         .insights {
@@ -312,13 +367,12 @@
             color: var(--primary);
         }
 
-        /* MAIN */
+        /* MAIN TOOLBAR */
         main {
             display: flex;
             flex-direction: column;
             background: rgba(5,5,7,0.5);
         }
-
         .toolbar {
             padding: 16px 22px;
             border-bottom: 1px solid var(--border);
@@ -328,14 +382,12 @@
             justify-content: space-between;
             gap: 14px;
         }
-
         .toolbar-left {
             display: flex;
             align-items: center;
             gap: 12px;
             min-width: 0;
         }
-
         .search-container {
             position: relative;
             width: min(360px, 60vw);
@@ -390,6 +442,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .view-toggle-group {
@@ -449,20 +503,45 @@
             color: var(--primary);
         }
 
-        /* Content area */
+        .quick-chips {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .quick-chip {
+            border-radius: 999px;
+            padding: 3px 8px;
+            border: 1px solid var(--border);
+            font-size: 0.68rem;
+            color: var(--secondary);
+            background: rgba(5,5,10,0.9);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .quick-chip i {
+            font-size: 0.8rem;
+        }
+        .quick-chip.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--border-light);
+        }
+
         .content-scroll {
             flex: 1;
             overflow-y: auto;
             padding: 18px 22px 22px;
         }
 
-        /* Grid view */
+        /* GRID */
         #grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px;
         }
-
         .card {
             background: radial-gradient(circle at top left, rgba(100, 210, 255, 0.08) 0, rgba(8, 8, 12, 0.98) 45%);
             border-radius: var(--radius-lg);
@@ -493,7 +572,6 @@
         .card:hover::before {
             opacity: 1;
         }
-
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -524,7 +602,6 @@
             min-width: 3ch;
             text-align: right;
         }
-
         .card-tags {
             display: flex;
             flex-wrap: wrap;
@@ -541,7 +618,6 @@
             color: var(--muted);
             font-family: var(--font-mono);
         }
-
         .card-summary {
             font-size: 0.82rem;
             color: var(--secondary);
@@ -551,7 +627,6 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-
         .card-footer {
             display: flex;
             justify-content: space-between;
@@ -567,7 +642,7 @@
             font-family: var(--font-mono);
         }
 
-        /* Table view */
+        /* TABLE */
         #table-container {
             width: 100%;
             border-collapse: collapse;
@@ -621,7 +696,7 @@
             color: var(--muted);
         }
 
-        /* Graph view */
+        /* GRAPH */
         #graph-container {
             position: relative;
             width: 100%;
@@ -657,7 +732,7 @@
             border-radius: 50%;
         }
 
-        /* Modal */
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -776,7 +851,9 @@
             padding-top: 10px;
             border-top: 1px solid var(--border);
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .btn-link {
             display: inline-flex;
@@ -806,8 +883,14 @@
             cursor: default;
             pointer-events: none;
         }
+        .modal-hints {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            font-family: var(--font-mono);
+            opacity: 0.9;
+        }
 
-        /* Loader */
+        /* LOADER */
         #loader {
             position: fixed;
             inset: 0;
@@ -831,6 +914,8 @@
             font-family: var(--font-mono);
             font-size: 0.8rem;
             color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
         }
         .loader-sub {
             margin-top: 4px;
@@ -842,7 +927,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
+        /* RESPONSIVE */
         @media (max-width: 840px) {
             #app-shell {
                 grid-template-columns: 1fr;
@@ -858,12 +943,7 @@
                 padding-inline: 14px;
             }
         }
-
         @media (max-width: 600px) {
-            .toolbar-right {
-                flex-wrap: wrap;
-                justify-content: flex-end;
-            }
             #graph-container {
                 height: calc(100vh - 154px);
             }
@@ -875,17 +955,17 @@
 
 <div id="loader">
     <div class="spinner"></div>
-    <div class="loader-text">INITIALIZING OBSERVER CORE...</div>
-    <div class="loader-sub">parsing ratings.txt | fitting normal distribution</div>
+    <div class="loader-text">INITIALIZING OBSERVER CORE</div>
+    <div class="loader-sub">parsing ratings.txt · fitting μ, σ · inferring eras</div>
 </div>
 
 <div id="app-shell">
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <aside>
         <div class="profile">
             <div class="profile-title">
                 <h1>JAMEEL TOLGA</h1>
-                <span class="profile-chip">Observer v2</span>
+                <span class="profile-chip">Observer v3</span>
             </div>
             <div class="profile-tag">PHYSICIST // CRITIC</div>
         </div>
@@ -905,6 +985,7 @@
             </button>
         </div>
 
+        <!-- FILTERS -->
         <div class="filters">
             <div class="filters-header">
                 <div class="filters-title">Filters</div>
@@ -932,12 +1013,43 @@
                 </div>
             </div>
 
+            <div class="filter-block">
+                <label class="filter-label">
+                    <span>Medium</span>
+                    <small>film vs TV</small>
+                </label>
+                <div class="filter-pills">
+                    <button type="button" class="pill-toggle medium-toggle active" data-medium="Film">
+                        <i class="ph ph-film-strip"></i>Film
+                    </button>
+                    <button type="button" class="pill-toggle medium-toggle active" data-medium="TV">
+                        <i class="ph ph-television"></i>TV
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-block">
+                <label class="filter-label" for="bucket-select">
+                    <span>Taste tier</span>
+                    <small>σ-bucket</small>
+                </label>
+                <select id="bucket-select" class="bucket-select">
+                    <option value="all">All buckets</option>
+                    <option value="Essential">Essential</option>
+                    <option value="Core Canon">Core Canon</option>
+                    <option value="Strong">Strong</option>
+                    <option value="Solid">Solid</option>
+                    <option value="Peripheral">Peripheral</option>
+                </select>
+            </div>
+
             <button class="filter-reset-btn" type="button" id="reset-filters">
                 <i class="ph ph-arrow-counter-clockwise"></i>
                 Reset
             </button>
         </div>
 
+        <!-- INSIGHTS -->
         <div class="insights">
             <div class="sidebar-section-title">Observer Notes</div>
             <ul class="insights-list">
@@ -945,9 +1057,11 @@
                 <li id="insight-spread">Spread: —</li>
                 <li id="insight-year-span">Temporal span: —</li>
                 <li id="insight-density">Density: —</li>
+                <li id="insight-buckets">Taste tiers: —</li>
             </ul>
         </div>
 
+        <!-- STATS -->
         <div class="stats-mini">
             <div class="sidebar-section-title">Distribution</div>
             <div class="stat-row">
@@ -962,20 +1076,32 @@
                 <span class="stat-label">σ (spread)</span>
                 <span class="stat-val" id="mini-sigma">0.0</span>
             </div>
+            <div class="stat-row">
+                <span class="stat-label">Film / TV</span>
+                <span class="stat-val" id="mini-ftv">0 / 0</span>
+            </div>
+
+            <div class="histogram-wrapper">
+                <canvas id="histogram"></canvas>
+            </div>
         </div>
     </aside>
 
-    <!-- Main -->
+    <!-- MAIN -->
     <main>
         <div class="toolbar">
             <div class="toolbar-left">
                 <div class="search-container">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input id="searchInput" type="text" placeholder="Search title, theme, or summary...">
+                    <input id="searchInput" type="text" placeholder="Search title, plot, or vibe...">
                 </div>
                 <div class="toolbar-pill">
                     <i class="ph ph-sigma"></i>
                     <span id="toolbar-distribution">No data loaded</span>
+                </div>
+                <div class="toolbar-pill">
+                    <i class="ph ph-keyboard"></i>
+                    <span>/ search · 1–3 views · Esc close</span>
                 </div>
             </div>
 
@@ -991,6 +1117,7 @@
                         <i class="ph ph-chart-scatter"></i><span>Graph</span>
                     </button>
                 </div>
+
                 <div class="sort-group">
                     <button class="sort-btn active" data-sort="score" onclick="sortData('score')">
                         <i class="ph ph-sort-descending"></i><span>Score</span>
@@ -1000,6 +1127,18 @@
                     </button>
                     <button class="sort-btn" data-sort="title" onclick="sortData('title')">
                         <i class="ph ph-text-t"></i><span>Title</span>
+                    </button>
+                </div>
+
+                <div class="quick-chips">
+                    <button class="quick-chip" id="chip-essential">
+                        <i class="ph ph-target"></i>Only Essential
+                    </button>
+                    <button class="quick-chip" id="chip-modern">
+                        <i class="ph ph-timer"></i>Since 2000
+                    </button>
+                    <button class="quick-chip" id="chip-pre80">
+                        <i class="ph ph-film-reel"></i>Pre-1980
                     </button>
                 </div>
             </div>
@@ -1013,6 +1152,7 @@
                 <tr>
                     <th onclick="sortData('title')"><span>Title</span></th>
                     <th onclick="sortData('year')"><span>Year</span></th>
+                    <th><span>Medium</span></th>
                     <th onclick="sortData('score')"><span>Score</span></th>
                     <th><span>z-score</span></th>
                     <th><span>Percentile</span></th>
@@ -1032,7 +1172,7 @@
                     </div>
                     <div class="graph-legend-row">
                         <span class="dot" style="background: var(--s-mid);"></span>
-                        <span>65 – 79</span>
+                        <span>65–79</span>
                     </div>
                     <div class="graph-legend-row">
                         <span class="dot" style="background: var(--s-low);"></span>
@@ -1044,7 +1184,7 @@
     </main>
 </div>
 
-<!-- Modal -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modal" onclick="closeModal(event)">
     <div class="dossier">
         <button class="btn-close" onclick="closeModalDirect()">&times;</button>
@@ -1073,14 +1213,19 @@
                     <div class="d-stat-num" id="m-pos">—</div>
                 </div>
                 <div class="d-stat-box">
+                    <div class="d-stat-label">Medium / Era</div>
+                    <div class="d-stat-num" id="m-medium-era">—</div>
+                </div>
+                <div class="d-stat-box">
                     <div class="d-stat-label">Raw score</div>
                     <div class="d-stat-num" id="m-raw">—</div>
                 </div>
             </div>
-            <div class="d-summary" id="m-summary">
-                Summary text...
-            </div>
+            <div class="d-summary" id="m-summary">Summary text...</div>
             <div class="d-actions">
+                <div class="modal-hints">
+                    ↑↓ scroll · ←→ switch items (table) · Esc closes
+                </div>
                 <a href="#" target="_blank" class="btn-link" id="m-link" aria-disabled="true">
                     Access source data
                     <i class="ph ph-arrow-up-right"></i>
@@ -1091,10 +1236,8 @@
 </div>
 
 <script>
-    // --- CONFIG ---
     const FILE = 'ratings.txt';
 
-    // --- STATE ---
     let DB = [];
     let FILTERED = [];
     let STATS = { n: 0, mean: 0, sigma: 0, minYear: null, maxYear: null };
@@ -1102,11 +1245,12 @@
     let SORT_KEY = 'score';
     let SORT_DIR = 'desc';
     let GRAPH_POINTS = [];
+    let SEARCH_TERM = '';
 
-    // --- INIT ---
     window.addEventListener('load', () => {
         initBackground();
         initApp();
+        initKeyboardShortcuts();
     });
 
     async function initApp() {
@@ -1127,11 +1271,10 @@
             const loaderText = document.querySelector('.loader-text');
             const loaderSub = document.querySelector('.loader-sub');
             loaderText.textContent = 'FAILED TO LOAD ratings.txt';
-            loaderSub.textContent = 'Check file location and reload.';
+            loaderSub.textContent = 'Place ratings.txt beside film.html and reload.';
         }
     }
 
-    // --- BACKGROUND CANVAS ---
     function initBackground() {
         const canvas = document.getElementById('canvas-bg');
         if (!canvas) return;
@@ -1143,7 +1286,7 @@
             height = window.innerHeight;
             canvas.width = width * dpr;
             canvas.height = height * dpr;
-            ctx.scale(dpr, dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
         resize();
@@ -1187,7 +1330,6 @@
         tick();
     }
 
-    // --- PARSING ---
     function parseRatings(text) {
         const lines = text.split(/\r?\n/);
         let current = null;
@@ -1209,7 +1351,9 @@
                     link: '',
                     z: 0,
                     percentile: 0,
-                    bucket: ''
+                    bucket: '',
+                    medium: 'Unknown',
+                    era: 'Unknown'
                 };
             } else if (current) {
                 if (line.startsWith('http')) {
@@ -1225,7 +1369,6 @@
         if (current) DB.push(current);
     }
 
-    // --- STATS & ENRICHMENT ---
     function computeStats() {
         const n = DB.length;
         STATS.n = n;
@@ -1253,6 +1396,25 @@
         return 'Peripheral';
     }
 
+    function guessMedium(m) {
+        const link = (m.link || '').toLowerCase();
+        const text = (m.title + ' ' + m.summary).toLowerCase();
+        if (link.includes('/tv/') || text.includes('season ') || text.includes('miniseries') || text.includes('mini-series')) {
+            return 'TV';
+        }
+        return 'Film';
+    }
+
+    function eraForYear(year) {
+        if (!year) return 'Unknown';
+        if (year < 1960) return 'Pre-60s';
+        if (year < 1980) return '60s–70s';
+        if (year < 2000) return '80s–90s';
+        if (year < 2015) return '00s–early 10s';
+        if (year < 2025) return 'Late 10s–20s';
+        return 'Future';
+    }
+
     function enrichItems() {
         const n = STATS.n || 1;
         for (const m of DB) {
@@ -1260,10 +1422,11 @@
             const worse = DB.filter(x => x.score < m.score).length;
             m.percentile = Math.round((worse / n) * 100);
             m.bucket = bucketForScore(m.score);
+            m.medium = guessMedium(m);
+            m.era = eraForYear(m.year);
         }
     }
 
-    // --- UI: Sidebar stats & insights ---
     function updateSidebarStats() {
         document.getElementById('mini-n').textContent = STATS.n;
         document.getElementById('mini-mean').textContent = STATS.mean.toFixed(1);
@@ -1280,12 +1443,14 @@
         const insightSpread = document.getElementById('insight-spread');
         const insightYearSpan = document.getElementById('insight-year-span');
         const insightDensity = document.getElementById('insight-density');
+        const insightBuckets = document.getElementById('insight-buckets');
 
         if (STATS.n === 0) {
             insightTop.textContent = 'Highest rated: —';
             insightSpread.textContent = 'Spread: —';
             insightYearSpan.textContent = 'Temporal span: —';
             insightDensity.textContent = 'Density: —';
+            insightBuckets.textContent = 'Taste tiers: —';
             return;
         }
 
@@ -1298,10 +1463,22 @@
         insightTop.innerHTML = `Highest rated: <strong>${top.title}</strong> (${top.year}, ${top.score})`;
         insightSpread.innerHTML = `Spread: <strong>${bottom.score}</strong> → <strong>${top.score}</strong>`;
         insightYearSpan.innerHTML = `Temporal span: <strong>${STATS.minYear}</strong> → <strong>${STATS.maxYear}</strong>`;
-        insightDensity.innerHTML = `Density: <strong>${density}</strong> items / year window`;
+        insightDensity.innerHTML = `Density: <strong>${density}</strong> items/year window`;
+
+        const bucketCounts = { Essential: 0, 'Core Canon': 0, Strong: 0, Solid: 0, Peripheral: 0 };
+        DB.forEach(m => { bucketCounts[m.bucket] = (bucketCounts[m.bucket] || 0) + 1; });
+        insightBuckets.innerHTML =
+            `Taste tiers: <strong>${bucketCounts.Essential || 0}</strong> essential · ` +
+            `<strong>${bucketCounts['Core Canon'] || 0}</strong> core · ` +
+            `<strong>${bucketCounts.Strong || 0}</strong> strong`;
+
+        const filmCount = DB.filter(m => m.medium === 'Film').length;
+        const tvCount = DB.filter(m => m.medium === 'TV').length;
+        document.getElementById('mini-ftv').textContent = `${filmCount} / ${tvCount}`;
+
+        drawHistogram();
     }
 
-    // --- Filters & defaults ---
     function setDefaultsAndFilters() {
         const scoreSlider = document.getElementById('score-slider');
         const scoreVal = document.getElementById('score-slider-val');
@@ -1319,7 +1496,7 @@
         yearMaxInput.value = STATS.maxYear;
         yearWindowLabel.textContent = `${STATS.minYear}–${STATS.maxYear}`;
 
-        filterChip.textContent = 'All scores · full span';
+        filterChip.textContent = 'All scores · full span · Film+TV · all tiers';
     }
 
     function attachEvents() {
@@ -1328,6 +1505,11 @@
         const yearMinInput = document.getElementById('year-min');
         const yearMaxInput = document.getElementById('year-max');
         const resetBtn = document.getElementById('reset-filters');
+        const bucketSelect = document.getElementById('bucket-select');
+        const mediumToggles = document.querySelectorAll('.medium-toggle');
+        const chipEssential = document.getElementById('chip-essential');
+        const chipModern = document.getElementById('chip-modern');
+        const chipPre80 = document.getElementById('chip-pre80');
 
         searchInput.addEventListener('input', () => applyFilters());
         scoreSlider.addEventListener('input', () => {
@@ -1336,10 +1518,50 @@
         });
         yearMinInput.addEventListener('change', applyFilters);
         yearMaxInput.addEventListener('change', applyFilters);
+        bucketSelect.addEventListener('change', applyFilters);
         resetBtn.addEventListener('click', resetFilters);
+
+        mediumToggles.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                applyFilters();
+            });
+        });
+
+        chipEssential.addEventListener('click', () => {
+            chipEssential.classList.toggle('active');
+            const select = document.getElementById('bucket-select');
+            select.value = chipEssential.classList.contains('active') ? 'Essential' : 'all';
+            applyFilters();
+        });
+
+        chipModern.addEventListener('click', () => {
+            chipModern.classList.toggle('active');
+            if (chipModern.classList.contains('active')) {
+                chipPre80.classList.remove('active');
+                document.getElementById('year-min').value = 2000;
+                document.getElementById('year-max').value = STATS.maxYear;
+            } else {
+                document.getElementById('year-min').value = STATS.minYear;
+            }
+            applyFilters();
+        });
+
+        chipPre80.addEventListener('click', () => {
+            chipPre80.classList.toggle('active');
+            if (chipPre80.classList.contains('active')) {
+                chipModern.classList.remove('active');
+                document.getElementById('year-min').value = STATS.minYear;
+                document.getElementById('year-max').value = 1979;
+            } else {
+                document.getElementById('year-max').value = STATS.maxYear;
+            }
+            applyFilters();
+        });
 
         window.addEventListener('resize', () => {
             if (CURRENT_VIEW === 'graph') drawGraph();
+            drawHistogram();
         });
     }
 
@@ -1349,41 +1571,55 @@
         document.getElementById('score-slider-val').textContent = '0';
         document.getElementById('year-min').value = STATS.minYear;
         document.getElementById('year-max').value = STATS.maxYear;
+        document.getElementById('bucket-select').value = 'all';
         document.getElementById('searchInput').value = '';
+
+        document.querySelectorAll('.medium-toggle').forEach(btn => btn.classList.add('active'));
+        document.getElementById('chip-essential').classList.remove('active');
+        document.getElementById('chip-modern').classList.remove('active');
+        document.getElementById('chip-pre80').classList.remove('active');
+
         applyFilters();
     }
 
     function applyFilters() {
         let dataset = DB.slice();
         const term = document.getElementById('searchInput').value.trim().toLowerCase();
-        const scoreMin = parseInt(document.getElementById('score-slider').value, 10) || 0;
+        SEARCH_TERM = term;
 
+        const scoreMin = parseInt(document.getElementById('score-slider').value, 10) || 0;
         let yearMin = parseInt(document.getElementById('year-min').value, 10);
         let yearMax = parseInt(document.getElementById('year-max').value, 10);
+        const bucket = document.getElementById('bucket-select').value;
 
         if (!Number.isFinite(yearMin)) yearMin = STATS.minYear;
         if (!Number.isFinite(yearMax)) yearMax = STATS.maxYear;
         if (yearMin > yearMax) {
-            const tmp = yearMin;
-            yearMin = yearMax;
-            yearMax = tmp;
+            const tmp = yearMin; yearMin = yearMax; yearMax = tmp;
         }
+
+        const activeMediums = [];
+        document.querySelectorAll('.medium-toggle').forEach(btn => {
+            if (btn.classList.contains('active')) activeMediums.push(btn.getAttribute('data-medium'));
+        });
 
         dataset = dataset.filter(m => {
             if (m.score < scoreMin) return false;
             if (m.year < yearMin || m.year > yearMax) return false;
+            if (bucket !== 'all' && m.bucket !== bucket) return false;
+            if (activeMediums.length && !activeMediums.includes(m.medium)) return false;
             if (!term) return true;
-            const blob = (m.title + ' ' + m.summary).toLowerCase();
+            const blob = (m.title + ' ' + m.summary + ' ' + m.era + ' ' + m.bucket).toLowerCase();
             return blob.includes(term);
         });
 
         FILTERED = dataset;
         applySort();
-        updateFilterSummary(scoreMin, yearMin, yearMax);
+        updateFilterSummary(scoreMin, yearMin, yearMax, bucket, activeMediums);
         render();
     }
 
-    function updateFilterSummary(scoreMin, yearMin, yearMax) {
+    function updateFilterSummary(scoreMin, yearMin, yearMax, bucket, activeMediums) {
         const chip = document.getElementById('filter-summary-chip');
         const yearLabel = document.getElementById('year-window-label');
 
@@ -1395,20 +1631,29 @@
         }
 
         const parts = [];
-        if (scoreMin > 0) {
-            parts.push(`score ≥ ${scoreMin}`);
-        } else {
-            parts.push('all scores');
-        }
+        parts.push(scoreMin > 0 ? `score ≥ ${scoreMin}` : 'all scores');
+
         if (yearMin > STATS.minYear || yearMax < STATS.maxYear) {
             parts.push(`${yearMin}–${yearMax}`);
         } else {
             parts.push('full span');
         }
+
+        if (bucket !== 'all') {
+            parts.push(bucket);
+        } else {
+            parts.push('all tiers');
+        }
+
+        if (activeMediums.length === 1) {
+            parts.push(activeMediums[0]);
+        } else {
+            parts.push('Film+TV');
+        }
+
         chip.textContent = parts.join(' · ');
     }
 
-    // --- Sorting ---
     function applySort() {
         FILTERED.sort((a, b) => {
             let av = a[SORT_KEY];
@@ -1442,7 +1687,6 @@
         render();
     }
 
-    // --- Views ---
     function setView(view) {
         CURRENT_VIEW = view;
 
@@ -1465,14 +1709,12 @@
         if (view === 'graph') drawGraph();
     }
 
-    // --- Render dispatcher ---
     function render() {
         if (CURRENT_VIEW === 'grid') renderGrid();
         else if (CURRENT_VIEW === 'table') renderTable();
         else if (CURRENT_VIEW === 'graph') drawGraph();
     }
 
-    // --- Grid renderer ---
     function renderGrid() {
         const container = document.getElementById('grid-container');
         container.innerHTML = '';
@@ -1504,10 +1746,11 @@
                 <div class="card-header">
                     <div class="card-title-block">
                         <div class="card-title">${m.title}</div>
-                        <div class="card-meta">${m.year} · ${m.bucket}</div>
+                        <div class="card-meta">${m.year} · ${m.bucket} · ${m.medium} · ${m.era}</div>
                         <div class="card-tags">
                             <span class="tag-pill">${percentLabel}</span>
                             <span class="tag-pill">z: ${zLabel}</span>
+                            <span class="tag-pill">${m.medium}</span>
                         </div>
                     </div>
                     <div class="card-score" style="color:${color}">${m.score}</div>
@@ -1523,7 +1766,6 @@
         }
     }
 
-    // --- Table renderer ---
     function renderTable() {
         const body = document.getElementById('table-body');
         body.innerHTML = '';
@@ -1531,11 +1773,11 @@
         if (FILTERED.length === 0) {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
-            cell.colSpan = 6;
+            cell.colSpan = 7;
             cell.textContent = 'No results for this filter.';
             cell.style.color = 'var(--secondary)';
-            body.appendChild(row);
             row.appendChild(cell);
+            body.appendChild(row);
             return;
         }
 
@@ -1554,6 +1796,7 @@
             tr.innerHTML = `
                 <td>${m.title}</td>
                 <td>${m.year}</td>
+                <td>${m.medium}</td>
                 <td class="t-score" style="color:${color}">${m.score}</td>
                 <td class="t-z">${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}</td>
                 <td class="t-percentile">${percentLabel}</td>
@@ -1563,7 +1806,6 @@
         }
     }
 
-    // --- Graph ---
     function drawGraph() {
         const canvas = document.getElementById('chart-canvas');
         const container = document.getElementById('graph-container');
@@ -1594,7 +1836,6 @@
         const minScore = Math.min(...scores);
         const maxScore = Math.max(...scores);
 
-        // Axes
         ctx.strokeStyle = 'rgba(255,255,255,0.25)';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -1606,7 +1847,6 @@
         ctx.fillStyle = 'var(--secondary)';
         ctx.font = '10px var(--font-mono)';
 
-        // Y labels
         const ySteps = 5;
         for (let i = 0; i <= ySteps; i++) {
             const t = i / ySteps;
@@ -1620,7 +1860,6 @@
             ctx.stroke();
         }
 
-        // X labels
         const xSteps = Math.min(6, Math.max(3, Math.floor(w / 100)));
         for (let i = 0; i <= xSteps; i++) {
             const t = i / xSteps;
@@ -1634,7 +1873,6 @@
             ctx.stroke();
         }
 
-        // Points
         GRAPH_POINTS = [];
         for (const m of data) {
             const tX = (m.year - minYear) / (maxYear - minYear || 1);
@@ -1656,12 +1894,10 @@
             GRAPH_POINTS.push({ x, y, r, item: m });
         }
 
-        // Title
         ctx.fillStyle = 'var(--secondary)';
         ctx.font = '11px var(--font-ui)';
         ctx.fillText('Score vs. Year (click a point for details)', padding.left, padding.top - 8);
 
-        // Click handling
         canvas.onclick = (ev) => {
             const rect2 = canvas.getBoundingClientRect();
             const cx = (ev.clientX - rect2.left);
@@ -1684,18 +1920,78 @@
         };
     }
 
+    function drawHistogram() {
+        const canvas = document.getElementById('histogram');
+        if (!canvas || STATS.n === 0) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const widthCSS = canvas.clientWidth || 220;
+        const heightCSS = canvas.clientHeight || 70;
+        canvas.width = widthCSS * dpr;
+        canvas.height = heightCSS * dpr;
+
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, widthCSS, heightCSS);
+
+        const padding = { left: 4, right: 4, top: 6, bottom: 14 };
+        const w = widthCSS - padding.left - padding.right;
+        const h = heightCSS - padding.top - padding.bottom;
+
+        const scores = DB.map(m => m.score);
+        const minScore = Math.min(...scores);
+        const maxScore = Math.max(...scores);
+        const bins = 10;
+        const binSize = (maxScore - minScore + 1) / bins;
+        const counts = Array(bins).fill(0);
+
+        DB.forEach(m => {
+            const idx = Math.min(bins - 1, Math.floor((m.score - minScore) / binSize));
+            counts[idx]++;
+        });
+
+        const maxCount = Math.max(...counts) || 1;
+
+        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+        ctx.fillRect(padding.left, padding.top, w, h);
+
+        for (let i = 0; i < bins; i++) {
+            const binCount = counts[i];
+            const slotWidth = w / bins;
+            const barWidth = slotWidth * 0.78;
+            const gap = slotWidth * 0.22;
+            const x = padding.left + i * slotWidth + gap / 2;
+            const barHeight = (binCount / maxCount) * h;
+
+            const representativeScore = minScore + (i + 0.5) * binSize;
+            let color;
+            if (representativeScore >= 80) color = getCSSColor('--s-high');
+            else if (representativeScore >= 65) color = getCSSColor('--s-mid');
+            else color = getCSSColor('--s-low');
+
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.9;
+            ctx.fillRect(x, padding.top + h - barHeight, barWidth, barHeight);
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '8px var(--font-mono)';
+        ctx.fillText(minScore.toString(), padding.left + 1, heightCSS - 3);
+        ctx.fillText(maxScore.toString(), padding.left + w - 16, heightCSS - 3);
+    }
+
     function getCSSColor(varName) {
         const value = getComputedStyle(document.documentElement).getPropertyValue(varName);
         return value || '#ffffff';
     }
 
-    // --- Modal ---
     function openModal(m) {
         const modal = document.getElementById('modal');
         modal.classList.add('open');
 
         document.getElementById('m-title').textContent = m.title;
-        document.getElementById('m-meta').textContent = `${m.year} · ${m.bucket}`;
+        document.getElementById('m-meta').textContent = `${m.year} · ${m.bucket} · ${m.medium} · ${m.era}`;
         document.getElementById('m-score').textContent = m.score;
         document.getElementById('m-z').textContent = `${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}σ from μ`;
 
@@ -1709,7 +2005,7 @@
             : `${(STATS.mean - m.score).toFixed(1)} below μ`;
         document.getElementById('m-pos').textContent = rel;
         document.getElementById('m-raw').textContent = `Score ${m.score}, z = ${m.z >= 0 ? '+' : ''}${m.z.toFixed(2)}`;
-
+        document.getElementById('m-medium-era').textContent = `${m.medium} · ${m.era}`;
         document.getElementById('m-summary').textContent = m.summary || 'No summary available.';
 
         const linkEl = document.getElementById('m-link');
@@ -1731,13 +2027,35 @@
         document.getElementById('modal').classList.remove('open');
     }
 
-    // --- Loader ---
     function hideLoader() {
         const loader = document.getElementById('loader');
         loader.style.opacity = '0';
         setTimeout(() => {
             loader.style.display = 'none';
         }, 260);
+    }
+
+    function initKeyboardShortcuts() {
+        document.addEventListener('keydown', (ev) => {
+            const searchInput = document.getElementById('searchInput');
+            const modal = document.getElementById('modal');
+
+            if (ev.key === '/' && document.activeElement !== searchInput) {
+                ev.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+
+            if (ev.key === 'Escape' && modal.classList.contains('open')) {
+                closeModalDirect();
+            }
+
+            if (ev.key === '1') setView('grid');
+            if (ev.key === '2') setView('table');
+            if (ev.key === '3' || ev.key === 'g') setView('graph');
+            if (ev.key === 't') setView('table');
+            if (ev.key === 'd') setView('grid');
+        });
     }
 </script>
 </body>
