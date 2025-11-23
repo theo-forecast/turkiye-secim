@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jameel Tolga | Film & Physics</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #121212;
+            --surface-hover: #1e1e1e;
+            --border: #2a2a2a;
+            --text-main: #ededed;
+            --text-muted: #888888;
+            
+            /* The "Physics" Palette */
+            --accent: #3b82f6; /* Blue Shift */
+            --highlight: #10b981; /* Green data */
+            --alert: #ef4444; /* Red Shift */
+            --gold: #f59e0b; /* Outliers */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.2s; }
+        
+        /* --- 1. HERO SECTION --- */
+        header {
+            padding: 80px 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .identity {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 5vw, 5rem);
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .roles {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        .bio {
+            max-width: 600px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        /* --- 2. DATA VISUALIZATION AREA --- */
+        .analytics-deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        canvas#distributionCanvas {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+        }
+
+        /* --- 3. CONTROLS --- */
+        .control-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .control-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input { flex: 1; min-width: 200px; }
+        input:focus, select:focus { border-color: var(--accent); }
+
+        /* --- 4. THE FEED --- */
+        .feed {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--text-muted);
+        }
+
+        .card-header {
+            padding: 20px 20px 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .movie-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 5px;
+        }
+
+        .movie-year {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .score-badge {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .card-body {
+            padding: 20px;
+            flex: 1;
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+
+        .card-footer {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .sigma-tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+        }
+
+        /* --- LOADING STATE --- */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .analytics-deck { grid-template-columns: 1fr; }
+            .control-inner { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">INITIALIZING DATASET...</div>
+
+    <header>
+        <div class="identity">
+            <div class="roles">Physicist // Forecaster // Film Theorist</div>
+            <h1>Jameel Tolga</h1>
+        </div>
+        
+        <div class="bio">
+            Applying the rigorous methodology of statistical mechanics and predictive modeling to the subjective landscape of cinema. This is a public ledger of my ratings, analyzing deviations in film theory from 1957 to present.
+        </div>
+
+        <div class="analytics-deck">
+            <div class="stat-card">
+                <span class="stat-label">Sample Size (N)</span>
+                <span class="stat-value" id="val-n">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Mean Score (&mu;)</span>
+                <span class="stat-value" id="val-mean">0.0</span>
+            </div>
+            <div class="stat-card" style="grid-column: span 2;">
+                <span class="stat-label">Taste Distribution (Gaussian)</span>
+                <canvas id="distributionCanvas"></canvas>
+            </div>
+        </div>
+    </header>
+
+    <div class="control-bar">
+        <div class="control-inner">
+            <input type="text" id="searchInput" placeholder="Query Database (Title, Summary, Year)...">
+            <select id="sortSelect">
+                <option value="score_desc">Rating: High &rarr; Low</option>
+                <option value="score_asc">Rating: Low &rarr; High</option>
+                <option value="year_desc">Year: Newest</option>
+                <option value="year_asc">Year: Oldest</option>
+                <option value="z_desc">Deviation: Controversial</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="feed" id="feed">
+        </div>
+
+    <script>
+        // CONFIG
+        const FILE_NAME = 'ratings.txt';
+
+        // STATE
+        let db = [];
+        let stats = { mean: 0, sigma: 0, n: 0 };
+
+        // INITIALIZATION
+        async function init() {
+            try {
+                const response = await fetch(FILE_NAME);
+                if (!response.ok) throw new Error("File not found");
+                const text = await response.text();
+                parseData(text);
+            } catch (error) {
+                document.getElementById('loader').innerText = `ERROR: ${error.message}. Ensure 'ratings.txt' is in the root folder.`;
+            }
+        }
+
+        // PARSER
+        function parseData(text) {
+            const lines = text.split('\n');
+            const entryRegex = /^(\d+)\t(.*?)\s\((\d{4})\)$/;
+            
+            let current = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                const match = line.match(entryRegex);
+                if (match) {
+                    if (current) db.push(current);
+                    current = {
+                        score: parseInt(match[1]),
+                        title: match[2],
+                        year: parseInt(match[3]),
+                        summary: '',
+                        link: ''
+                    };
+                } else if (current) {
+                    if (line.startsWith('http')) current.link = line;
+                    else if (!line.startsWith('[source')) {
+                        current.summary += (current.summary ? ' ' : '') + line.replace('Summary:', '').trim();
+                    }
+                }
+            });
+            if (current) db.push(current);
+
+            calculateStats();
+            drawDistribution();
+            renderFeed(db);
+            
+            // Fade out loader
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+
+        // PHYSICS ENGINE
+        function calculateStats() {
+            stats.n = db.length;
+            const sum = db.reduce((a, b) => a + b.score, 0);
+            stats.mean = sum / stats.n;
+            const variance = db.reduce((a, b) => a + Math.pow(b.score - stats.mean, 2), 0) / stats.n;
+            stats.sigma = Math.sqrt(variance);
+
+            db.forEach(m => {
+                m.z = (m.score - stats.mean) / stats.sigma;
+            });
+
+            document.getElementById('val-n').innerText = stats.n;
+            document.getElementById('val-mean').innerText = stats.mean.toFixed(1);
+        }
+
+        // CANVAS VISUALIZER
+        function drawDistribution() {
+            const canvas = document.getElementById('distributionCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Fix resolution
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            // Bins
+            const bins = new Array(21).fill(0); // 0-100 in steps of 5
+            db.forEach(m => {
+                let idx = Math.floor(m.score / 5);
+                if(idx >= 21) idx = 20;
+                bins[idx]++;
+            });
+
+            const maxVal = Math.max(...bins);
+            const barWidth = rect.width / 21;
+
+            bins.forEach((val, i) => {
+                const barHeight = (val / maxVal) * (rect.height - 10);
+                const x = i * barWidth;
+                const y = rect.height - barHeight;
+                
+                // Physics Coloring
+                if (i * 5 < 50) ctx.fillStyle = '#ef4444'; // Red shift
+                else if (i * 5 > 80) ctx.fillStyle = '#3b82f6'; // Blue shift
+                else ctx.fillStyle = '#2a2a2a'; // Standard model
+
+                ctx.fillRect(x, y, barWidth - 2, barHeight);
+            });
+        }
+
+        // RENDERER
+        function renderFeed(data) {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '';
+
+            data.forEach(m => {
+                // Determine Category based on Z-Score
+                let category = "Standard Model";
+                let color = "var(--text-main)";
+                
+                if (m.score >= 80) { color = "var(--accent)"; category = "Essential"; }
+                if (m.score < 50) { color = "var(--alert)"; category = "Critical Failure"; }
+                if (m.score === 0) { category = "Null Value"; }
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="movie-title">${m.title}</div>
+                            <div class="movie-year">${m.year}</div>
+                        </div>
+                        <div class="score-badge" style="color: ${color}">${m.score}</div>
+                    </div>
+                    <div class="card-body">
+                        ${m.summary || "Awaiting Analysis."}
+                    </div>
+                    <div class="card-footer">
+                        <span class="sigma-tag">${category} (${m.z > 0 ? '+' : ''}${m.z.toFixed(2)}σ)</span>
+                        ${m.link ? `<a href="${m.link}" target="_blank">SOURCE &nearr;</a>` : ''}
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        // FILTERS
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+
+        function update() {
+            const term = searchInput.value.toLowerCase();
+            let filtered = db.filter(m => 
+                m.title.toLowerCase().includes(term) || 
+                (m.summary && m.summary.toLowerCase().includes(term)) ||
+                m.year.toString().includes(term)
+            );
+
+            const mode = sortSelect.value;
+            filtered.sort((a, b) => {
+                if (mode === 'score_desc') return b.score - a.score;
+                if (mode === 'score_asc') return a.score - b.score;
+                if (mode === 'year_desc') return b.year - a.year;
+                if (mode === 'year_asc') return a.year - b.year;
+                if (mode === 'z_desc') return Math.abs(b.z) - Math.abs(a.z);
+            });
+
+            renderFeed(filtered);
+        }
+
+        searchInput.addEventListener('input', update);
+        sortSelect.addEventListener('change', update);
+
+        // RUN
+        init();
+
+        // Handle Resize
+        window.addEventListener('resize', drawDistribution);
+
+    </script>
+</body>
+</html>
