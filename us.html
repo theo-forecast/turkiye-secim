@@ -3,27 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024 Congressional Swingometer (Side-by-Side)</title>
+<title>2024 Congressional Swingometer (Expanded Categories)</title>
 <style>
   :root {
     --bg-app: #0f1115;
     --bg-panel: #1a1d26;
     --text-main: #ececf1;
-    --text-muted: #5e6573;
+    --text-muted: #8a8f98;
     
-    /* Color Palette */
-    --rep-safe: #d92b2b;       
-    --rep-lean: #ff8585;       
-    --rep-tilt: #d6aeb1;       
+    /* --- NEW EXPANDED PALETTE --- */
+    
+    /* REPUBLICAN SHADES */
+    --rep-safe:   #b91c1c; /* 15+ */
+    --rep-solid:  #dc2626; /* 5-15 */
+    --rep-likely: #ef4444; /* 2.5-5 */
+    --rep-lean:   #f87171; /* 1-2.5 */
+    --rep-tilt:   #fca5a5; /* 0-1 */
     
     --tossup-pure: #444444;    
     
-    --dem-tilt: #aebbd6;       
-    --dem-lean: #85b6ff;       
-    --dem-safe: #2b6cd9;       
+    /* DEMOCRAT SHADES */
+    --dem-tilt:   #93c5fd; /* 0-1 */
+    --dem-lean:   #60a5fa; /* 1-2.5 */
+    --dem-likely: #3b82f6; /* 2.5-5 */
+    --dem-solid:  #2563eb; /* 5-15 */
+    --dem-safe:   #1e40af; /* 15+ */
     
-    --glow-rep: rgba(217, 43, 43, 0.4);
-    --glow-dem: rgba(43, 108, 217, 0.4);
+    --glow-rep: rgba(220, 38, 38, 0.4);
+    --glow-dem: rgba(37, 99, 235, 0.4);
   }
 
   * { box-sizing: border-box; }
@@ -122,11 +129,11 @@
   .score-value { font-size: 1.5rem; font-weight: 800; line-height: 1; }
   .score-label { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 4px; text-align: center;}
   
-  .sc-r-main .score-value { color: var(--rep-lean); text-shadow: 0 0 10px var(--glow-rep); }
-  .sc-r-tilt .score-value { color: var(--rep-tilt); }
+  .sc-r-main .score-value { color: var(--rep-solid); text-shadow: 0 0 10px var(--glow-rep); }
+  .sc-r-tilt .score-value { color: var(--rep-lean); }
   .sc-t .score-value      { color: #666; font-size: 1.2rem; } 
-  .sc-d-tilt .score-value { color: var(--dem-tilt); }
-  .sc-d-main .score-value { color: var(--dem-lean); text-shadow: 0 0 10px var(--glow-dem); }
+  .sc-d-tilt .score-value { color: var(--dem-lean); }
+  .sc-d-main .score-value { color: var(--dem-solid); text-shadow: 0 0 10px var(--glow-dem); }
 
   /* --- Controls --- */
   .controls-container {
@@ -134,7 +141,7 @@
     padding: 15px 25px;
     border-radius: 12px;
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     margin-bottom: 30px;
     border: 1px solid rgba(255,255,255,0.08);
     position: sticky;
@@ -181,13 +188,13 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px 15px;
+    gap: 8px 12px;
     margin-top: 15px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-muted);
     text-transform: uppercase;
   }
-  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
   .dot { width: 10px; height: 10px; border-radius: 2px; }
 
   /* --- Visualizations (Side by Side Grid) --- */
@@ -327,14 +334,20 @@
   #tooltip .row { display: flex; justify-content: space-between; color: #999; margin-bottom: 2px; }
   #tooltip .val { color: #eee; font-weight: 600; }
   
-  /* Logic Classes */
-  .safe-r { background-color: var(--rep-safe); }
-  .lean-r { background-color: var(--rep-lean); }
-  .tilt-r { background-color: var(--rep-tilt); } 
+  /* --- Logic Classes (New Expanded) --- */
+  .r-safe   { background-color: var(--rep-safe); }
+  .r-solid  { background-color: var(--rep-solid); }
+  .r-likely { background-color: var(--rep-likely); }
+  .r-lean   { background-color: var(--rep-lean); }
+  .r-tilt   { background-color: var(--rep-tilt); }
+  
   .pure-toss { background-color: var(--tossup-pure); }
-  .tilt-d { background-color: var(--dem-tilt); } 
-  .lean-d { background-color: var(--dem-lean); }
-  .safe-d { background-color: var(--dem-safe); }
+  
+  .d-tilt   { background-color: var(--dem-tilt); }
+  .d-lean   { background-color: var(--dem-lean); }
+  .d-likely { background-color: var(--dem-likely); }
+  .d-solid  { background-color: var(--dem-solid); }
+  .d-safe   { background-color: var(--dem-safe); }
 
 </style>
 </head>
@@ -350,11 +363,11 @@
         
         <div class="score-card sc-r-main">
           <div class="score-value" id="h-seat-r">0</div>
-          <div class="score-label">GOP<br>Safe/Lean</div>
+          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
         </div>
         <div class="score-card sc-r-tilt">
           <div class="score-value" id="h-seat-r-tilt">0</div>
-          <div class="score-label">Tilt R</div>
+          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
         </div>
         <div class="score-card sc-t">
           <div class="score-value" id="h-seat-t">0</div>
@@ -362,11 +375,11 @@
         </div>
         <div class="score-card sc-d-tilt">
           <div class="score-value" id="h-seat-d-tilt">0</div>
-          <div class="score-label">Tilt D</div>
+          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
         </div>
         <div class="score-card sc-d-main">
           <div class="score-value" id="h-seat-d">0</div>
-          <div class="score-label">Dem<br>Safe/Lean</div>
+          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
         </div>
       </div>
 
@@ -375,11 +388,11 @@
         
         <div class="score-card sc-r-main">
           <div class="score-value" id="s-seat-r">31</div>
-          <div class="score-label">GOP<br>Safe/Lean</div>
+          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
         </div>
         <div class="score-card sc-r-tilt">
           <div class="score-value" id="s-seat-r-tilt">0</div>
-          <div class="score-label">Tilt R</div>
+          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
         </div>
         <div class="score-card sc-t">
           <div class="score-value" id="s-seat-t">0</div>
@@ -387,11 +400,11 @@
         </div>
         <div class="score-card sc-d-tilt">
           <div class="score-value" id="s-seat-d-tilt">0</div>
-          <div class="score-label">Tilt D</div>
+          <div class="score-label">Lean/Tilt<br>(<2.5%)</div>
         </div>
         <div class="score-card sc-d-main">
           <div class="score-value" id="s-seat-d">34</div>
-          <div class="score-label">Dem<br>Safe/Lean</div>
+          <div class="score-label">Safe/Likely<br>(>2.5%)</div>
         </div>
       </div>
 
@@ -405,13 +418,17 @@
     <input type="range" id="swing-slider" min="-15" max="15" step="0.1" value="0">
     
     <div class="legend">
-      <div class="legend-item"><div class="dot safe-r"></div> Safe R</div>
-      <div class="legend-item"><div class="dot lean-r"></div> Lean R</div>
-      <div class="legend-item"><div class="dot tilt-r"></div> Tilt R</div>
+      <div class="legend-item"><div class="dot r-safe"></div> >15</div>
+      <div class="legend-item"><div class="dot r-solid"></div> 5-15</div>
+      <div class="legend-item"><div class="dot r-likely"></div> 2.5-5</div>
+      <div class="legend-item"><div class="dot r-lean"></div> 1-2.5</div>
+      <div class="legend-item"><div class="dot r-tilt"></div> <1</div>
       <div class="legend-item"><div class="dot pure-toss"></div> Tie</div>
-      <div class="legend-item"><div class="dot tilt-d"></div> Tilt D</div>
-      <div class="legend-item"><div class="dot lean-d"></div> Lean D</div>
-      <div class="legend-item"><div class="dot safe-d"></div> Safe D</div>
+      <div class="legend-item"><div class="dot d-tilt"></div> <1</div>
+      <div class="legend-item"><div class="dot d-lean"></div> 1-2.5</div>
+      <div class="legend-item"><div class="dot d-likely"></div> 2.5-5</div>
+      <div class="legend-item"><div class="dot d-solid"></div> 5-15</div>
+      <div class="legend-item"><div class="dot d-safe"></div> >15</div>
     </div>
   </div>
 
@@ -465,18 +482,23 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
     const BASE_SENATE_R = 31;
 
     // --- Helper Functions ---
+    // UPDATED LOGIC FOR NEW CATEGORIES
     function getWinCategory(margin) {
       const absM = Math.abs(margin);
-      if(absM < 0.01) return { code: 'pure-toss', type: 'Tie' };
+      if(absM < 0.05) return { code: 'pure-toss', type: 'Tie' };
       
       if(margin > 0) { // R
-        if(absM >= 10) return { code: 'safe-r', type: 'Safe R' };
-        if(absM >= 5) return { code: 'lean-r', type: 'Lean R' };
-        return { code: 'tilt-r', type: 'Tilt R' };
+        if(absM >= 15) return { code: 'r-safe', type: 'Safe R' };
+        if(absM >= 5)  return { code: 'r-solid', type: 'Solid R' };
+        if(absM >= 2.5) return { code: 'r-likely', type: 'Likely R' };
+        if(absM >= 1)   return { code: 'r-lean', type: 'Lean R' };
+        return { code: 'r-tilt', type: 'Tilt R' };
       } else { // D
-        if(absM >= 10) return { code: 'safe-d', type: 'Safe D' };
-        if(absM >= 5) return { code: 'lean-d', type: 'Lean D' };
-        return { code: 'tilt-d', type: 'Tilt D' };
+        if(absM >= 15) return { code: 'd-safe', type: 'Safe D' };
+        if(absM >= 5)  return { code: 'd-solid', type: 'Solid D' };
+        if(absM >= 2.5) return { code: 'd-likely', type: 'Likely D' };
+        if(absM >= 1)   return { code: 'd-lean', type: 'Lean D' };
+        return { code: 'd-tilt', type: 'Tilt D' };
       }
     }
 
@@ -484,7 +506,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
 
     function parseSenateData() {
       const raw = document.getElementById('raw-senate-string').textContent.trim();
-      // Regex to extract STATE-D-R pattern
       const regex = /([A-Z]{2})-([\d\.]+)-([\d\.]+)/g;
       const results = [];
       let match;
@@ -534,7 +555,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         stateGroups[d.state].push(d);
       });
       
-      // Sort Districts
       Object.values(stateGroups).forEach(g => g.sort((a,b) => (a.id==='at-large'?-1:(b.id==='at-large'?1:parseInt(a.id)-parseInt(b.id)))));
 
       for (const [state, districts] of Object.entries(stateGroups)) {
@@ -612,7 +632,6 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
     function updateDashboard() {
       const swing = parseFloat(slider.value);
       
-      // 1. Update Header Text
       if (swing > 0) {
         marginDisp.innerHTML = `National: <span style="color:var(--rep-lean)">R+${swing.toFixed(1)}</span>`;
       } else if (swing < 0) {
@@ -625,6 +644,9 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       const natD = 50 - (swing / 2);
 
       // --- HOUSE CALCULATIONS ---
+      // New Counters: 
+      // safeR = Safe(15+) + Solid(5-15) + Likely(2.5-5)
+      // tiltR = Lean(1-2.5) + Tilt(0-1)
       let hCounts = { safeR:0, tiltR:0, tie:0, tiltD:0, safeD:0 };
       
       allHouseDistricts.forEach(d => {
@@ -640,11 +662,24 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         const cat = getWinCategory(margin);
         d.element.className = `district-dot ${cat.code}`;
         
-        if(cat.code.includes('safe-r') || cat.code.includes('lean-r')) hCounts.safeR++;
-        else if(cat.code === 'tilt-r') hCounts.tiltR++;
-        else if(cat.code === 'pure-toss') hCounts.tie++;
-        else if(cat.code === 'tilt-d') hCounts.tiltD++;
-        else hCounts.safeD++;
+        // Grouping for scoreboard
+        if(cat.code === 'pure-toss') {
+            hCounts.tie++;
+        } else if (margin > 0) {
+            // Republican
+            if (cat.code === 'r-safe' || cat.code === 'r-solid' || cat.code === 'r-likely') {
+                hCounts.safeR++;
+            } else {
+                hCounts.tiltR++;
+            }
+        } else {
+            // Democrat
+            if (cat.code === 'd-safe' || cat.code === 'd-solid' || cat.code === 'd-likely') {
+                hCounts.safeD++;
+            } else {
+                hCounts.tiltD++;
+            }
+        }
       });
 
       hSeatR.textContent = hCounts.safeR;
@@ -674,11 +709,21 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
         const cat = getWinCategory(s.currMargin);
         s.element.className = `senate-seat ${cat.code}`;
         
-        if(cat.code.includes('safe-r') || cat.code.includes('lean-r')) sCounts.safeR++;
-        else if(cat.code === 'tilt-r') sCounts.tiltR++;
-        else if(cat.code === 'pure-toss') sCounts.tie++;
-        else if(cat.code === 'tilt-d') sCounts.tiltD++;
-        else sCounts.safeD++;
+        if(cat.code === 'pure-toss') {
+            sCounts.tie++;
+        } else if (s.currMargin > 0) {
+            if (cat.code === 'r-safe' || cat.code === 'r-solid' || cat.code === 'r-likely') {
+                sCounts.safeR++;
+            } else {
+                sCounts.tiltR++;
+            }
+        } else {
+            if (cat.code === 'd-safe' || cat.code === 'd-solid' || cat.code === 'd-likely') {
+                sCounts.safeD++;
+            } else {
+                sCounts.tiltD++;
+            }
+        }
       });
 
       sSeatR.textContent = sCounts.safeR;
@@ -697,7 +742,7 @@ State-D-RWY-0.5657-1.4364WV-0.5896-1.3696ID-0.6339-1.3495OK-0.6824-1.2748AR-0.69
       let color = "white";
       if(m > 0) color = "var(--rep-lean)";
       if(m < 0) color = "var(--dem-lean)";
-      if(Math.abs(m) < 0.01) color = "#999";
+      if(Math.abs(m) < 0.05) color = "#999";
       
       const title = data.type === 'house' 
         ? `${data.state} ${data.id==='at-large'?'AL':data.id}`
