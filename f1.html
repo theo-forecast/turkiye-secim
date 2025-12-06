@@ -1,0 +1,1318 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula 1 Elo (1992-2025)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> 
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
+        .table-container {
+            background-color: #162447;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid #1f4068;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #1f4068;
+            color: #e0e0e0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #1b2a49;
+        }
+        .total-elo {
+            font-weight: 700;
+            color: #fca311;
+        }
+        .positive-elo { color: #4ade80; }
+        .negative-elo { color: #f87171; }
+        .tabs button.active {
+            background-color: #fca311;
+            color: #1a1a2e;
+        }
+        .dnf { color: #facc15; font-style: italic; }
+        .modal {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            background-color: #162447;
+        }
+        .method-section {
+            background-color: #162447;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 2rem;
+        }
+        .method-section h2 {
+            color: #fca311;
+        }
+        .method-section p, .method-section li {
+            color: #e0e0e0;
+        }
+        .method-section code {
+            background-color: #1b2a49;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Formula 1 Elo (1992-2025)</h1>
+            <p class="text-lg text-gray-400"> Scroll down to see the method. </p>
+        </header>
+
+        <!-- Year Selector and Controls -->
+        <div id="year-controls" class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <label for="year-selector" class="font-semibold text-lg">Select Season:</label>
+            <select id="year-selector" class="custom-select p-2 rounded-md text-black"></select>
+        </div>
+
+        <div class="tabs flex flex-wrap justify-center gap-2 sm:gap-4 mb-8" id="tab-buttons">
+            <button class="active" data-tab="all-time-elo">All-Time Elo</button>
+            <button data-tab="total-elo">Total Elo</button>
+            <button data-tab="position-elo">Position Elo</button>
+            <button data-tab="expected-elo">Driver's Expected Elo</button>
+            <button data-tab="teammate-elo">Teammate Elo</button>
+        </div>
+
+        <div id="main-content">
+             <div id="tables-container"></div>
+             <div id="no-data-message" class="text-center text-xl text-gray-400 p-8" style="display: none;">
+                No data available for the selected season. Please add data for this year.
+            </div>
+        </div>
+
+        <!-- Method Section -->
+        <div class="method-section max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-center">Elo Calculation Method</h2>
+            <p class="mb-4">The total Elo score for a driver in a race is the sum of three components: Position Elo, Driver's Expected Elo, and Teammate Elo. Each component is designed to evaluate performance from a different perspective.</p>
+            
+            <h3 class="text-xl font-semibold mb-2">1. Position Elo</h3>
+            <p class="mb-3">This score is based directly on the driver's finishing position. It rewards higher placements and penalizes lower ones. A DNF (Did Not Finish) results in a flat -5 penalty.</p>
+            <ul class="list-disc list-inside space-y-1 mb-4">
+                <li><strong>P1:</strong> +12</li>
+                <li><strong>P2:</strong> +10</li>
+                <li><strong>P3:</strong> +8</li>
+                <li><strong>P4:</strong> +7</li>
+                <li><strong>P5:</strong> +6</li>
+                <li><strong>P6:</strong> +5</li>
+                <li><strong>P7:</strong> +4</li>
+                <li><strong>P8:</strong> +3</li>
+                <li><strong>P9:</strong> +2</li>
+                <li><strong>P10:</strong> +1</li>
+                <li><strong>P11-P20:</strong> -1 to -10 respectively</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold mb-2">2. Driver's Expected Elo</h3>
+            <p class="mb-3">This component adjusts the score based on the pre-season ranking of the driver's team. It measures performance against expectation. Finishing higher than your team's expected range yields positive points, while finishing lower results in negative points. The table below shows the adjustments:</p>
+            <div class="table-container mb-4">
+                <table class="text-sm">
+                    <thead>
+                        <tr>
+                            <th>Team Rank</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th><th>P8</th><th>P9</th><th>P10</th><th>...</th><th>P20</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1st</td><td>2</td><td>2</td><td>-2</td><td>-4</td><td>-6</td><td>-8</td><td>-10</td><td>-12</td><td>-14</td><td>-16</td><td>...</td><td>-36</td></tr>
+                        <tr><td>2nd</td><td>4</td><td>2</td><td>2</td><td>2</td><td>-2</td><td>-4</td><td>-6</td><td>-8</td><td>-10</td><td>-12</td><td>...</td><td>-32</td></tr>
+                        <tr><td>3rd</td><td>8</td><td>6</td><td>4</td><td>2</td><td>2</td><td>2</td><td>-2</td><td>-4</td><td>-6</td><td>-8</td><td>...</td><td>-28</td></tr>
+                        <tr><td>... (and so on)</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                        <tr><td>10th</td><td>36</td><td>34</td><td>32</td><td>30</td><td>28</td><td>26</td><td>24</td><td>22</td><td>20</td><td>18</td><td>...</td><td>2</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-2">3. Teammate Elo</h3>
+            <p class="mb-3">This provides a direct comparison to the driver's teammate in the same machinery. A driver receives a <code>-4</code> penalty if they finish behind their teammate or if they DNF while their teammate finishes the race. This emphasizes the importance of beating the one driver with equal equipment.</p>
+        </div>
+    </div>
+    
+    <!-- Modal for Career Summary -->
+<div id="career-summary-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 hidden">
+    <div class="modal-content w-11/12 max-w-2xl bg-blue rounded-lg shadow-xl flex flex-col max-h-[90vh]">
+        
+        <div class="flex justify-between items-center p-4 border-b flex-shrink-0">
+            <h2 id="career-summary-title" class="text-xl font-bold">Career Summary</h2>
+            <button id="close-career-summary" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+        </div>
+        
+        <div id="career-summary-content" class="p-4 overflow-y-auto">
+            </div>
+
+    </div>
+</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA STRUCTURE ---
+        // This object holds all the raw data for F1 seasons.
+        const f1Data = {
+            "1992": {
+                "teamRankingsRaw": "Williams 1\nBenetton 2\nMcLaren 3\nFootwork 4\nFerrari 5\nTeam Lotus 6\nLigier 7\nTyrrell 8\nDallara 9\nMinardi 10",
+                "driverTeamsRaw": "Nigel Mansell Williams\nRiccardo Patrese Williams\nMichael Schumacher Benetton\nMartin Brundle Benetton\nGerhard Berger McLaren\nAyrton Senna McLaren\nMichele Alboreto Footwork\nAguri Suzuki Footwork\nJean Alesi Ferrari\nIvan Capelli Ferrari\nMika Hakkinen Team Lotus\nJohnny Herbert Team Lotus\nErik Comas Ligier\nThierry Boutsen Ligier\nAndrea deCesaris Tyrrell\nOlivier Grouillard Tyrrell\nPierluigi Martini Dallara\nJyrki Jarvilehto Dallara\nChristian Fittipaldi Minardi\nGianni Morbidelli Minardi",
+                "driverRankingsRaw": "Michele Alboreto 10 13 6 5 5 7 7 7 7 9 7 - 7 6 15 -\nGianni Morbidelli - - 7 - - - 11 8 17 12 - 16 - 14 14 10\nJyrki Jarvilehto - 8 8 - 11 9 9 9 13 10 - 7 11 - 9 -\nAguri Suzuki 8 - - 7 10 11 - - 12 - - 9 - 10 8 8\nPierluigi Martini - - - 6 6 - 8 10 15 11 - - 8 - 10 -\nThierry Boutsen - 10 - - - 12 10 - 10 7 - - - 8 - 5\nErik Comas 7 9 - - 9 10 6 5 8 6 - - - - - -\nAndrea deCesaris - 5 - - 14 - 5 - - - 8 8 6 9 4 -\nChristian Fittipaldi - - - 11 - 8 13 - - - - - - 12 6 9\nMika Hakkinen 9 6 10 - - - - 4 6 - 4 6 - 5 - 7\nJohnny Herbert 6 7 - - - - - 6 - - - 13 - - - 13\nOlivier Grouillard - - - - 8 - 12 11 11 - - - - - - -\nMartin Brundle - - - - 4 5 - 3 3 4 5 4 2 4 3 3\nMichael Schumacher 4 3 3 2 - 4 2 - 4 3 - 1 3 7 - 2\nRiccardo Patrese 2 2 2 - 2 3 - 2 2 8 - 3 5 - 1 -\nGerhard Berger 5 4 - 4 - - 1 - 5 - 3 - 4 2 2 1\nIvan Capelli - - 5 10 - - - - 9 - 6 - - - - -\nAyrton Senna 3 - - 9 3 1 - - - 2 1 5 1 3 - -\nJean Alesi - - 4 3 - - 3 - - 5 - - - - 5 4\nNigel Mansell 1 1 1 1 1 2 - 1 1 1 2 2 - 1 - -"
+            },
+            "1993": {
+                "teamRankingsRaw": "Williams 1\nMcLaren 2\nBenetton 3\nLigier 4\nFerrari 5\nSauber 6\nMinardi 7\nTeam Lotus 8\nLarrousse 9\nFootwork 10",
+                "driverTeamsRaw": "Alain Prost Williams\nDamon Hill Williams\nAyrton Senna McLaren\nMichael Andretti McLaren\nMichael Schumacher Benetton\nRiccardo Patrese Benetton\nMartin Brundle Ligier\nMark Blundell Ligier\nJean Alesi Ferrari\nGerhard Berger Ferrari\nJyrki Jarvilehto Sauber\nKarl Wendlinger Sauber\nChristian Fittipaldi Minardi\nFabrizio Barbazza Minardi\nPierluigi Martini Minardi\nJohnny Herbert Team Lotus\nAlessandro Zanardi Team Lotus\nPhilippe Alliot Larrousse\nErik Comas Larrousse\nDerek Warwick Footwork\nAguri Suzuki Footwork",
+                "driverRankingsRaw": "Derek Warwick 7 9 - - 13 - 16 13 6 17 4 - - 15 14 10\nPhilippe Alliot - 7 - 5 - 12 - 9 11 12 8 12 9 10 - -\nChristian Fittipaldi 4 - 7 - 8 5 9 8 12 11 - - 8 9 - -\nErik Comas - 10 9 - 9 - 8 16 - - - - 6 11 - 12\nMartin Brundle - - - 3 - 6 5 5 14 8 5 7 - 6 9 6\nGerhard Berger 6 - - - 6 14 4 14 - 6 3 10 - - - 5\nRiccardo Patrese - - 5 - 4 - - 10 3 5 2 6 5 16 - 8\nMark Blundell 3 5 - - 7 - - - 7 3 7 11 - - 7 9\nKarl Wendlinger - - - - - 13 6 - - 9 6 - 4 5 - 15\nJohnny Herbert - 4 4 8 - - 10 - 4 10 - 5 - - 11 -\nAguri Suzuki - - - 9 10 - 13 12 - - - - - - - 7\nJyrki Jarvilehto 5 - - 4 - - 7 - 8 - - 9 - 7 8 -\nAlain Prost 1 - 3 1 1 4 1 1 1 1 12 3 12 2 2 2\nAlessandro Zanardi - 6 8 - 14 7 11 - - - - - - - - -\nAyrton Senna 2 1 1 - 2 1 18 4 5 4 - 4 - - 1 1\nMichael Andretti - - - - 5 8 14 6 - - - 8 3 - - -\nDamon Hill - 2 2 - - 2 3 2 - 15 1 1 1 3 4 3\nPierluigi Martini - - - - - - - - - 14 - - 7 8 10 -\nJean Alesi - 8 - - - 3 - - 9 7 - - 2 4 - 4\nMichael Schumacher - 3 - 2 3 - 2 3 2 2 - 2 - 1 - -\nFabrizio Barbazza - - 6 6 - 6 11 - - - - - - - - -"
+            },
+            "1994": {
+                "teamRankingsRaw": "Williams 1\nBenetton 2\nFerrari 3\nMcLaren 4\nJordan 5\nLigier 6\nSauber 7\nTyrrell 8\nFootwork 9\nMinardi 10",
+                "driverTeamsRaw": "Damon Hill Williams\nDavid Coulthard Williams\nMichael Schumacher Benetton\nJos Verstappen Benetton\nJyrki Jarvilehto Benetton\nGerhard Berger Ferrari\nJean Alesi Ferrari\nMika Hakkinen McLaren\nMartin Brundle McLaren\nRubens Barrichello Jordan\nEddie Irvine Jordan\nOlivier Panis Ligier\nEric Bernard Ligier\nHeinz-Harald Frentzen Sauber\nKarl Wendlinger Sauber\nMark Blundell Tyrrell\nUkyo Katayama Tyrrell\nChristian Fittipaldi Footwork\nGianni Morbidelli Footwork\nPierluigi Martini Minardi\nMichele Alboreto Minardi",
+                "driverRankingsRaw": "Olivier Panis 11 9 11 9 7 12 - 12 2 6 7 10 - 9 11 5\nChristian Fittipaldi - 4 13 - - - 8 9 4 14 - - 8 17 8 8\nPierluigi Martini 8 - - - 5 9 5 10 - - 8 - 12 15 - 9\nMichele Alboreto - - - 6 - 11 - - - 7 9 - 13 14 - -\nMark Blundell - - 9 - 3 10 10 - - 5 5 - - 13 - -\nRubens Barrichello 4 3 - - - 7 - 4 - - - 4 4 12 - 4\nHeinz-Harald Frentzen - 5 7 - - - 4 7 - - - - - 6 6 7\nMartin Brundle - - 8 2 11 - - - - 4 - 5 6 - - 3\nMika Hakkinen - - 3 - - - - 3 - - 2 3 3 3 7 12\nJean Alesi 3 - - 5 4 3 - 2 - - - - - 10 3 6\nEddie Irvine - - - - 6 - - - - - 13 - 7 4 5 -\nGerhard Berger - 2 - 3 - 4 3 - 1 12 - 2 - 5 - 2\nJyrki Jarvlehto - - - 7 - 6 - - - - - 9 - - - 10\nGianni Morbidelli - - - - - - - - 5 - 6 - 9 11 - -\nDamon Hill 2 - 6 - 1 2 2 1 8 2 1 1 1 2 1 -\nUkyo Katayama 5 - 5 - - - - 6 - - - - - 7 - -\nDavid Coulthard - - - - - 5 - 5 - - 4 6 2 - - -\nJos Verstappen - - - - - - - 8 - 3 3 - 5 - - -\nMichael Schumacher 1 1 1 1 2 1 1 - - 1 - - - 1 2 -"
+            },
+            "1995": {
+                "teamRankingsRaw": "Benetton 1\nWilliams 2\nFerrari 3\nMcLaren 4\nLigier 5\nSauber 6\nJordan 7\nTyrrell 8\nFootwork 9\nMinardi 10",
+                "driverTeamsRaw": "Michael Schumacher Benetton\nJohnny Herbert Benetton\nDamon Hill Williams\nDavid Coulthard Williams\nJean Alesi Ferrari\nGerhard Berger Ferrari\nMark Blundell McLaren\nMika Hakkinen McLaren\nOlivier Panis Ligier\nAguri Suzuki Ligier\nHeinz-Harald Frentzen Sauber\nKarl Wendlinger Sauber\nJean-Christophe Boullion Sauber\nRubens Barrichello Jordan\nEddie Irvine Jordan\nMika Salo Tyrrell\nUkyo Katayama Tyrrell\nGianni Morbidelli Footwork\nTaki Inoue Footwork\nPierluigi Martini Minardi\nLuca Badoer Minardi",
+                "driverRankingsRaw": "Mika Salo 7 - - 10 - 7 15 8 - - 8 5 13 10 12 6 5\nLuca Badoer - - 14 - - 8 13 10 - 8 - - 14 11 15 9 -\nEddie Irvine - - 8 5 - 3 9 - 9 13 - - 10 6 11 4 -\nHeinz-Harald Frentzen - 5 6 8 6 - 10 6 - 5 4 3 6 - 7 8 -\nOlivier Panis - 7 9 6 - 4 8 4 - 6 9 - - - 8 5 2\nMark Blundell 6 - - - 5 - 11 5 - - 5 4 9 - 9 7 4\nJean-Christophe Boullion - - - - 8 - - 9 5 10 11 6 12 - - - -\nGianni Morbidelli - - 13 11 9 6 14 - - - - - - - - - 3\nTaki Inoue - - - - - 9 - - - - 12 8 15 - - 12 -\nJohnny Herbert - 4 7 2 4 - - 1 4 4 7 1 7 5 6 3 -\nGerhard Berger 3 6 3 3 3 11 12 - 3 3 - - 4 - 4 - -\nRubens Barrichello - - - 7 - 2 6 11 - 7 6 - 11 4 - - -\nPierluigi Martini - - 12 14 7 - - 7 - - - - - - - - -\nUkyo Katayama - 8 - - - - - - 7 - - 10 - - 14 - -\nMichael Schumacher 1 3 - 1 1 5 1 - 1 11 1 - 2 1 1 1 -\nJean Alesi 5 2 2 - - 1 5 2 - - - - 5 2 5 - -\nMika Hakkinen 4 - 5 - - - 7 - - - - 2 - 8 - 2 -\nDavid Coulthard 2 - 4 - - - 3 3 2 2 - - 1 3 2 - -\nDamon Hill - 1 1 4 2 - 2 - - 1 2 - 3 - 3 - 1"
+            },
+            "1996": {
+                "teamRankingsRaw": "Williams 1\nBenetton 2\nFerrari 3\nMcLaren 4\nJordan 5\nLigier 6\nSauber 7\nTyrrell 8\nFootwork 9\nMinardi 10",
+                "driverTeamsRaw": "Damon Hill Williams\nJacques Villeneuve Williams\nJean Alesi Benetton\nGerhard Berger Benetton\nMichael Schumacher Ferrari\nEddie Irvine Ferrari\nMika Hakkinen McLaren\nDavid Coulthard McLaren\nRubens Barrichello Jordan\nMartin Brundle Jordan\nOlivier Panis Ligier\nPedro Diniz Ligier\nHeinz-Harald Frentzen Sauber\nJohnny Herbert Sauber\nMika Salo Tyrrell\nUkyo Katayama Tyrrell\nJos Verstappen Footwork\nRicardo Rosset Footwork\nGiancarlo Fisichella Minardi\nPedro Lamy Minardi",
+                "driverRankingsRaw": "Pedro Lamy - 10 - 12 9 - - - 12 - 12 - 10 - 16 12\nRicardo Rosset 9 - - 11 - - - - 11 - 11 8 9 - 14 13\nMartin Brundle - 12 - 6 - - - 6 8 6 10 - - 4 9 5\nMika Hakkinen 5 4 - 8 8 6 5 5 5 3 - 4 3 3 - 3\nJohnny Herbert - - 9 7 - 3 - 7 - 9 - - - 9 8 10\nMika Salo 6 5 - - - 5 - - 10 7 9 - 7 - 11 -\nOlivier Panis 7 6 8 - - 1 - - 7 - 7 5 - - 10 7\nUkyo Katayama 11 9 - - - - - - - - - 7 8 10 12 -\nDavid Coulthard - - 7 3 - 2 - 4 6 5 5 - - - 13 8\nRubens Barrichello - - 4 5 5 - - - 9 4 6 6 - 5 - 9\nGerhard Berger 4 - - 9 3 - - - 4 2 13 - 6 - 6 4\nPedro Diniz 10 8 - 10 7 - 6 - - - - - - 6 - -\nHeinz-Harald Frentzen 8 - - - - 4 4 - - 8 8 - - - 7 6\nJacques Villeneuve 2 - 2 1 11 - 3 2 2 1 3 1 2 7 1 -\nJos Verstappen - - 6 - - - - - - 10 - - - 8 - 11\nJean Alesi - 2 3 - 6 - 2 3 3 - 2 3 4 2 4 -\nGiancarlo Fisichella - - - 13 - - - 8 - 11 - - - - - -\nEddie Irvine 3 7 5 - 4 7 - - - - - - - - 5 -\nMichael Schumacher - 3 - 2 2 - 1 - - - 4 9 1 1 3 2\nDamon Hill 1 1 1 4 1 - - 1 1 - 1 2 5 - 2 1"
+            },
+            "1997": {
+                "teamRankingsRaw": "Williams 1\nFerrari 2\nBenetton 3\nMcLaren 4\nJordan 5\nProst 6\nSauber 7\nArrows 8\nStewart 9\nTyrrell 10",
+                "driverTeamsRaw": "Jacques Villeneuve Williams\nHeinz-Harald Frentzen Williams\nMichael Schumacher Ferrari\nEddie Irvine Ferrari\nJean Alesi Benetton\nGerhard Berger Benetton\nDavid Coulthard McLaren\nMika Hakkinen McLaren\nGiancarlo Fisichella Jordan\nRalf Schumacher Jordan\nOlivier Panis Prost\nShinji Nakano Prost\nJohnny Herbert Sauber\nNicola Larini Sauber\nGianni Morbidelli Sauber\nDamon Hill Arrows\nPedro Diniz Arrows\nRubens Barrichello Stewart\nJan Magnussen Stewart\nMika Salo Tyrrell\nJos Verstappen Tyrrell",
+                "driverRankingsRaw": "Jos Verstappen - 15 - 10 8 11 - - - 10 - - - 12 - 13 16\nDamon Hill - 17 - - - - 9 12 6 8 2 13 - 7 8 11 -\nGiancarlo Fisichella - 8 - 4 6 9 3 9 7 11 - 2 4 4 - 7 11\nMika Salo - 13 8 9 5 - - - - - 13 11 - - 10 - 12\nGerhard Berger 4 2 6 - 9 10 - - - 1 8 6 7 10 4 8 4\nJean Alesi - 6 7 5 - 3 2 5 2 6 11 8 2 - 2 5 13\nEddie Irvine - 16 2 3 3 12 - 3 - - 9 10 8 - - 3 5\nShinji Nakano 7 14 - - - - 6 - 11 7 6 - 11 - - - 10\nJohnny Herbert - 7 4 - - 5 5 8 - - 3 4 - 8 7 6 8\nGianni Morbidelli - - - - - 14 10 - - - - 9 12 9 9 - -\nPedro Diniz 10 - - - - - 8 - - - - 7 - 13 5 12 -\nHeinz-Harald Frentzen 8 9 - 1 - 8 4 2 - - - 3 3 3 3 2 6\nJan Magnussen - - 10 - 7 13 - - - - - 12 - - - - 9\nDavid Coulthard 1 10 - - - 6 7 7 4 - - - 1 2 - 10 2\nOlivier Panis 5 3 - 8 4 2 11 - - - - - - - 6 - 7\nMika Hakkinen 3 4 5 6 - 7 - - - 3 - - 9 - - 4 1\nRalf Schumacher - - 3 - - - - 6 5 5 5 - - 5 - 9 -\nMichael Schumacher 2 5 - 2 1 4 1 1 - 2 4 1 6 6 - 1 -\nRubens Barrichello - - - - 2 - - - - - - - 13 14 - - -\nJacques Villeneuve - 1 1 - - 1 - 4 1 - 1 5 5 1 1 - 3\nNicola Larini - 14 7 - 6 - - - - - - - - - - - -"
+            },
+            "1998": {
+                "teamRankingsRaw": "McLaren 1\nFerrari 2\nWilliams 3\nBenetton 4\nJordan 5\nSauber 6\nArrows 7\nStewart 8\nMinardi 9\nProst 10",
+                "driverTeamsRaw": "Mika Hakkinen McLaren\nDavid Coulthard McLaren\nMichael Schumacher Ferrari\nEddie Irvine Ferrari\nJacques Villeneuve Williams\nHeinz-Harald Frentzen Williams\nGiancarlo Fisichella Benetton\nAlexander Wurz Benetton\nDamon Hill Jordan\nRalf Schumacher Jordan\nJean Alesi Sauber\nJohnny Herbert Sauber\nPedro Diniz Arrows\nMika Salo Arrows\nRubens Barrichello Stewart\nJos Verstappen Stewart\nShinji Nakano Minardi\nEstaban Tuero Minardi\nJarno Trulli Prost\nOlivier Panis Prost",
+                "driverRankingsRaw": "Shinji Nakano - - 13 - 14 9 7 17 8 11 - 15 8 - 15 -\nOlivier Panis 9 - 15 11 16 - - 11 - - 15 12 - - 12 11\nJean Alesi - 9 5 6 10 12 - 7 - - 10 7 3 5 10 7\nAlexander Wurz 7 4 4 - 4 - 4 5 4 9 11 16 - - 7 9\nHeinz-Harald Frentzen 3 5 9 5 8 - - 15 - - 9 5 4 7 5 5\nJacques Villeneuve 5 7 - 4 6 5 10 4 7 6 3 3 - - 8 6\nJarno Trulli - - 11 - 9 - - - - 10 12 - 6 13 - 12\nDamon Hill 8 - 8 10 - 8 - - - 7 4 4 1 6 9 4\nGiancarlo Fisichella - 6 7 - - 2 2 9 5 - 7 8 - 8 6 8\nJohnny Herbert 6 11 - - 7 7 - 8 - 8 - 10 - - - 10\nRalf Schumacher - - - 7 11 - - 16 6 5 6 9 2 3 - -\nMika Salo - - - 9 - 4 - 13 - - 14 - - - 14 -\nRubens Barrichello - - 10 - 5 - 5 10 - - - - - 10 11 -\nEstaban Tuero - - - 8 15 - - - - - 16 - - 11 - -\nEddie Irvine 4 8 3 3 - 3 3 2 3 4 8 - - 2 4 2\nPedro Diniz - - - - - 6 9 14 - - - 11 5 - - -\nDavid Coulthard 2 2 6 1 2 - - 6 - 2 2 2 7 - 3 3\nJos Verstappen - - - - - - - 12 - - - 13 - - 13 -\nMichael Schumacher - 3 1 2 3 10 1 1 1 3 5 1 - 1 2 -\nMika Hakkinen 1 1 2 - 1 1 - 3 2 1 1 6 - 4 1 1"
+            },
+            "1999": {
+                "teamRankingsRaw": "Ferrari 1\nMcLaren 2\nJordan 3\nWilliams 4\nStewart 5\nBenetton 6\nProst 7\nSauber 8\nMinardi 9\nBAR 10",
+                "driverTeamsRaw": "Eddie Irvine Ferrari\nMichael Schumacher Ferrari\nMika Salo Ferrari\nMika Hakkinen McLaren\nDavid Coulthard McLaren\nHeinz-Harald Frentzen Jordan\nDamon Hill Jordan\nRalf Schumacher Williams\nAlessandro Zanardi Williams\nRubens Barrichello Stewart\nJohnny Herbert Stewart\nGiancarlo Fisichella Benetton\nAlexander Wurz Benetton\nJarno Trulli Prost\nOlivier Panis Prost\nJean Alesi Sauber\nPedro Diniz Sauber\nMarc Gene Minardi\nLuca Badoer Minardi\nJacques Villeneuve BAR\nRicardo Zonta BAR",
+                "driverRankingsRaw": "Marc Gene - 9 9 - - 8 - 15 11 9 17 16 - 6 9 -\nOlivier Panis - 6 - - - 9 8 13 10 6 10 13 11 9 - -\nAlexander Wurz - 7 - 6 10 - - 10 5 7 7 14 - - 8 10\nGiancarlo Fisichella 4 - 5 5 9 2 - 7 12 - - 11 - - 11 14\nJohnny Herbert - - 10 - - 5 - 12 14 11 11 - - 1 4 7\nJean Alesi - - 6 - - - - 14 - 8 16 9 9 - 7 6\nLuca Badoer - - 8 - - 10 10 - 13 10 14 - - - - -\nRubens Barrichello 5 - 3 9 - - 3 8 - - 5 10 4 3 5 8\nJarno Trulli - - - 7 6 - 7 9 7 - 8 12 - 2 - -\nRicardo Zonta - - - - - - 9 - 15 - 13 - - 8 - 12\nAlessandro Zanardi - - 11 8 - - - 11 - - - 8 7 - 10 -\nRalf Schumacher 3 4 - - 5 4 4 3 - 4 9 5 2 4 - 5\nHeinz-Harald Frentzen 2 3 - 4 - 11 1 4 4 3 4 3 1 - 6 4\nEddie Irvine 1 5 - 2 4 3 6 2 1 1 3 4 6 7 1 3\nMika Salo 0 0 0 0 0 0 0 0 9 2 12 7 3 0 0 0\nDamon Hill - - 4 - 7 - - 5 8 - 6 6 10 - - -\nJacques Villeneuve - - - - - - - - - - - 15 8 10 - 9\nPedro Diniz - - - - - 6 - 6 6 - - - - - - 11\nDavid Coulthard - - 2 - 2 7 - 1 2 5 2 1 5 - - -\nMichael Schumacher 8 2 1 1 3 - 5 0 0 0 0 0 0 2 2 -\nMika Hakkinen - 1 - 3 1 1 2 - 3 - 1 2 - 5 3 1"
+            },
+            "2000": {
+                "teamRankingsRaw": "Ferrari 1\nMcLaren 2\nWilliams 3\nBenetton 4\nBAR 5\nJordan 6\nArrows 7\nSauber 8\nJaguar 9\nMinardi 10",
+                "driverTeamsRaw": "Michael Schumacher Ferrari\nRubens Barrichello Ferrari\nMika Hakkinen McLaren\nDavid Coulthard McLaren\nRalf Schumacher Williams\nJenson Button Williams\nGiancarlo Fisichella Benetton\nAlexander Wurz Benetton\nJacques Villeneuve BAR\nRicardo Zonta BAR\nHeinz-Harald Frentzen Jordan\nJarno Trulli Jordan\nJos Verstappen Arrows\nPedro delaRosa Arrows\nMika Salo Sauber\nPedro Diniz Sauber\nEddie Irvine Jaguar\nJohnny Herbert Jaguar\nGaston Mazzacane Minardi\nMarc Gene Minardi",
+                "driverRankingsRaw": "Gaston Mazzacane	-	10	13	15	15	8	-	12	-	12	11	-	17	10	-	15	13\nMarc Gene	8	-	-	14	14	-	-	16	15	8	-	15	14	9	12	-	-\nAlexander Wurz	7	-	9	9	10	12	-	9	-	10	-	11	13	5	10	-	7\nEddie Irvine	-	-	7	13	11	-	4	13	13	-	10	8	10	-	7	8	6\nMika Salo	10	-	6	8	7	-	5	-	10	6	5	10	9	7	-	10	8\nJacques Villeneuve	4	-	5	16	-	-	7	15	4	4	8	12	7	-	4	6	5\nPedro Diniz	-	-	8	11	-	7	-	10	11	9	-	-	11	8	8	11	-\nJarno Trulli	-	4	15	6	12	-	-	6	6	-	9	7	-	-	-	13	12\nRicardo Zonta	6	9	12	-	8	-	-	8	-	-	-	14	12	6	6	9	-\nGiancarlo Fisichella	5	2	11	7	9	5	3	3	9	-	-	-	-	11	-	14	9\nJohnny Herbert	-	-	10	12	13	11	9	-	-	7	-	-	8	-	11	7	-\nJenson Button	-	6	-	5	17	10	-	11	8	5	4	9	5	-	-	5	-\nJos Verstappen	-	7	14	-	-	-	-	5	-	-	-	13	15	4	-	-	10\nPedro delaRosa	-	8	-	-	-	6	-	-	-	-	6	16	16	-	-	12	-\nHeinz-Harald Frentzen	-	3	-	17	6	-	10	-	7	-	-	6	6	-	3	-	-\nRalf Schumacher	3	5	-	4	4	-	-	14	5	-	7	5	3	3	-	-	-\nDavid Coulthard	-	-	3	1	2	3	1	7	1	2	3	3	4	-	5	3	2\nRubens Barrichello	2	-	4	-	3	4	2	2	3	3	1	4	-	-	2	4	3\nMika Hakkinen	-	-	2	2	1	2	6	4	2	1	2	1	1	2	-	2	4\nMichael Schumacher	1	1	1	3	5	1	-	1	-	-	-	2	2	1	1	1	1"
+            },
+            "2001": {
+                "teamRankingsRaw": "Ferrari 1\nMcLaren 2\nWilliams 3\nSauber 4\nJordan 5\nBAR 6\nJaguar 7\nBenetton 8\nProst 9\nArrows 10\nMinardi 10",
+                "driverTeamsRaw": "Michael Schumacher Ferrari\nRubens Barrichello Ferrari\nDavid Coulthard McLaren\nMika Hakkinen McLaren\nRalf Schumacher Williams\nJuanPablo Montoya Williams\nNick Heidfeld Sauber\nKimi Räikkönen Sauber\nJarno Trulli Jordan\nHeinz-Harald Frentzen Jordan\nJacques Villeneuve BAR\nOlivier Panis BAR\nEddie Irvine Jaguar\nLuciano Burti Jaguar\nPedro delaRosa Jaguar\nGiancarlo Fisichella Benetton\nJenson Button Benetton\nJean Alesi Prost\nGaston Mazzacane Prost\nJos Verstappen Arrows\nEnrique Bernoldi Arrows\nFernando Alonso Minardi\nTarso Marques Minardi",
+                "driverRankingsRaw": "Jean Alesi 9 9 8 9 10 10 6 5 15 12 11 6 10 6 8 7 -\nJenson Button 14 11 10 12 15 - 7 - 13 16 15 5 - - - 9 7\nJos Verstappen 10 7 - - 12 6 8 10 - 13 10 9 12 10 - - 15\nGiancarlo Fisichella 13 - 6 - 14 - - - 11 11 13 4 - 3 10 8 17\nOlivier Panis 7 - 4 8 7 5 - - - 9 - 7 - 11 9 11 13\nLuciano Burti 8 10 - 11 11 11 - 8 12 10 - - - - - - -\nEnrique Bernoldi - - - 10 - - 9 - - - 14 8 - 12 - 13 14\nJacques Villeneuve - - 7 - 3 8 4 - 9 - 8 3 9 8 6 - 10\nNick Heidfeld 4 - 3 7 6 9 - - - 6 6 - 6 - 11 6 9\nHeinz-Harald Frentzen 5 4 11 6 - - - - - 8 7 - - 9 - 10 12\nKimi Räikkönen 6 - - - 8 4 10 4 10 7 5 - 7 - 7 - -\nPedro delaRosa - - - - - - - 6 8 14 12 - 11 - 5 12 -\nRubens Barrichello 3 2 - 3 - 3 2 - 5 3 3 2 2 5 2 15 5\nJarno Trulli - 8 5 5 4 - - 11 - 5 - - - - - 4 8\nMika Hakkinen - 6 - 4 9 - - 3 6 - 1 - 5 4 - 1 4\nEddie Irvine 11 - - - - 7 3 - 7 - 9 - - - - 5 -\nDavid Coulthard 2 3 1 2 5 1 5 - 3 4 - - 3 2 - 3 3\nRalf Schumacher - 5 - 1 - - - 1 4 2 - 1 4 7 3 - 6\nMichael Schumacher 1 1 2 - 1 2 1 2 1 1 2 - 1 1 4 2 1\nJuanPablo Montoya - - - - 2 - - - 2 - 4 - 8 - 1 - 2\nFernando Alonso	12	13 - - 13	14 - - -	17	16	10	13	11\nTarso Marques	-	14	9	-	16	-	-	9	-	15	-	-	-	-	-	-	-"
+            },
+            "2002": {
+                "teamRankingsRaw": "Ferrari 1\nWilliams 2\nMcLaren 3\nRenault 4\nSauber 5\nJordan 6\nBAR 7\nJaguar 8\nToyota 9\nMinardi 10",
+                "driverTeamsRaw": "Michael Schumacher Ferrari\nRubens Barrichello Ferrari\nJuanPablo Montoya Williams\nRalf Schumacher Williams\nDavid Coulthard McLaren\nKimi Räikkönen McLaren\nJenson Button Renault\nJarno Trulli Renault\nNick Heidfeld Sauber\nFelipe Massa Sauber\nGiancarlo Fisichella Jordan\nTakuma Sato Jordan\nJacques Villeneuve BAR\nOlivier Panis BAR\nEddie Irvine Jaguar\nPedro de la Rosa Jaguar\nMika Salo Toyota\nAllan McNish Toyota\nMark Webber Minardi\nAlex Yoong Minardi",
+                "driverRankingsRaw": "Nick Heidfeld - 5 - 10 4 - 8 12 7 6 7 6 9 10 10 9 7\nMark Webber 5 - 11 11 - 12 11 11 15 - 8 - 16 - - - 10\nMika Salo 6 12 6 - 9 8 - - - - - 9 15 7 11 14 8\nTakuma Sato - 9 9 - - - - 10 16 - - 8 10 11 12 11 5\nJenson Button - 4 4 5 12 7 - 15 5 12 6 - - - 5 8 6\nAllan McNish - 7 - - 8 9 - - 14 - 11 - 14 9 - 15 -\nRalf Schumacher - 1 2 3 11 4 3 7 4 8 5 3 3 5 - 16 11\nJacques Villeneuve - 8 10 7 7 10 - - 12 4 - - - 8 9 6 -\nPedro delaRosa 8 10 8 - - - 10 - 10 11 9 - 13 - - - -\nOlivier Panis - - - - - - - 8 9 5 - - 12 12 6 12 -\nDavid Coulthard - - 3 6 3 6 1 2 - 10 3 5 5 4 7 3 -\nFelipe Massa - 6 - 8 5 - - 9 6 9 - 7 7 - - - -\nAlex Yoong 7 - 13 - - - - 14 - - 10 - - - 13 - -\nGiancarlo Fisichella - 13 - - - 5 5 5 - 7 - - 6 - 8 7 -\nJarno Trulli - - - 9 10 - 4 6 8 - - - 8 - 4 5 -\nJuanPablo Montoya 2 2 5 4 2 3 - - - 3 4 2 11 3 - 4 4\nEddie Irvine 4 - 7 - - - 9 - - - - - - 6 3 10 9\nKimi Räikkönen 3 - 12 - - - - 4 3 - 2 - 4 - - - 3\nRubens Barrichello - - - 2 - 2 7 3 1 2 - 4 1 2 1 1 2\nMichael Schumacher 1 3 1 1 1 1 2 1 2 1 1 1 2 1 2 2 1"
+            },
+            "2003": {
+                "teamRankingsRaw": "Ferrari 1\nWilliams 2\nMcLaren 3\nRenault 4\nBAR 5\nSauber 6\nJaguar 7\nToyota 8\nJordan 9\nMinardi 10",
+                "driverTeamsRaw": "Michael Schumacher Ferrari\nRubens Barrichello Ferrari\nJuanPablo Montoya Williams\nRalf Schumacher Williams\nKimi Räikkönen McLaren\nDavid Coulthard McLaren\nFernando Alonso Renault\nJarno Trulli Renault\nJenson Button BAR\nJacques Villeneuve BAR\nHeinz-Harald Frentzen Sauber\nNick Heidfeld Sauber\nMark Webber Jaguar\nAntonio Pizzonia Jaguar\nCristiano da Matta Toyota\nOlivier Panis Toyota\nGiancarlo Fisichella Jordan\nRalph Firman Jordan\nJos Verstappen Minardi\nJustin Wilson Minardi",
+                "driverRankingsRaw": "Jos Verstappen 11 13 - - 12 - - 9 14 16 15 - 12 - 10 15\nCristiano daMatta - 11 10 12 6 10 9 11 - 11 7 6 11 - 9 7\nNick Heidfeld - 8 - 10 10 - 11 - 8 13 17 10 9 9 5 9\nRalph Firman - 10 - - 8 11 12 - 11 15 13 - - - - 14\nMark Webber - - 9 - 7 7 - 7 6 6 14 11 6 7 - 11\nJustin Wilson - - - - 11 13 - - 13 14 16 - - - 8 13\nHeinz-Harald Frentzen 6 9 5 11 - - - - 9 12 12 - - 13 3 -\nGiancarlo Fisichella 12 - 1 15 - - 10 - 12 - - 13 - 10 7 -\nJenson Button 10 7 - 8 9 4 - - 7 - 8 8 10 - - 4\nJarno Trulli 5 5 8 13 - 8 6 - - - 6 3 7 - 4 5\nRalf Schumacher 8 4 7 4 5 6 4 2 1 1 9 - 4 - - 12\nAntonio Pizzonia 13 - - 14 - 9 - 10 10 10 - - - - - -\nOlivier Panis - - - 9 - - 13 8 - 8 11 5 - - - 10\nJacques Villeneuve 9 - 6 - - 12 - - - 9 10 9 - 6 - -\nDavid Coulthard 1 - 4 5 - 5 7 - 15 5 5 2 5 - - 3\nMichael Schumacher 4 6 - 1 1 1 3 1 5 3 4 7 8 1 1 8\nJuanPablo Montoya 2 12 - 7 4 - 1 3 2 2 2 1 3 2 6 -\nFernando Alonso 7 3 3 6 2 - 5 4 4 - - 4 1 8 - -\nRubens Barrichello - 2 - 3 3 3 8 5 3 7 1 - - 3 - 1\nKimi Räikkönen 3 1 2 2 - 2 2 6 - 4 3 - 2 4 2 2"
+            },
+            "2004": {
+                "teamRankingsRaw": "Ferrari 1\nBAR 2\nRenault 3\nWilliams 4\nMcLaren 5\nSauber 6\nJaguar 7\nToyota 8\nJordan 9\nMinardi 10",
+                "driverTeamsRaw": "Michael Schumacher Ferrari\nRubens Barrichello Ferrari\nJenson Button BAR\nTakuma Sato BAR\nFernando Alonso Renault\nJarno Trulli Renault\nJuanPablo Montoya Williams\nRalf Schumacher Williams\nKimi Räikkönen McLaren\nDavid Coulthard McLaren\nGiancarlo Fisichella Sauber\nFelipe Massa Sauber\nMark Webber Jaguar\nChristian Klien Jaguar\nOlivier Panis Toyota\nCristiano daMatta Toyota\nNick Heidfeld Jordan\nGiorgio Pantano Jordan\nZsolt Baumgartner Minardi\nGianmaria Bruni Minardi",
+                "driverRankingsRaw": "Christian Klien 11 10 14 14 - - 12 9 - 11 14 10 13 6 13 - 12 14\nZsolt Baumgartner - 16 - 15 - 9 15 10 8 - - 16 15 - 15 16 - 16\nOlivier Panis 13 12 9 11 - 8 11 - 5 15 - 14 11 8 - 14 14 -\nGianmaria Bruni - 14 17 - - - 14 - - 18 16 17 14 - - - 16 17\nGiancarlo Fisichella 10 11 11 9 7 - 6 4 9 12 6 9 8 5 8 7 8 9\nNick Heidfeld - - 15 - - 7 10 8 - 16 15 - 12 11 14 13 13 -\nFelipe Massa - 8 12 10 9 5 9 - - 13 9 13 - 4 12 8 9 8\nDavid Coulthard 8 6 - 12 10 - - 6 7 6 7 4 9 7 6 9 - 11\nTakuma Sato 9 15 5 16 5 - - - 3 - 11 8 6 - 4 6 4 6\nMark Webber - - 8 13 12 - 7 - - 9 8 6 10 - 9 10 - -\nJarno Trulli 7 5 4 5 3 1 4 - 4 4 - 11 - 9 10 - 11 12\nGiorgio Pantano 14 13 16 - - - 13 - - 17 - 15 - - - - - -\nCristiano daMatta 12 9 10 - 13 6 - - - 14 13 - - - - - - -\nJuanPablo Montoya 5 2 13 3 - 4 8 - - 8 5 5 4 - 5 5 7 1\nFernando Alonso 3 7 6 4 4 - 5 - - 2 10 3 3 - - 4 5 4\nJenson Button 6 3 3 2 8 2 3 3 - 5 4 2 5 - 3 2 3 -\nRubens Barrichello 2 4 2 6 2 3 2 2 2 3 3 12 2 3 1 1 - 3\nKimi Räikkönen - - - 8 11 - - 5 6 7 2 - - 1 - 3 6 2\nRalf Schumacher 4 - 7 7 6 10 - - - - - - - - - - 2 5\nMichael Schumacher 1 1 1 1 1 - 1 1 1 1 1 1 1 2 2 12 1 7"
+            },
+            "2005": {
+                "teamRankingsRaw": "Renault 1\nMcLaren 2\nFerrari 3\nToyota 4\nWilliams 5\nRed Bull 6\nBAR 7\nSauber 8\nJordan 9\nMinardi 10",
+                "driverTeamsRaw": "Fernando Alonso Renault\nGiancarlo Fisichella Renault\nKimi Räikkönen McLaren\nJuan Pablo Montoya McLaren\nMichael Schumacher Ferrari\nRubens Barrichello Ferrari\nRalf Schumacher Toyota\nJarno Trulli Toyota\nMark Webber Williams\nNick Heidfeld Williams\nDavid Coulthard Red Bull\nChristian Klien Red Bull\nJenson Button BAR\nTakuma Sato BAR\nFelipe Massa Sauber\nJacques Villeneuve Sauber\nTiago Monteiro Jordan\nNarain Karthikeyan Jordan\nChristijan Albers Minardi\nPatrick Friesacher Minardi",
+                "driverRankingsRaw": "Tiago Monteiro 16 12 10 13 12 13 15 10 3 13 17 17 13 15 17 8 - 13 11\nNarain Karthikeyan 15 11 - 12 13 - 16 - 4 15 - 16 12 14 20 11 15 15 -\nChristijan Albers - 13 13 - - 14 17 11 5 - 18 13 - - 19 12 14 16 16\nJacques Villeneuve 13 - 11 4 - 11 13 9 - 8 14 15 - 11 11 6 12 12 10\nFelipe Massa 10 10 7 10 11 9 14 4 - - 10 8 14 - 9 10 11 10 6\nRubens Barrichello 2 - 9 - 9 8 3 3 2 9 7 10 10 10 12 5 6 11 12\nDavid Coulthard 4 6 8 11 8 - 4 7 - 10 13 7 - 7 15 - - 6 9\nRalf Schumacher 12 5 4 9 4 6 - 6 - 7 8 6 3 12 6 7 8 8 3\nJarno Trulli 9 2 2 5 3 10 8 - - 5 9 14 4 6 5 - 13 - 15\nTakuma Sato 14 - - - - - 12 - - 11 16 12 8 9 16 - 10 - -\nChristian Klien 7 8 - - - - - 8 - - 15 9 - 8 13 9 9 9 5\nMark Webber 5 - 6 7 6 3 - 5 - 12 11 - 7 - 14 4 - 4 7\nJenson Button 11 - - - - - 10 - - 4 5 3 5 5 8 3 7 5 8\nPatrick Friesacher 17 - 12 - - - 18 - 6 - 19 - - - - - - - -\nNick Heidfeld - 3 - 6 10 2 2 - - 14 12 11 6 - - - - - -\nGiancarlo Fisichella 1 - - - 5 12 6 - - 6 4 4 9 4 3 - 5 2 4\nMichael Schumacher - 7 - 2 - 7 5 2 1 3 6 5 2 - 10 - 4 7 -\nKimi Räikkönen 8 9 3 - 1 1 11 1 - 2 3 - 1 1 4 1 2 1 2\nJuanPablo Montoya 6 4 - - 7 5 7 - - - 1 2 - 3 1 14 1 - -\nFernando Alonso 3 1 1 1 2 4 1 - - 1 2 1 11 2 2 2 3 3 1"
+            },
+            "2006": {
+                "teamRankingsRaw": "Renault 1\nFerrari 2\nMcLaren 3\nHonda 4\nBMW Sauber 5\nToyota 6\nRed Bull 7\nWilliams 8\nToro Rosso 9\nMF1 10",
+                "driverTeamsRaw": "Fernando Alonso Renault\nGiancarlo Fisichella Renault\nMichael Schumacher Ferrari\nFelipe Massa Ferrari\nKimi Räikkönen McLaren\nJuan Pablo Montoya McLaren\nJenson Button Honda\nRubens Barrichello Honda\nNick Heidfeld BMW Sauber\nJacques Villeneuve BMW Sauber\nRalf Schumacher Toyota\nJarno Trulli Toyota\nDavid Coulthard Red Bull\nChristian Klien Red Bull\nMark Webber Williams\nNico Rosberg Williams\nVitantonio Liuzzi Toro Rosso\nScott Speed Toro Rosso\nTiago Monteiro MF1\nChristijan Albers MF1",
+                "driverRankingsRaw": "Scott Speed 13 - 9 15 11 - 13 - 10 - 10 12 11 13 13 14 18 11\nVitantonio Liuzzi 11 11 - 14 - 15 10 13 13 8 13 10 - - 14 10 14 13\nTiago Monteiro 17 13 - 16 12 16 15 16 14 - - - 9 - - - 16 15\nChristijan Albers - 12 11 - 13 - 12 15 - - 15 - 10 - 17 15 - 14\nNick Heidfeld 12 - 4 13 10 8 7 7 7 - 8 - 3 14 8 7 8 17\nJarno Trulli 16 9 - - 9 10 17 11 6 4 - 7 12 9 7 - 6 -\nDavid Coulthard 10 - 8 - - 14 3 12 8 7 9 11 5 15 12 9 - -\nRubens Barrichello 15 10 7 10 5 7 4 10 - 6 - - 4 8 6 6 12 7\nRalf Schumacher 14 8 3 9 - - 8 - - - 4 9 6 7 15 - 7 -\nNico Rosberg 7 - - 11 7 11 - 9 - 9 14 - - - - 11 10 -\nChristian Klien 8 - - - - 13 - 14 11 - 12 8 - 11 11 - - -\nJacques Villeneuve - 7 6 12 8 12 14 8 - - 11 - - - - - - -\nJenson Button 4 3 10 7 - 6 11 - 9 - - 4 1 4 5 4 4 3\nGiancarlo Fisichella - 1 5 8 6 3 6 4 4 3 6 6 - 6 4 3 3 6\nFelipe Massa 9 5 - 4 3 4 9 5 5 2 3 2 7 1 9 - 2 1\nMark Webber 6 - - 6 - 9 - - 12 - - - - 10 10 8 - -\nKimi Räikkönen 3 - 2 5 4 5 - 3 3 - 5 3 - - 2 - 5 5\nMichael Schumacher 2 6 - 1 1 2 5 2 2 1 1 1 8 3 1 1 - 4\nFernando Alonso 1 2 1 2 2 1 1 1 1 5 2 5 - 2 - 2 1 2"
+            },
+            "2007": {
+                "teamRankingsRaw": "McLaren 1\nFerrari 2\nBMW Sauber 3\nRenault 4\nWilliams 5\nRed Bull 6\nToyota 7\nHonda 8\nToro Rosso 9\nSuper Aguri 10",
+                "driverTeamsRaw": "Lewis Hamilton McLaren\nFernando Alonso McLaren\nKimi Räikkönen Ferrari\nFelipe Massa Ferrari\nNick Heidfeld BMW Sauber\nRobert Kubica BMW Sauber\nHeikki Kovalainen Renault\nGiancarlo Fisichella Renault\nNico Rosberg Williams\nAlexander Wurz Williams\nDavid Coulthard Red Bull\nMark Webber Red Bull\nJarno Trulli Toyota\nRalf Schumacher Toyota\nJenson Button Honda\nRubens Barrichello Honda\nVitantonio Liuzzi Toro Rosso\nTakuma Sato Super Aguri\nAnthony Davidson Super Aguri",
+                "driverRankingsRaw": "Takuma Sato 12 13 - 8 17 6 - 16 14 - 15 18 16 15 15 14 12\nRubens Barrichello 11 11 13 10 10 12 - 11 9 11 18 17 10 13 10 15 -\nAnthony Davidson 16 16 16 11 18 11 11 - - 12 - 14 14 16 - - 14\nJarno Trulli 9 7 7 - 15 - 6 - - 13 10 16 11 11 13 13 8\nVitantonio Liuzzi 14 17 - - - - 17 - 16 - - 15 17 12 9 6 13\nNico Rosberg 7 - 10 6 12 10 16 9 12 - 7 7 6 6 - 16 4\nHeikki Kovalainen 10 8 9 7 13 4 5 15 7 8 8 6 7 8 2 9 -\nRalf Schumacher 8 15 12 - 16 8 - 10 - - 6 12 15 10 - - 11\nAlexander Wurz - 9 11 - 7 3 10 14 13 4 14 11 13 - - 12 -\nJenson Button 15 12 - 12 11 - 12 8 10 - - 13 8 - 11 5 -\nGiancarlo Fisichella 5 6 8 9 4 - 9 6 8 10 12 9 12 - 5 11 -\nDavid Coulthard - - - 5 14 - - 13 11 5 11 10 - - 4 8 9\nMark Webber 13 10 - - - 9 7 12 - 3 9 - 9 7 - 10 -\nRobert Kubica - 18 6 4 5 - - 4 4 7 5 8 5 9 7 - 5\nNick Heidfeld 4 4 4 - 6 2 - 5 6 6 3 4 4 5 14 7 6\nFelipe Massa 6 5 1 1 3 - 3 2 5 2 13 1 - 2 6 3 2\nLewis Hamilton 3 2 2 2 2 1 1 3 3 9 1 5 2 4 1 - 7\nFernando Alonso 2 1 5 3 1 7 2 7 2 1 4 3 1 3 - 2 3\nKimi Räikkönen 1 3 3 - 8 5 4 1 1 - 2 2 3 1 3 1 1"
+            },
+            "2008": {
+                "teamRankingsRaw": "Ferrari 1\nMcLaren 2\nBMW Sauber 3\nRenault 4\nToyota 5\nToro Rosso 6\nRed Bull 7\nWilliams 8\nHonda 9\nForce India 10",
+                "driverTeamsRaw": "Felipe Massa Ferrari\nKimi Räikkönen Ferrari\nLewis Hamilton McLaren\nHeikki Kovalainen McLaren\nRobert Kubica BMW Sauber\nNick Heidfeld BMW Sauber\nFernando Alonso Renault\nNelsinho Piquet Renault\nJarno Trulli Toyota\nTimo Glock Toyota\nSebastian Vettel Toro Rosso\nSebastien Bourdais Toro Rosso\nMark Webber Red Bull\nDavid Coulthard Red Bull\nNico Rosberg Williams\nKazuki Nakajima Williams\nRubens Barrichello Honda\nJenson Button Honda\nGiancarlo Fisichella Force India\nAdrian Sutil Force India",
+                "driverRankingsRaw": "Kazuki Nakajima 6 17 14 7 - 7 - 15 8 14 13 15 14 12 8 15 12 17\nSebastien Bourdais 7 - 15 - - - 13 17 11 12 18 10 7 18 12 10 13 14\nJenson Button - 10 - 6 11 11 11 - - 17 12 13 15 15 9 14 16 13\nNico Rosberg 3 14 8 - 8 - 10 16 9 10 14 8 12 14 2 11 15 12\nGiancarlo Fisichella - 12 12 10 - - - 18 - 16 15 14 17 - 14 - 17 18\nRubens Barrichello - 13 11 - 14 6 7 14 3 - 16 16 - 17 - 13 11 15\nDavid Coulthard - 9 18 12 9 - 3 9 - 13 11 17 11 16 7 - 10 -\nMark Webber - 7 7 5 7 4 12 6 10 - 9 12 8 8 - 8 14 9\nJarno Trulli - 4 6 8 10 13 6 3 7 9 7 5 16 13 - 5 - 8\nTimo Glock - - 9 11 13 12 4 11 12 - 2 7 9 11 4 - 7 6\nNick Heidfeld 2 6 4 9 5 14 2 13 2 4 10 9 2 5 6 9 5 10\nAdrian Sutil - - 19 - 16 - - 19 - 15 - - 13 19 - - - 16\nKimi Räikkönen 8 1 2 1 3 9 - 2 4 6 3 - 18 9 15 3 3 3\nHeikki Kovalainen 5 3 5 - 12 8 9 4 5 5 1 4 10 2 10 - - 7\nSebastian Vettel - - - - 17 5 8 12 - 8 - 6 5 1 5 6 9 4\nFernando Alonso 4 8 10 - 6 10 - 8 6 11 4 - 4 4 1 1 4 2\nRobert Kubica - 2 3 4 4 2 1 5 - 7 8 3 6 3 11 2 6 11\nFelipe Massa - - 1 2 1 3 5 1 13 3 17 1 1 6 13 7 2 1\nLewis Hamilton 1 5 13 3 2 1 - 10 1 1 5 2 3 7 3 12 1 5"
+            },
+            "2009": {
+                "teamRankingsRaw": "Brawn 1\nRed Bull 2\nFerrari 3\nMcLaren 4\nToyota 5\nWilliams 6\nBMW Sauber 7\nRenault 8\nForce India 9\nToro Rosso 10",
+                "driverTeamsRaw": "Jenson Button Brawn\nRubens Barrichello Brawn\nSebastian Vettel Red Bull\nMark Webber Red Bull\nKimi Räikkönen Ferrari\nFelipe Massa Ferrari\nLewis Hamilton McLaren\nHeikki Kovalainen McLaren\nJarno Trulli Toyota\nTimo Glock Toyota\nNico Rosberg Williams\nKazuki Nakajima Williams\nNick Heidfeld BMW Sauber\nRobert Kubica BMW Sauber\nFernando Alonso Renault\nNelsinho Piquet Renault\nGiancarlo Fisichella Force India\nAdrian Sutil Force India\nSebastien Buemi Toro Rosso\nSebastien Bourdais Toro Rosso",
+                "driverRankingsRaw": "Giancarlo Fisichella 11 18 14 15 14 9 - 10 11 14 12 2 9 13 12 10 16\nAdrian Sutil 9 17 17 16 - 14 17 17 15 - 10 11 4 - 13 - 17\nKazuki Nakajima - 12 - - 13 15 12 11 12 9 18 13 10 9 15 - 13\nSebastien Buemi 7 16 8 17 - - 15 18 16 16 - 12 13 - - 7 8\nRobert Kubica 14 - 13 18 11 - 7 13 14 13 8 4 - 8 9 2 10\nNick Heidfeld 10 2 12 19 7 11 11 15 10 11 11 5 7 - 6 - 5\nNico Rosberg 6 8 15 9 8 6 5 5 4 4 5 8 16 11 5 - 9\nFernando Alonso 5 11 9 8 5 7 10 14 7 - 6 - 5 3 10 - 14\nTimo Glock 4 3 7 7 10 10 8 9 9 6 14 10 11 2 - - -\nJarno Trulli 3 4 - 3 - 13 4 7 17 8 13 - 14 12 2 - 7\nLewis Hamilton - 7 6 4 9 12 13 16 18 1 2 - 12 1 3 3 -\nHeikki Kovalainen - - 5 12 - - 14 - 8 5 4 6 6 7 11 12 11\nKimi Räikkönen 15 14 10 6 - 3 9 8 - 2 3 1 3 10 4 6 12\nNelsinho Piquet - 13 16 10 12 - 16 12 13 12 - - - - - - -\nMark Webber 12 6 2 11 3 5 2 2 1 3 9 9 - - 17 1 2\nRubens Barrichello 2 5 4 5 2 2 - 3 6 10 1 7 1 6 7 8 4\nSebastien Bourdais 8 10 11 13 - 8 18 - - - - - - - - - -\nJenson Button 1 1 3 1 1 1 1 6 5 7 7 - 2 5 8 5 3\nSebastian Vettel 13 15 1 2 4 - 3 1 2 - - 3 8 4 1 4 1\nFelipe Massa - 9 - 14 6 4 6 4 3 - - - - - - - -"
+            },
+            "2010": {
+                "teamRankingsRaw": "Red Bull 1\nMcLaren 2\nFerrari 3\nMercedes 4\nRenault 5\nWilliams 6\nForce India 7\nSauber 8\nToro Rosso 9\nLotus 10",
+                "driverTeamsRaw": "Sebastian Vettel Red Bull\nMark Webber Red Bull\nLewis Hamilton McLaren\nJenson Button McLaren\nFernando Alonso Ferrari\nFelipe Massa Ferrari\nNico Rosberg Mercedes\nMichael Schumacher Mercedes\nRobert Kubica Renault\nVitaly Petrov Renault\nRubens Barrichello Williams\nNico Hulkenberg Williams\nAdrian Sutil Force India\nVitantonio Liuzzi Force India\nKamui Kobayashi Sauber\nPedro delaRosa Sauber\nSebastien Buemi Toro Rosso\nJaime Alguersuari Toro Rosso\nJarno Trulli Lotus\nHeikki Kovalainen Lotus",
+                "driverRankingsRaw": "Jaime Alguersuari 13 11 9 13 10 11 12 12 13 - 15 - 13 15 12 11 11 11 9\nHeikki Kovalainen 15 13 - 14 - - - 16 - 17 - 14 16 18 16 12 13 18 17\nNico Hulkenberg 14 - 10 15 16 - 17 13 - 10 13 6 14 7 10 - 10 8 16\nSebastien Buemi 16 - 11 - - 10 16 8 9 12 - 12 12 11 14 10 - 13 15\nRubens Barrichello 10 8 12 12 9 - 14 14 4 5 12 10 - 10 6 9 7 14 12\nVitaly Petrov - - - 7 11 13 15 17 14 13 10 5 9 13 11 - - 16 6\nAdrian Sutil 12 - 5 11 7 8 9 10 6 8 17 - 5 16 9 - - 12 13\nJarno Trulli 17 - 17 - 17 15 - - - 16 - 15 19 - - 13 - 19 -\nMichael Schumacher 6 10 - 10 4 12 4 11 15 9 9 11 7 9 13 6 4 7 -\nVitantonio Liuzzi 9 7 - - 15 9 13 9 16 11 16 13 10 12 - - 6 - -\nFelipe Massa 2 3 7 9 6 4 7 15 11 15 2 4 4 3 8 - 3 15 10\nNico Rosberg 5 5 3 3 13 7 5 6 10 3 8 - 6 5 5 17 - 6 4\nKamui Kobayashi - - - - 12 - 10 - 7 6 11 9 8 - - 7 8 10 14\nRobert Kubica 11 2 4 5 8 3 6 7 5 - 7 - 3 8 7 - 5 9 5\nFernando Alonso 1 4 13 4 2 6 8 3 8 14 1 2 - 1 1 3 1 3 7\nPedro delaRosa - 12 - - - - 11 - 12 - 14 7 11 14 - - - - -\nJenson Button 7 1 8 1 5 - 2 2 3 4 5 8 - 2 4 4 12 5 3\nMark Webber 8 9 2 8 1 1 3 5 - 1 6 1 2 6 3 2 - 2 8\nLewis Hamilton 3 6 6 2 14 5 1 1 2 2 4 - 1 - - 5 2 4 2\nSebastian Vettel 4 - 1 6 3 2 - 4 1 7 3 3 15 4 2 1 - 1 1"
+            },
+            "2011": {
+                "teamRankingsRaw": "Red Bull 1\nMcLaren 2\nFerrari 3\nMercedes 4\nRenault 5\nForce India 6\nSauber 7\nToro Rosso 8\nWilliams 9\nLotus 10",
+                "driverTeamsRaw": "Sebastian Vettel Red Bull\nMark Webber Red Bull\nJenson Button McLaren\nLewis Hamilton McLaren\nFernando Alonso Ferrari\nFelipe Massa Ferrari\nNico Rosberg Mercedes\nMichael Schumacher Mercedes\nVitaly Petrov Renault\nNick Heidfeld Renault\nAdrian Sutil Force India\nPaul diResta Force India\nKamui Kobayashi Sauber\nSergio Perez Sauber\nJaime Alguersuari Toro Rosso\nSebastien Buemi Toro Rosso\nRubens Barrichello Williams\nPastor Maldonado Williams\nHeikki Kovalainen Lotus\nJarno Trulli Lotus",
+                "driverRankingsRaw": "Jarno Trulli 13 - 19 18 18 13 16 20 - - - 14 14 - 19 17 19 18 18\nHeikki Kovalainen - 15 16 19 - 14 - 19 - 16 - 15 13 16 18 14 14 17 16\nRubens Barrichello - - 13 15 17 9 9 12 13 - 13 16 12 13 17 12 15 12 14\nPaul diResta 10 10 11 - 12 12 18 14 15 13 7 11 8 6 12 10 13 9 8\nPastor Maldonado - - 18 17 15 18 - 18 14 14 16 10 11 11 14 - - 14 -\nVitaly Petrov 3 17 9 8 11 - 5 15 12 10 12 9 - 17 9 - 11 13 10\nAdrian Sutil 9 11 15 13 13 7 - 9 11 6 14 7 - 8 11 11 9 8 6\nJaime Alguersuari 11 14 - 16 16 - 8 8 10 12 10 - 7 - 15 7 8 15 11\nKamui Kobayashi - 7 10 10 10 5 7 16 - 9 11 12 - 14 13 15 - 10 9\nSebastien Buemi 8 13 14 9 14 10 10 13 - 15 8 - 10 12 - 9 - - 12\nSergio Perez - - 17 14 9 - - 11 7 11 15 - - 10 8 16 10 11 13\nNico Rosberg - 12 5 5 7 11 11 7 6 7 9 6 - 7 10 8 6 6 7\nMichael Schumacher - 9 8 12 6 - 4 17 9 8 - 5 5 - 6 - 5 7 15\nFelipe Massa 7 5 6 11 - - 6 5 5 5 6 8 6 9 7 6 - 5 5\nNick Heidfeld 12 3 12 7 8 8 - 10 8 - - - - - - - - - -\nFernando Alonso 4 6 7 3 5 2 - 2 1 2 3 4 3 4 2 5 3 2 4\nMark Webber 5 4 3 2 4 4 3 3 3 3 5 2 - 3 4 3 4 4 1\nLewis Hamilton 2 8 1 4 2 6 - 4 4 1 4 - 4 5 5 2 7 1 -\nJenson Button 6 2 4 6 3 3 1 6 - - 1 3 2 2 1 4 2 3 3\nSebastian Vettel 1 1 2 1 1 1 2 1 2 4 2 1 1 1 3 1 1 - 2"
+            },
+            '2012': {
+                teamRankingsRaw: `Red Bull 1
+                    Ferrari 2
+                    McLaren 3
+                    Lotus F1 4
+                    Mercedes 5
+                    Sauber 6
+                    Force India 7
+                    Williams 8
+                    Toro Rosso 9
+                    Caterham 10`,
+                driverTeamsRaw: `Sebastian Vettel Red Bull
+                    Mark Webber Red Bull
+                    Fernando Alonso Ferrari
+                    Felipe Massa Ferrari
+                    Lewis Hamilton McLaren
+                    Jenson Button McLaren
+                    Kimi Räikkönen Lotus F1
+                    Romain Grosjean Lotus F1
+                    Nico Rosberg Mercedes
+                    Michael Schumacher Mercedes
+                    Sergio Perez Sauber
+                    Kamui Kobayashi Sauber
+                    Nico Hulkenberg Force India
+                    Paul di Resta Force India
+                    Pastor Maldonado Williams
+                    Bruno Senna Williams
+                    Jean-Eric Vergne Toro Rosso
+                    Daniel Ricciardo Toro Rosso
+                    Heikki Kovalainen Caterham
+                    Vitaly Petrov Caterham`,
+                driverRankingsRaw: `Heikki Kovalainen	-	18	-	17	16	13	18	14	17	19	17	17	14	15	15	17	18	13	18	14
+                    Vitaly Petrov	-	16	18	16	17	-	19	13	-	16	19	14	15	19	17	16	17	16	17	11
+                    Daniel Ricciardo	9	12	17	15	13	-	14	11	13	13	15	9	12	9	10	9	13	10	12	13
+                    Paul di Resta	10	7	12	6	14	7	11	7	-	11	12	10	8	4	12	12	12	9	15	19
+                    Bruno Senna	16	6	7	-	-	10	17	10	9	17	7	12	10	18	14	15	10	8	10	-
+                    Jean-Eric Vergne	11	8	16	14	12	12	15	-	14	14	16	8	-	-	13	8	15	12	-	8
+                    Pastor Maldonado	13	19	8	-	1	-	13	12	16	15	13	-	11	-	8	14	16	5	9	-
+                    Kamui Kobayashi	6	-	10	13	5	-	9	-	11	4	18	13	9	13	3	-	14	6	14	9
+                    Nico Hulkenberg	-	9	15	12	10	8	12	5	12	9	11	4	-	14	7	6	8	-	8	5
+                    Felipe Massa	-	15	13	9	15	6	10	16	4	12	9	5	4	8	2	4	6	7	4	3
+                    Nico Rosberg	12	13	1	5	7	2	6	6	15	10	10	11	7	5	-	-	11	-	13	15
+                    Jenson Button	1	14	2	18	9	16	16	8	10	2	6	1	-	2	4	-	5	4	5	1
+                    Sergio Perez	8	2	11	11	-	11	3	9	-	6	14	-	2	10	-	11	-	15	11	-
+                    Mark Webber	4	4	4	4	11	1	7	4	1	8	8	6	20	11	9	2	3	-	-	4
+                    Kimi Räikkönen	7	5	14	2	3	9	8	2	5	3	2	3	5	6	6	5	7	1	6	10
+                    Michael Schumacher	-	10	-	10	-	-	-	3	7	7	-	7	6	-	11	13	-	11	16	7
+                    Romain Grosjean	-	-	6	3	4	-	2	-	6	18	3	-	-	7	19	7	9	-	7	-
+                    Lewis Hamilton	3	3	3	8	8	5	1	19	8	-	1	-	1	-	5	10	4	-	1	-
+                    Sebastian Vettel	2	11	5	1	6	4	4	-	3	5	4	2	-	1	1	1	1	3	2	6
+                    Fernando Alonso	5	1	9	7	2	3	5	1	2	1	5	-	3	3	-	3	2	2	3	2`
+            },
+            '2013': {
+                teamRankingsRaw: `Red Bull 1
+                    Mercedes 2
+                    Ferrari 3
+                    Lotus F1 4
+                    McLaren 5
+                    Force India 6
+                    Sauber 7
+                    Toro Rosso 8
+                    Williams 9
+                    Marussia 10`,
+                driverTeamsRaw: `Sebastian Vettel Red Bull
+                    Mark Webber Red Bull
+                    Lewis Hamilton Mercedes
+                    Nico Rosberg Mercedes
+                    Fernando Alonso Ferrari
+                    Felipe Massa Ferrari
+                    Kimi Räikkönen Lotus F1
+                    Romain Grosjean Lotus F1
+                    Heikki Kovalainen Lotus F1
+                    Jenson Button McLaren
+                    Sergio Perez McLaren
+                    Paul di Resta Force India
+                    Adrian Sutil Force India
+                    Nico Hulkenberg Sauber
+                    Esteban Gutierrez Sauber
+                    Daniel Ricciardo Toro Rosso
+                    Jean-Eric Vergne Toro Rosso
+                    Valtteri Bottas Williams
+                    Pastor Maldonado Williams
+                    Max Chilton Marussia
+                    Jules Bianchi Marussia`,
+                driverRankingsRaw: `Max Chilton	17	16	17	20	19	14	19	17	19	17	19	20	17	17	19	17	-	-	19
+                    Jules Bianchi	15	13	15	19	18	-	17	16	-	16	18	19	18	16	-	18	20	18	17
+                    Valtteri Bottas	14	11	13	14	16	12	14	12	16	-	15	15	13	12	17	16	15	8	-
+                    Esteban Gutierrez	13	12	-	18	11	13	20	14	14	-	14	13	12	11	7	15	13	13	12
+                    Pastor Maldonado	-	-	14	11	14	-	16	11	15	10	17	14	11	13	16	12	11	17	16
+                    Daniel Ricciardo	-	18	7	16	10	-	15	8	12	13	10	7	-	19	13	10	16	11	10
+                    Sergio Perez	11	9	11	6	9	16	11	20	8	9	11	12	8	10	15	5	9	7	6
+                    Jean-Eric Vergne	12	10	12	-	-	8	6	-	-	12	12	-	14	18	12	13	17	16	15
+                    Jenson Button	9	17	5	10	8	6	12	13	6	7	6	10	7	8	9	14	12	10	4
+                    Nico Hulkenberg	-	8	10	12	15	11	-	10	10	11	13	5	9	4	6	19	14	6	8
+                    Adrian Sutil	7	-	-	13	13	5	10	7	13	-	9	16	10	20	14	9	10	-	13
+                    Paul di Resta	8	-	8	4	7	9	7	9	11	18	-	-	20	-	11	8	6	15	11
+                    Felipe Massa	4	5	6	15	3	-	8	6	-	8	7	4	6	9	10	4	8	12	7
+                    Nico Rosberg	-	4	-	9	6	1	5	1	9	19	4	6	4	7	8	2	3	9	5
+                    Romain Grosjean	10	6	9	3	-	-	13	19	3	6	8	8	-	3	3	3	4	2	-
+                    Lewis Hamilton	5	3	3	5	12	4	3	4	5	1	3	9	5	5	-	6	7	4	9
+                    Fernando Alonso	2	-	1	8	1	7	2	3	4	5	2	2	2	6	4	11	5	5	3
+                    Mark Webber	6	2	-	7	5	3	4	2	7	4	5	3	15	-	2	-	2	3	2
+                    Kimi Räikkönen	1	7	2	2	2	10	9	5	2	2	-	11	3	2	5	7	-	-	-
+                    Sebastian Vettel	3	1	4	1	4	2	1	-	1	3	1	1	1	1	1	1	1	1	1
+                    Heikki Kovalainen - - - - - - - - - - - - - - - - 14 14 -`
+            },
+            '2014': {
+                teamRankingsRaw: `Mercedes 1
+                    Red Bull 2
+                    Williams 3
+                    Ferrari 4
+                    McLaren 5
+                    Force India 6
+                    Toro Rosso 7
+                    Lotus F1 8
+                    Marussia 9
+                    Sauber 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Nico Rosberg Mercedes
+                    Daniel Ricciardo Red Bull
+                    Sebastian Vettel Red Bull
+                    Valtteri Bottas Williams
+                    Felipe Massa Williams
+                    Fernando Alonso Ferrari
+                    Kimi Räikkönen Ferrari
+                    Jenson Button McLaren
+                    Kevin Magnussen McLaren
+                    Nico Hulkenberg Force India
+                    Sergio Perez Force India
+                    Jean-Eric Vergne Toro Rosso
+                    Daniil Kvyat Toro Rosso
+                    Romain Grosjean Lotus F1
+                    Pastor Maldonado Lotus F1
+                    Jules Bianchi Marussia
+                    Max Chilton Marussia
+                    Esteban Gutierrez Sauber
+                    Adrian Sutil Sauber`,
+                driverRankingsRaw: `Max Chilton	13	15	13	19	19	14	-	17	16	17	16	16	-	17	18	-	-	-	-
+                    Esteban Gutierrez	12	-	-	16	16	-	14	19	-	14	-	15	20	-	13	15	14	14	15
+                    Jules Bianchi	-	-	16	17	18	9	-	15	14	15	15	18	18	16	20	-	-	-	-
+                    Pastor Maldonado	-	-	14	14	15	-	-	12	17	12	13	-	14	12	16	18	9	12	-
+                    Kevin Magnussen	2	9	-	13	12	10	9	7	7	9	12	12	10	10	14	5	8	9	11
+                    Romain Grosjean	-	11	12	-	8	8	-	14	12	-	-	-	16	13	15	17	11	17	13
+                    Kimi Räikkönen	7	12	10	8	7	12	10	10	-	11	6	4	9	8	12	9	13	7	10
+                    Daniil Kvyat	9	10	11	10	14	-	-	-	9	-	14	9	11	14	11	14	15	11	-
+                    Adrian Sutil	11	-	-	-	17	-	13	13	13	-	11	14	15	-	-	16	-	16	16
+                    Jean-Eric Vergne	8	-	-	12	-	-	8	-	10	13	9	11	13	6	9	13	10	13	12
+                    Jenson Button	3	6	17	11	11	6	4	11	4	8	10	6	8	-	5	4	12	4	5
+                    Sergio Perez	10	-	3	9	9	-	11	6	11	10	-	8	7	7	10	10	-	15	7
+                    Nico Hulkenberg	6	5	5	6	10	5	5	9	8	7	-	10	12	9	8	12	-	8	6
+                    Felipe Massa	-	7	7	15	13	7	12	4	-	-	5	13	3	5	7	11	4	3	2
+                    Valtteri Bottas	5	8	8	7	5	-	7	3	2	2	8	3	4	11	6	3	5	10	3
+                    Fernando Alonso	4	4	9	3	6	4	6	5	6	5	2	7	-	4	-	6	6	6	9
+                    Sebastian Vettel	-	3	6	5	4	-	3	-	5	4	7	5	6	2	3	8	7	5	8
+                    Daniel Ricciardo	-	-	4	4	3	3	1	8	3	6	1	1	5	3	4	7	3	-	4
+                    Nico Rosberg	1	2	2	2	2	1	2	1	-	1	4	2	2	-	2	2	2	1	14
+                    Lewis Hamilton	-	1	1	1	1	2	-	2	1	3	3	-	1	1	1	1	1	2	1`
+            },
+            '2015': {
+                teamRankingsRaw: `Mercedes 1
+                    Ferrari 2
+                    Williams 3
+                    Red Bull 4
+                    Force India 5
+                    Lotus F1 6
+                    Toro Rosso 7
+                    Sauber 8
+                    McLaren 9
+                    Marussia 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Nico Rosberg Mercedes
+                    Sebastian Vettel Ferrari
+                    Kimi Räikkönen Ferrari
+                    Valtteri Bottas Williams
+                    Felipe Massa Williams
+                    Daniil Kvyat Red Bull
+                    Daniel Ricciardo Red Bull
+                    Sergio Perez Force India
+                    Nico Hulkenberg Force India
+                    Romain Grosjean Lotus F1
+                    Pastor Maldonado Lotus F1
+                    Max Verstappen Toro Rosso
+                    Carlos Sainz Toro Rosso
+                    Felipe Nasr Sauber
+                    Marcus Ericsson Sauber
+                    Jenson Button McLaren
+                    Fernando Alonso McLaren
+                    Will Stevens Marussia
+                    Roberto Merhi Marussia`,
+                driverRankingsRaw: `Will Stevens	-	-	15	16	17	17	17	-	13	16	16	15	15	19	14	-	16	17	18
+                    Felipe Nasr	5	12	8	12	12	9	16	11	-	11	11	13	10	20	6	9	-	13	15
+                    Marcus Ericsson	8	-	10	14	14	13	14	13	11	10	10	9	11	14	-	-	12	16	14
+                    Roberto Merhi	-	15	16	17	18	16	-	14	12	15	15	16	-	-	13	-	-	-	19
+                    Jenson Button	11	-	14	-	16	8	-	-	-	9	14	14	-	16	9	6	14	14	12
+                    Sergio Perez	10	13	11	8	13	7	11	9	9	-	5	6	7	12	3	5	8	12	5
+                    Max Verstappen	-	7	17	-	11	-	15	8	-	4	8	12	8	9	10	4	9	9	16
+                    Daniel Ricciardo	6	10	9	6	7	5	13	10	-	3	-	8	2	15	15	10	5	11	6
+                    Fernando Alonso	-	-	12	11	-	-	-	-	10	5	13	18	-	11	11	11	-	15	17
+                    Carlos Sainz	9	8	13	-	9	10	12	-	-	-	-	11	9	10	-	7	13	-	11
+                    Daniil Kvyat	-	9	-	9	10	4	9	12	6	2	4	10	6	13	5	-	4	7	10
+                    Valtteri Bottas	-	5	6	4	4	14	3	5	5	13	9	4	5	5	12	-	3	5	13
+                    Felipe Massa	4	6	5	10	6	15	6	3	4	12	6	3	-	17	4	-	6	-	8
+                    Nico Hulkenberg	7	14	-	13	15	11	8	6	7	-	-	7	-	6	-	-	7	6	7
+                    Romain Grosjean	-	11	7	7	8	12	10	-	-	7	3	-	13	7	-	-	10	8	9
+                    Pastor Maldonado	-	-	-	15	-	-	7	7	-	14	-	-	12	8	7	8	11	10	-
+                    Kimi Räikkönen	-	4	4	2	5	6	4	-	8	-	7	5	3	4	8	-	-	4	3
+                    Sebastian Vettel	3	1	3	5	3	2	5	4	3	1	12	2	1	3	2	3	-	3	4
+                    Nico Rosberg	2	3	2	3	1	1	2	1	2	8	2	17	4	2	-	2	1	1	1
+                    Lewis Hamilton	1	2	1	1	2	3	1	2	1	6	1	1	-	1	1	1	2	2	2`
+            },
+            '2016': {
+                teamRankingsRaw: `Mercedes 1
+                    Red Bull 2
+                    Ferrari 3
+                    Force India 4
+                    Williams 5
+                    McLaren 6
+                    Toro Rosso 7
+                    Haas 8
+                    Renault 9
+                    Sauber 10`,
+                driverTeamsRaw: `Nico Rosberg Mercedes
+                    Lewis Hamilton Mercedes
+                    Daniel Ricciardo Red Bull
+                    Max Verstappen Red Bull
+                    Sebastian Vettel Ferrari
+                    Kimi Räikkönen Ferrari
+                    Sergio Perez Force India
+                    Nico Hulkenberg Force India
+                    Valtteri Bottas Williams
+                    Felipe Massa Williams
+                    Fernando Alonso McLaren
+                    Jenson Button McLaren
+                    Carlos Sainz Toro Rosso
+                    Daniil Kvyat Toro Rosso
+                    Romain Grosjean Haas
+                    Esteban Gutierrez Haas
+                    Kevin Magnussen Renault
+                    Jolyon Palmer Renault
+                    Felipe Nasr Sauber
+                    Marcus Ericsson Sauber`,
+                driverRankingsRaw: `Felipe Nasr	15	14	20	16	14	-	18	12	13	15	17	-	17	-	13	-	19	15	15	9
+                    Marcus Ericsson	-	12	16	14	12	-	15	17	15	-	20	18	-	16	17	12	15	14	11	-
+                    Kevin Magnussen	12	11	17	7	15	-	16	14	14	17	15	16	-	17	10	-	14	12	17	14
+                    Esteban Gutierrez	-	-	14	17	11	11	13	16	11	16	13	11	12	13	11	-	20	-	19	-
+                    Jolyon Palmer	11	-	-	13	13	-	-	15	12	-	12	19	15	-	15	10	12	13	14	-
+                    Romain Grosjean	6	5	19	8	-	13	14	13	7	-	14	13	13	11	-	-	11	10	20	-
+                    Sergio Perez	13	16	11	9	7	3	10	3	17	6	11	10	5	8	8	6	7	8	10	4
+                    Daniil Kvyat	-	7	3	15	10	-	12	-	-	10	16	15	14	-	9	14	13	11	18	13
+                    Felipe Massa	5	8	6	5	8	10	-	10	20	11	18	-	10	9	12	13	9	7	9	-
+                    Carlos Sainz	9	-	9	12	6	8	9	-	8	8	8	14	-	15	14	11	17	6	16	6
+                    Fernando Alonso	-	-	12	6	-	5	11	-	18	13	7	12	7	14	7	7	16	5	13	10
+                    Jenson Button	14	-	13	10	9	9	-	11	6	12	-	8	-	12	-	9	18	9	12	16
+                    Valtteri Bottas	8	9	10	4	5	12	3	6	9	14	9	9	8	6	-	5	10	16	8	11
+                    Nico Hulkenberg	7	15	15	-	-	6	8	9	19	7	10	7	4	10	-	8	8	-	7	7
+                    Daniel Ricciardo	4	4	4	11	4	2	7	7	5	4	3	2	2	5	2	1	6	3	3	8
+                    Max Verstappen	10	6	8	-	1	-	4	8	2	2	5	3	11	7	6	2	2	-	4	3
+                    Kimi Räikkönen	-	2	5	3	2	-	6	4	3	5	6	6	9	4	4	4	5	-	6	-
+                    Sebastian Vettel	3	-	2	-	3	4	2	2	-	9	4	5	6	3	5	-	4	4	5	5
+                    Nico Rosberg	1	1	1	1	-	7	5	1	4	3	2	4	1	1	1	3	1	2	2	2
+                    Lewis Hamilton	2	3	7	2	-	1	1	5	1	1	1	1	3	2	3	-	3	1	1	1`
+            },
+            '2017': {
+                teamRankingsRaw: `Mercedes 1
+                    Ferrari 2
+                    Red Bull 3
+                    Force India 4
+                    Williams 5
+                    Renault 6
+                    Toro Rosso 7
+                    Haas 8
+                    McLaren 9
+                    Sauber 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Valtteri Bottas Mercedes
+                    Sebastian Vettel Ferrari
+                    Kimi Räikkönen Ferrari
+                    Daniel Ricciardo Red Bull
+                    Max Verstappen Red Bull
+                    Sergio Perez Force India
+                    Esteban Ocon Force India
+                    Felipe Massa Williams
+                    Lance Stroll Williams
+                    Nico Hulkenberg Renault
+                    Jolyon Palmer Renault
+                    Carlos Sainz Toro Rosso
+                    Daniil Kvyat Toro Rosso
+                    Romain Grosjean Haas
+                    Kevin Magnussen Haas
+                    Fernando Alonso McLaren
+                    Stoffel Vandoorne McLaren
+                    Marcus Ericsson Sauber
+                    Pascal Wehrlein Sauber`,
+                driverRankingsRaw: `Pascal Wehrlein	-	-	11	16	8	-	15	10	14	17	15	-	16	12	17	15	-	14	14	14
+                    Marcus Ericsson	-	15	-	15	11	-	13	11	15	14	16	16	18	-	18	-	15	-	13	17
+                    Romain Grosjean	-	11	8	-	10	8	10	13	6	13	-	7	15	9	13	9	14	15	15	11
+                    Lance Stroll	-	-	-	11	16	15	9	3	10	16	14	11	7	8	8	-	11	6	16	18
+                    Kevin Magnussen	-	8	-	13	14	10	12	7	-	12	13	15	11	-	12	8	16	8	-	13
+                    Stoffel Vandoorne	13	-	-	14	-	-	14	12	12	11	10	14	-	7	7	14	12	12	-	12
+                    Felipe Massa	6	14	6	9	13	9	-	-	9	10	-	8	8	11	9	10	9	11	7	10
+                    Esteban Ocon	10	10	10	7	5	12	6	6	8	8	9	9	6	10	10	6	6	5	-	8
+                    Sergio Perez	7	9	7	6	4	13	5	-	7	9	8	17	9	5	6	7	8	7	9	7
+                    Nico Hulkenberg	11	12	9	8	6	-	8	-	13	6	17	6	13	-	16	-	-	-	10	6
+                    Jolyon Palmer	-	13	13	-	15	11	11	-	11	-	12	13	-	6	15	12	-	-	-	-
+                    Daniil Kvyat	9	-	12	12	9	14	-	-	16	15	11	12	12	-	-	-	10	-	-	-
+                    Fernando Alonso	-	-	14	-	12	-	16	9	-	-	6	-	17	-	11	11	-	10	8	9
+                    Carlos Sainz	8	7	-	10	7	6	-	8	-	-	7	10	14	4	-	-	7	-	11	-
+                    Kimi Räikkönen	4	5	4	3	-	2	7	14	5	3	2	4	5	-	-	5	3	3	3	4
+                    Valtteri Bottas	3	6	3	1	-	4	2	2	1	2	3	5	2	3	5	4	5	2	2	1
+                    Max Verstappen	5	3	-	5	-	5	-	-	-	4	5	-	10	-	1	2	4	1	5	5
+                    Lewis Hamilton	2	1	2	4	1	7	1	5	4	1	4	1	1	1	2	1	1	9	4	2
+                    Daniel Ricciardo	-	4	5	-	3	3	3	1	3	5	-	3	4	2	3	3	-	-	6	-
+                    Sebastian Vettel	1	2	1	2	2	1	4	4	2	7	1	2	3	-	4	-	2	4	1	3`
+            },
+            '2018': {
+                teamRankingsRaw: `Mercedes 1
+                    Ferrari 2
+                    Red Bull 3
+                    Renault 4
+                    Force India 5
+                    Haas 6
+                    McLaren 7
+                    Sauber 8
+                    Toro Rosso 9
+                    Williams 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Valtteri Bottas Mercedes
+                    Sebastian Vettel Ferrari
+                    Kimi Räikkönen Ferrari
+                    Daniel Ricciardo Red Bull
+                    Max Verstappen Red Bull
+                    Nico Hulkenberg Renault
+                    Carlos Sainz Renault
+                    Sergio Perez Force India
+                    Esteban Ocon Force India
+                    Kevin Magnussen Haas
+                    Romain Grosjean Haas
+                    Fernando Alonso McLaren
+                    Stoffel Vandoorne McLaren
+                    Charles Leclerc Sauber
+                    Marcus Ericsson Sauber
+                    Pierre Gasly Toro Rosso
+                    Brendon Hartley Toro Rosso
+                    Lance Stroll Williams
+                    Sergey Sirotkin Williams`,
+                driverRankingsRaw: `Sergey Sirotkin	-	15	15	-	14	16	17	15	13	14	-	16	12	10	19	18	16	13	13	16	15
+                    Lance Stroll	14	14	14	8	11	17	-	17	14	12	-	17	13	9	14	15	17	14	12	18	13
+                    Stoffel Vandoorne	9	8	13	9	-	14	16	12	15	11	13	-	15	12	12	16	15	11	8	15	14
+                    Brendon Hartley	15	17	20	10	12	19	-	14	-	-	10	11	14	-	17	-	13	9	14	11	12
+                    Marcus Ericsson	-	9	16	11	13	11	15	13	10	-	9	15	10	15	11	13	12	10	9	-	-
+                    Sergio Perez	11	16	12	3	9	12	14	-	7	10	7	14	5	7	16	10	7	8	-	10	8
+                    Kevin Magnussen	-	5	10	13	6	13	13	6	5	9	11	7	8	16	18	8	-	-	15	9	10
+                    Carlos Sainz	10	11	9	5	7	10	8	8	12	-	12	9	11	8	8	17	10	7	-	12	6
+                    Pierre Gasly	-	4	18	12	-	7	11	-	11	13	14	6	9	14	13	-	11	12	10	13	-
+                    Charles Leclerc	13	12	19	6	10	18	10	10	9	-	15	-	-	11	9	7	-	-	7	7	7
+                    Romain Grosjean	-	13	17	-	-	15	12	11	4	-	6	10	7	-	15	11	8	-	16	8	9
+                    Fernando Alonso	5	7	7	7	8	-	-	16	8	8	16	8	-	-	7	14	14	-	-	17	11
+                    Esteban Ocon	12	10	11	-	-	6	9	-	6	7	8	13	6	6	-	9	9	-	11	14	-
+                    Nico Hulkenberg	7	6	6	-	-	8	7	9	-	6	5	12	-	13	10	12	-	6	6	-	-
+                    Valtteri Bottas	8	2	2	14	2	5	2	7	-	4	2	5	4	3	4	2	2	5	5	5	5
+                    Max Verstappen	6	-	5	-	3	9	3	2	1	15	4	-	3	5	2	5	3	2	1	2	3
+                    Sebastian Vettel	1	1	8	4	4	2	1	5	3	1	-	2	1	4	3	3	6	4	2	6	2
+                    Kimi Räikkönen	3	-	3	2	-	4	6	3	2	3	3	3	-	2	5	4	5	1	3	3	-
+                    Daniel Ricciardo	4	-	1	-	5	1	4	4	-	5	-	4	-	-	6	6	4	-	-	4	4
+                    Lewis Hamilton	2	3	4	1	1	3	5	1	-	2	1	1	2	1	1	1	1	3	4	1	1`
+            },
+            '2019': {
+                teamRankingsRaw: `Mercedes 1
+                    Ferrari 2
+                    Red Bull 3
+                    McLaren 4
+                    Renault 5
+                    Toro Rosso 6
+                    Racing Point 7
+                    Alfa Romeo 8
+                    Haas 9
+                    Williams 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Valtteri Bottas Mercedes
+                    Sebastian Vettel Ferrari
+                    Charles Leclerc Ferrari
+                    Max Verstappen Red Bull
+                    Alexander Albon Red Bull
+                    Carlos Sainz McLaren
+                    Lando Norris McLaren
+                    Daniel Ricciardo Renault
+                    Nico Hulkenberg Renault
+                    Pierre Gasly Toro Rosso
+                    Daniil Kvyat Toro Rosso
+                    Sergio Perez Racing Point
+                    Lance Stroll Racing Point
+                    Kimi Räikkönen Alfa Romeo
+                    Antonio Giovinazzi Alfa Romeo
+                    Romain Grosjean Haas
+                    Kevin Magnussen Haas
+                    George Russell Williams
+                    Robert Kubica Williams`,
+                driverRankingsRaw: `Robert Kubica	17	16	17	16	18	18	18	18	20	15	10	19	17	17	16	-	17	18	-	16	19
+                    George Russell	16	15	16	15	17	15	16	19	18	14	11	16	15	14	-	-	16	16	17	12	17
+                    Antonio Giovinazzi	15	11	15	12	16	19	13	16	10	-	13	18	18	9	10	15	14	14	14	5	16
+                    Kevin Magnussen	6	13	13	13	7	14	17	17	19	-	8	13	12	-	17	9	15	15	18	11	14
+                    Lance Stroll	9	14	12	9	-	16	9	13	14	13	4	17	10	12	13	11	9	12	13	19	-
+                    Kimi Räikkönen	8	7	9	10	14	17	15	7	9	8	12	7	16	15	-	13	12	-	11	4	13
+                    Daniil Kvyat	10	12	-	-	9	7	10	14	17	9	3	15	7	-	15	12	10	11	12	10	9
+                    Nico Hulkenberg	7	17	-	14	13	13	7	8	13	10	-	12	8	5	9	10	-	10	9	15	12
+                    Sergio Perez	13	10	8	6	15	12	12	12	11	17	-	11	6	7	-	7	8	7	10	9	7
+                    Romain Grosjean	-	-	11	-	10	10	14	-	16	-	7	-	13	16	11	-	13	17	15	13	15
+                    Pierre Gasly	11	8	6	-	6	5	8	10	7	4	14	6	9	11	8	14	7	9	16	2	18
+                    Alexander Albon	14	9	10	11	11	8	-	15	15	12	6	10	5	6	6	5	4	5	5	14	6
+                    Lando Norris	12	6	18	8	-	11	-	9	6	11	-	9	11	10	7	8	11	-	7	8	8
+                    Daniel Ricciardo	-	18	7	-	12	9	6	11	12	7	-	14	14	4	14	-	-	8	6	6	11
+                    Carlos Sainz	-	19	14	7	8	6	11	6	8	6	5	5	-	-	12	6	5	13	8	3	10
+                    Sebastian Vettel	4	5	3	3	4	2	2	5	4	16	2	3	4	13	1	-	2	2	-	17	5
+                    Charles Leclerc	5	3	5	5	5	-	3	3	2	3	-	4	1	1	2	3	6	4	4	18	3
+                    Max Verstappen	3	4	4	4	3	4	5	4	1	5	1	2	-	8	3	4	-	6	3	1	2
+                    Valtteri Bottas	1	2	2	1	2	3	4	2	3	2	-	8	3	2	5	2	1	3	1	-	4
+                    Lewis Hamilton	2	1	1	2	1	1	1	1	5	1	9	1	2	3	4	1	3	1	2	7	1`
+            },
+            '2020': {
+                teamRankingsRaw: `Mercedes 1
+                    Red Bull 2
+                    Racing Point 3
+                    McLaren 4
+                    Renault 5
+                    Ferrari 6
+                    AlphaTauri 7
+                    Alfa Romeo 8
+                    Haas 9
+                    Williams 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Valtteri Bottas Mercedes
+                    Max Verstappen Red Bull
+                    Alexander Albon Red Bull
+                    Sergio Perez Racing Point
+                    Lance Stroll Racing Point
+                    Carlos Sainz McLaren
+                    Lando Norris McLaren
+                    Daniel Ricciardo Renault
+                    Esteban Ocon Renault
+                    Charles Leclerc Ferrari
+                    Sebastian Vettel Ferrari
+                    Pierre Gasly AlphaTauri
+                    Daniil Kvyat AlphaTauri
+                    Antonio Giovinazzi Alfa Romeo
+                    Kimi Räikkönen Alfa Romeo
+                    Romain Grosjean Haas
+                    Kevin Magnussen Haas
+                    Nicholas Latifi Williams
+                    George Russell Williams`,
+                driverRankingsRaw: `Nicholas Latifi	11	17	19	15	19	18	16	11	-	16	14	18	11	-	14	-	17
+                    Kimi Räikkönen	-	11	15	17	15	14	12	13	9	14	12	11	9	15	15	14	12
+                    Antonio Giovinazzi	9	14	17	14	17	16	-	16	-	11	10	15	10	-	16	13	16
+                    George Russell	-	16	18	12	18	17	-	14	11	18	-	14	-	16	12	9	15
+                    Romain Grosjean	-	13	16	16	16	19	15	12	12	17	9	17	14	-	-	-	-
+                    Daniil Kvyat	12	10	12	-	10	12	11	9	7	8	15	19	4	12	11	7	11
+                    Kevin Magnussen	-	12	10	-	-	15	17	-	-	12	13	16	-	17	17	15	18
+                    Sebastian Vettel	10	-	6	10	12	7	13	-	10	13	11	10	12	3	13	12	14
+                    Lando Norris	3	5	13	5	9	10	7	4	6	15	-	13	8	8	4	10	5
+                    Alexander Albon	13	4	5	8	5	8	6	15	3	10	-	12	15	7	3	6	4
+                    Pierre Gasly	7	15	-	7	11	9	8	1	-	9	6	5	-	13	6	11	8
+                    Daniel Ricciardo	-	8	8	4	14	11	4	6	4	5	3	9	3	10	7	5	7
+                    Esteban Ocon	8	-	14	6	8	13	5	8	-	7	-	8	-	11	9	2	9
+                    Carlos Sainz	5	9	9	13	13	6	-	2	-	-	5	6	7	5	5	4	6
+                    Sergio Perez	6	6	7	-	-	5	10	10	5	4	4	7	6	2	18	1	-
+                    Charles Leclerc	2	-	11	3	4	-	14	-	8	6	7	4	5	4	10	-	13
+                    Lance Stroll	-	7	4	9	6	4	9	3	-	-	-	-	13	9	-	3	10
+                    Valtteri Bottas	1	2	3	11	3	3	2	5	2	1	-	2	2	14	8	8	2
+                    Lewis Hamilton	4	1	1	1	2	1	1	7	1	3	1	1	1	1	1	-	3
+                    Max Verstappen	-	3	2	2	1	2	3	-	-	2	2	3	-	6	2	-	1`
+            },
+            '2021': {
+                teamRankingsRaw: `Mercedes 1
+                    Red Bull 2
+                    Ferrari 3
+                    McLaren 4
+                    Alpine 5
+                    AlphaTauri 6
+                    Aston Martin 7
+                    Williams 8
+                    Alfa Romeo 9
+                    Haas 10`,
+                driverTeamsRaw: `Lewis Hamilton Mercedes
+                    Valtteri Bottas Mercedes
+                    Max Verstappen Red Bull
+                    Sergio Perez Red Bull
+                    Carlos Sainz Ferrari
+                    Charles Leclerc Ferrari
+                    Lando Norris McLaren
+                    Daniel Ricciardo McLaren
+                    Fernando Alonso Alpine
+                    Esteban Ocon Alpine
+                    Pierre Gasly AlphaTauri
+                    Yuki Tsunoda AlphaTauri
+                    Sebastian Vettel Aston Martin
+                    Lance Stroll Aston Martin
+                    George Russell Williams
+                    Nicholas Latifi Williams
+                    Kimi Räikkönen Alfa Romeo
+                    Antonio Giovinazzi Alfa Romeo
+                    Nikita Mazepin Haas
+                    Mick Schumacher Haas`,
+                driverRankingsRaw: `Mick Schumacher	16	16	17	18	18	13	19	16	18	18	12	16	18	15	-	19	16	-	18	16	-	14
+                    Nicholas Latifi	18	-	18	16	15	16	18	17	16	14	7	9	16	11	19	17	15	17	16	-	12	-
+                    Nikita Mazepin	-	17	19	19	17	14	20	18	19	17	-	17	-	-	18	20	17	18	17	18	-	-
+                    Antonio Giovinazzi	12	14	12	15	10	11	15	15	14	13	13	13	14	13	16	11	11	11	14	15	9	-
+                    George Russell	14	-	16	14	14	17	12	-	11	12	8	2	17	9	10	15	14	16	13	17	-	-
+                    Kimi Räikkönen	11	13	-	12	11	10	17	11	15	15	10	18	-	-	8	12	13	8	12	14	15	-
+                    Sebastian Vettel	15	15	13	13	5	2	9	12	17	-	-	5	13	12	12	18	10	7	11	10	-	11
+                    Yuki Tsunoda	9	12	15	-	16	7	13	10	12	10	6	15	-	-	17	14	9	-	15	13	14	4
+                    Lance Stroll	10	8	14	11	8	-	10	8	13	8	-	20	12	7	11	9	12	14	-	6	11	13
+                    Fernando Alonso	-	10	8	17	13	6	8	9	10	7	4	11	6	8	6	16	-	9	9	3	13	8
+                    Esteban Ocon	13	9	7	9	9	-	14	14	-	9	1	7	9	10	14	10	-	13	8	5	4	9
+                    Daniel Ricciardo	7	6	9	6	12	9	6	13	7	5	11	4	11	1	4	13	5	12	-	12	5	12
+                    Pierre Gasly	17	7	10	10	6	3	7	-	9	11	5	6	4	-	13	6	-	4	7	11	6	5
+                    Carlos Sainz	8	5	11	7	2	8	11	6	5	6	3	10	7	6	3	8	7	6	6	7	8	3
+                    Lando Norris	4	3	5	8	3	5	5	5	3	4	-	14	10	2	7	7	8	10	10	9	10	7
+                    Charles Leclerc	6	4	6	4	-	4	16	7	8	2	-	8	5	4	15	4	4	5	5	8	7	10
+                    Sergio Perez	5	11	4	5	4	1	3	4	6	16	-	19	8	5	9	3	3	3	4	4	-	15
+                    Valtteri Bottas	3	-	3	3	-	12	4	3	2	3	-	12	3	3	5	1	6	15	3	-	3	6
+                    Lewis Hamilton	1	2	1	1	7	15	2	2	4	1	2	3	2	-	1	5	2	2	1	1	1	2
+                    Max Verstappen	2	1	2	2	1	18	1	1	1	-	9	1	1	-	2	2	1	1	2	2	2	1`
+            },
+            '2022': {
+                teamRankingsRaw: `Red Bull 1
+                    Ferrari 2
+                    Mercedes 3
+                    Alpine 4
+                    McLaren 5
+                    Alfa Romeo 6
+                    Aston Martin 7
+                    Haas 8
+                    AlphaTauri 9
+                    Williams 10`,
+                driverTeamsRaw: `Max Verstappen Red Bull
+                    Sergio Perez Red Bull
+                    Charles Leclerc Ferrari
+                    Carlos Sainz Ferrari
+                    George Russell Mercedes
+                    Lewis Hamilton Mercedes
+                    Esteban Ocon Alpine
+                    Fernando Alonso Alpine
+                    Lando Norris McLaren
+                    Daniel Ricciardo McLaren
+                    Valtteri Bottas Alfa Romeo
+                    Zhou Guanyu Alfa Romeo
+                    Sebastian Vettel Aston Martin
+                    Lance Stroll Aston Martin
+                    Kevin Magnussen Haas
+                    Mick Schumacher Haas
+                    Pierre Gasly AlphaTauri
+                    Yuki Tsunoda AlphaTauri
+                    Alexander Albon Williams
+                    Nicholas Latifi Williams`,
+                driverRankingsRaw: `Carlos Sainz	2	3	-	-	3	4	2	-	2	1	-	5	4	3	8	4	3	-	-	5	3	4
+                    Max Verstappen	19	1	-	1	1	1	3	1	1	7	2	1	1	1	1	1	7	1	1	1	6	1
+                    Charles Leclerc	1	2	1	6	2	-	4	-	5	4	1	-	6	6	3	2	2	3	3	6	4	2
+                    Sergio Perez	18	4	2	2	4	2	1	2	-	2	-	4	5	2	5	6	1	2	4	3	7	3
+                    George Russell	4	5	3	4	5	3	5	3	4	-	4	3	3	4	2	3	14	8	5	4	1	5
+                    Lewis Hamilton	3	10	4	13	6	5	8	4	3	3	3	2	2	-	4	5	9	5	2	2	2	18
+                    Fernando Alonso	9	-	17	-	11	9	7	7	9	5	10	6	8	5	6	-	-	7	7	19	5	-
+                    Lando Norris	15	7	5	3	-	8	6	9	15	6	7	7	7	12	7	7	4	10	6	9	-	6
+                    Esteban Ocon	7	6	7	14	8	7	12	10	6	-	5	8	9	7	9	11	-	4	11	8	8	7
+                    Valtteri Bottas	6	-	8	5	7	6	9	11	7	-	11	14	20	-	-	13	11	15	-	10	9	15
+                    Sebastian Vettel - - - 8 17 11 10 6 12 9 17 11 10 8 14 - 8 6 8 14 11 10
+                    Yuki Tsunoda	8	-	15	7	12	10	17	13	-	14	16	-	19	13	-	14	-	13	10	-	17	11
+                    Alexander Albon	13	14	10	11	9	18	-	12	13	-	12	13	17	10	12	-	-	-	13	12	15	13
+                    Zhou Guanyu	10	11	11	15	-	-	16	-	8	-	14	16	13	14	16	10	-	16	12	13	12	12
+                    Pierre Gasly	-	8	9	12	-	13	11	5	14	-	15	12	12	9	11	8	10	18	14	11	14	14
+                    Daniel Ricciardo 14 - 6 18 13 12 13 8 11 13 9 9 15 15 17 - 5 11 16 7 - 9
+                    Lance Stroll	12	13	12	10	10	15	14	16	10	11	13	10	11	11	10	-	6	12	-	15	10	8
+                    Kevin Magnussen	5	9	14	9	16	17	-	-	17	10	8	-	16	16	15	16	12	14	9	17	-	17
+                    Mick Schumacher	11	-	13	17	15	14	-	14	-	8	6	15	14	17	13	12	13	17	15	16	13	16
+                    Nicholas Latifi	16	-	16	16	14	16	15	15	16	12	-	-	18	18	18	15	-	9	17	18	16	19`
+            },
+            '2023': {
+                teamRankingsRaw: `Red Bull 1
+                    Ferrari 2
+                    Mercedes 3
+                    McLaren 4
+                    Aston Martin 5
+                    Alpine 6
+                    Williams 7
+                    AlphaTauri 8
+                    Alfa Romeo 9
+                    Haas 10`,
+                driverTeamsRaw: `Max Verstappen Red Bull
+                    Sergio Perez Red Bull
+                    Charles Leclerc Ferrari
+                    Carlos Sainz Ferrari
+                    Lewis Hamilton Mercedes
+                    George Russell Mercedes
+                    Lando Norris McLaren
+                    Oscar Piastri McLaren
+                    Fernando Alonso Aston Martin
+                    Lance Stroll Aston Martin
+                    Pierre Gasly Alpine
+                    Esteban Ocon Alpine
+                    Alexander Albon Williams
+                    Logan Sargeant Williams
+                    Yuki Tsunoda AlphaTauri
+                    Daniel Ricciardo AlphaTauri
+                    Valtteri Bottas Alfa Romeo
+                    Zhou Guanyu Alfa Romeo
+                    Nico Hulkenberg Haas
+                    Kevin Magnussen Haas`,
+                driverRankingsRaw: `Max Verstappen	1	2	1	2	1	1	1	1	1	1	1	1	1	1	5	1	1	1	1	1	1	1
+                    Charles Leclerc	-	7	-	3	7	6	11	4	2	9	7	3	-	4	4	4	5	-	3	-	2	2
+                    Sergio Perez	2	1	5	1	2	16	4	6	3	6	3	2	4	2	8	-	10	4	-	4	3	4
+                    Lewis Hamilton	5	5	2	6	6	4	2	3	8	3	4	4	6	6	3	5	-	-	2	8	7	9
+                    Fernando Alonso	3	3	3	4	3	2	7	2	5	7	9	5	2	9	15	8	6	-	-	3	9	7
+                    Carlos Sainz	4	6	12	5	5	8	5	5	6	10	8	-	5	3	1	6	-	3	4	6	6	18
+                    George Russell	7	4	-	8	4	5	3	-	7	5	6	6	17	5	16	7	4	5	6	-	8	3
+                    Esteban Ocon	-	8	14	15	9	3	8	8	14	-	-	8	10	-	-	9	7	-	10	10	4	12
+                    Lando Norris	17	17	6	9	17	9	17	13	4	2	2	7	7	8	2	2	3	2	5	2	-	5
+                    Lance Stroll	6	-	4	7	12	-	6	9	9	14	10	9	11	16	-	-	11	7	17	5	5	10
+                    Oscar Piastri	-	15	8	11	19	10	13	11	16	4	5	-	9	12	7	3	2	-	8	14	10	6
+                    Alexander Albon	10	-	-	12	14	14	16	7	11	8	11	14	8	7	11	-	13	9	9	-	12	14
+                    Pierre Gasly	9	9	13	14	8	7	10	12	10	18	-	11	3	15	6	10	12	6	11	7	11	13
+                    Yuki Tsunoda	11	11	10	10	11	15	12	14	19	16	15	10	15	-	-	12	15	8	12	9	18	8
+                    Valtteri Bottas	8	18	11	18	13	11	19	10	15	12	12	12	14	10	-	-	8	12	15	-	17	19
+                    Zhou Guanyu	16	13	9	-	16	13	9	16	12	15	16	13	-	14	12	13	9	13	14	-	15	17
+                    Logan Sargeant	12	16	16	16	20	18	20	-	13	11	18	17	-	13	14	-	-	10	16	11	16	16
+                    Kevin Magnussen	13	10	17	13	10	19	18	17	18	-	17	15	16	18	10	15	14	14	-	-	13	20
+                    Nico Hulkenberg	15	12	7	17	15	17	15	15	-	13	14	18	12	17	13	14	16	11	13	12	19	15
+                    Daniel Ricciardo - - - - - - - - - - - - - - - - - - - - - -`
+            },
+            '2024': {
+                teamRankingsRaw: `McLaren 1 
+                    Ferrari 2 
+                    Red Bull 3 
+                    Mercedes 4 
+                    Aston Martin 5 
+                    Alpine 6 
+                    Haas 7 
+                    Racing Bulls 8 
+                    Williams 9 
+                    Sauber 10`,
+                driverTeamsRaw: `Max Verstappen Red Bull
+                    Charles Leclerc Ferrari
+                    Carlos Sainz Ferrari
+                    Lando Norris McLaren
+                    George Russell Mercedes
+                    Oscar Piastri McLaren
+                    Lewis Hamilton Mercedes
+                    Sergio Perez Red Bull
+                    Alexander Albon Williams
+                    Nico Hulkenberg Haas
+                    Fernando Alonso Aston Martin
+                    Pierre Gasly Alpine
+                    Yuki Tsunoda Racing Bulls
+                    Lance Stroll Aston Martin
+                    Kevin Magnussen Haas
+                    Esteban Ocon Alpine
+                    Zhou Guanyu Sauber
+                    Valtteri Bottas Sauber`,
+                driverRankingsRaw: `Max Verstappen	1	1	-	1	1	2	1	6	1	1	5	2	5	4	2	6	5	2	3	6	1	5	1	6
+                    Charles Leclerc	4	3	2	4	4	3	3	1	-	5	11	14	4	3	3	1	2	5	1	3	5	4	2	3
+                    Carlos Sainz	3	-	1	3	5	5	5	3	-	6	3	5	6	6	5	4	18	7	2	1	-	3	6	2
+                    Lando Norris	6	8	3	5	2	1	2	4	2	2	20	3	2	5	1	3	4	1	4	2	6	6	10	1
+                    George Russell	5	6	17	7	6	8	7	5	3	4	1	-	8	-	7	7	3	4	6	5	4	1	4	5
+                    Oscar Piastri	8	4	4	8	8	13	4	2	5	7	2	4	1	2	4	2	1	3	5	8	8	7	3	10
+                    Lewis Hamilton	7	9	-	9	9	6	6	7	4	3	4	1	3	1	8	5	9	6	-	4	10	2	12	4
+                    Sergio Perez	2	2	5	2	3	4	8	-	-	8	7	17	7	7	6	8	17	10	7	17	11	10	-	-
+                    Alexander Albon	15	11	11	-	12	18	-	9	-	18	15	9	14	12	14	9	7	-	16	-	-	-	15	11
+                    Nico Hulkenberg	16	10	9	11	10	11	11	-	11	11	6	6	13	18	11	17	11	9	8	9	-	8	-	8
+                    Fernando Alonso	9	5	8	6	7	9	19	11	6	12	18	8	11	8	10	11	6	8	13	-	14	11	7	9
+                    Pierre Gasly	18	-	13	16	13	12	16	10	9	9	10	-	-	13	9	15	12	17	12	10	3	-	5	7
+                    Yuki Tsunoda	14	15	7	10	-	7	10	8	14	19	14	10	9	16	17	-	-	12	14	-	7	9	13	12
+                    Lance Stroll	10	-	6	12	15	17	9	14	7	14	13	7	10	11	13	19	19	14	15	11	-	15	-	14
+                    Kevin Magnussen	12	12	10	13	16	19	12	-	12	17	8	12	15	14	18	10	-	19	11	7	-	12	9	16
+                    Esteban Ocon	17	13	16	15	11	10	14	-	10	10	12	16	18	9	15	14	15	13	18	13	2	17	-	-
+                    Zhou Guanyu	11	18	15	-	14	14	15	16	15	13	17	18	19	-	20	18	14	15	19	15	15	13	8	13
+                    Valtteri Bottas	19	17	14	14	-	16	18	13	13	16	16	15	16	15	19	16	16	16	17	14	13	18	11	-`
+            },
+"2025": {
+  "teamRankingsRaw": "McLaren 1\nFerrari 2\nMercedes 3\nRed Bull 4\nWilliams 5\nRacing Bulls 6\nAston Martin 7\nSauber 8\nHaas 9\nAlpine 10",
+  "driverTeamsRaw": "Oscar Piastri McLaren\nLando Norris McLaren\nCharles Leclerc Ferrari\nLewis Hamilton Ferrari\nGeorge Russell Mercedes\nKimi Antonelli Mercedes\nMax Verstappen Red Bull\nYuki Tsunoda Red Bull\nAlexander Albon Williams\nCarlos Sainz Williams\nIsack Hadjar Racing Bulls\nLiam Lawson Racing Bulls\nEsteban Ocon Haas\nOliver Bearman Haas\nFernando Alonso Aston Martin\nLance Stroll Aston Martin\nNico Hulkenberg Sauber\nGabriel Bortoleto Sauber\nPierre Gasly Alpine\nJack Doohan Alpine",
+  "driverRankingsRaw": "Oscar Piastri 9 1 3 1 1 1 3 3 1 4 2 2 1 2 1 3 0 4 5 5 5 0 2 0\nLando Norris 1 2 2 3 4 2 2 1 2 18 1 1 2 1 2 18 2 7 3 2 1 1 0 4\nMax Verstappen 2 4 1 6 2 4 1 4 10 2 0 5 4 9 2 1 1 2 1 3 3 1 1 0\nGeorge Russell 3 3 5 2 5 3 7 11 4 1 5 10 5 5 3 4 5 2 0 0 0 0 0 0\nCharles Leclerc 8 0 4 4 3 7 6 2 3 5 3 14 3 4 0 4 9 6 0 0 0 0 0 0\nLewis Hamilton 10 0 7 5 7 8 4 5 6 6 4 4 7 12 0 6 8 8 0 0 0 0 0 0\nKimi Antonelli 4 6 6 11 6 6 0 18 0 3 0 0 16 10 16 9 4 5 0 0 0 0 0 0\nAlexander Albon 5 7 9 12 9 5 5 9 0 0 0 8 6 15 5 7 13 14 0 0 0 0 0 0\nIsack Hadjar 0 11 8 13 10 11 9 6 7 16 12 0 20 11 3 10 10 11 0 0 0 0 0 0\nNico Hulkenberg 7 15 16 0 15 14 12 16 5 8 9 3 12 13 14 0 16 20 0 0 0 0 0 0\nFernando Alonso 0 0 11 15 11 15 11 0 9 7 7 9 17 5 8 0 15 7 0 0 0 0 0 0\nCarlos Sainz 0 10 14 0 8 9 8 10 14 10 0 12 18 14 13 11 3 10 0 0 0 0 0 0\nLance Stroll 6 9 20 17 16 16 15 15 0 17 14 7 14 7 18 17 13 13 0 0 0 0 0 0\nLiam Lawson 0 12 17 16 12 0 14 8 11 0 6 0 8 8 12 14 5 15 0 0 0 0 0 0\nEsteban Ocon 13 5 18 8 14 12 0 7 16 9 10 13 15 16 10 15 14 18 0 0 0 0 0 0\nPierre Gasly 11 0 13 7 0 13 13 0 8 15 13 6 10 19 17 16 18 19 0 0 0 0 0 0\nYuki Tsunoda 12 16 12 9 0 10 10 17 13 12 16 15 13 17 9 13 6 12 0 0 0 0 0 0\nGabriel Bortoleto 0 14 19 18 18 0 18 14 12 14 8 0 9 6 15 8 11 17 0 0 0 0 0 0\nOliver Bearman 14 8 10 10 13 0 17 12 17 11 11 11 0 6 12 12 17 16 0 0 0 0 0 0\nFranco Colapinto 0 0 0 0 0 0 0 0 16 13 15 15 0 19 18 11 17 16 0 0 0 0 0 0\nJack Doohan 0 13 15 14 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+}           
+        };
+        
+        // --- GLOBAL VARIABLES & INITIAL DATA ---
+        let expectedEloTable;
+        const initialDataKeys = Object.keys(f1Data); // Store keys of the initial hardcoded data
+
+        // Add the shared expected elo table to each season's data
+        const referenceEloTable = `
+              p1   p2   p3   p4   p5   p6   p7   p8   p9  p10  p11  p12  p13  p14  p15  p16  p17  p18  p19  p20
+        1st    2    2   -2   -4   -6   -8  -10  -12  -14  -16  -18  -20  -22  -24  -26  -28  -30  -32  -34  -36
+        2nd    4    2    2    2   -2   -4   -6   -8  -10  -12  -14  -16  -18  -20  -22  -24  -26  -28  -30  -32
+        3rd    8    6    4    2    2    2   -2   -4   -6   -8  -10  -12  -14  -16  -18  -20  -22  -24  -26  -28
+        4th   12   10    8    6    4    2    2    2   -2   -4   -6   -8  -10  -12  -14  -16  -18  -20  -22  -24
+        5th   16   14   12   10    8    6    4    2    2    2   -2   -4   -6   -8  -10  -12  -14  -16  -18  -20
+        6th   20   18   16   14   12   10    8    6    4    2    2    2   -2   -4   -6   -8  -10  -12  -14  -16
+        7th   24   22   20   18   16   14   12   10    8    6    4    2    2    2   -2   -4   -6   -8  -10  -12
+        8th   28   26   24   22   20   18   16   14   12   10    8    6    4    2    2    2   -2   -4   -6   -8
+        9th   32   30   28   26   24   22   20   18   16   14   12   10    8    6    4    2    2    2   -2   -4
+       10th   36   34   32   30   28   26   24   22   20   18   16   14   12   10    8    6    4    2    2    2`;
+
+        Object.keys(f1Data).forEach(year => {
+            f1Data[year].expectedEloTableRaw = referenceEloTable;
+        });
+
+
+        // --- DOM ELEMENTS ---
+        const yearSelector = document.getElementById('year-selector');
+        const yearControls = document.getElementById('year-controls');
+        const tablesContainer = document.getElementById('tables-container');
+        const careerModal = document.getElementById('career-summary-modal');
+        const closeCareerBtn = document.getElementById('close-career-summary');
+
+        // --- PARSING FUNCTIONS ---
+        const parseTeamRankings = (rawString) => {
+            const data = {};
+            if (!rawString) return data;
+            const lines = rawString.trim().split('\n');
+            lines.forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if (parts.length < 2) return;
+                const rank = parts.pop();
+                const teamName = parts.join(' ');
+                data[teamName] = rank;
+            });
+            return data;
+        };
+        const parseDriverTeams = (rawString) => {
+            const data = {};
+            if (!rawString) return data;
+            const lines = rawString.trim().split('\n');
+            lines.forEach(line => {
+                const parts = line.trim().split(/\s+/);
+                if (parts.length < 3) return;
+                const driverName = parts.slice(0, 2).join(' ');
+                const teamName = parts.slice(2).join(' ');
+                data[driverName] = teamName;
+            });
+            return data;
+        };
+        const parseDriverRankings = (rawString) => {
+             const rankings = {};
+             if (!rawString) return rankings;
+             const lines = rawString.trim().split('\n');
+             lines.forEach(line => {
+                 const parts = line.trim().split(/\s+/);
+                 if (parts.length < 2) return;
+                 const driverName = parts.slice(0, 2).join(' ');
+                 const results = parts.slice(2).map(pos => pos === '-' ? 'DNF' : parseInt(pos));
+                 rankings[driverName] = results;
+             });
+             return rankings;
+        }
+        const parseExpectedEloTable = (rawString) => {
+            if (!rawString) return []; 
+            return rawString.trim().split('\n').slice(1).map(line =>
+                line.trim().split(/\s+/).slice(1).map(Number)
+            );
+        }
+
+        // --- CALCULATION LOGIC ---
+        function calculatePositionElo(position) {
+            if (position === 'DNF' || isNaN(position)) return -5;
+            const points = {
+                1: 12, 2: 10, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1,
+                11: -1, 12: -2, 13: -3, 14: -4, 15: -5, 16: -6, 17: -7, 18: -8, 19: -9, 20: -10
+            };
+            return points[position] || 0;
+        }
+        function getExpectedElo(position, teamRank) {
+            if (position === 'DNF' || !teamRank || !expectedEloTable || isNaN(position)) return 0;
+            const rowIndex = teamRank - 1;
+            const colIndex = position - 1;
+            if (rowIndex >= 0 && rowIndex < expectedEloTable.length && colIndex >= 0 && colIndex < expectedEloTable[0].length) {
+                return expectedEloTable[rowIndex][colIndex];
+            }
+            return 0;
+        }
+
+        function calculateSeasonElo(year) {
+            const yearData = f1Data[year];
+            if (!yearData || !yearData.driverRankingsRaw) return null;
+
+            const teamRankings = parseTeamRankings(yearData.teamRankingsRaw);
+            const driverTeams = parseDriverTeams(yearData.driverTeamsRaw);
+            const driverData = parseDriverRankings(yearData.driverRankingsRaw);
+            
+            const drivers = Object.keys(driverData);
+            if(drivers.length === 0) return null;
+            
+            const teamsToDrivers = {};
+            Object.keys(driverTeams).forEach(driver => {
+                const team = driverTeams[driver];
+                if (!teamsToDrivers[team]) teamsToDrivers[team] = [];
+                teamsToDrivers[team].push(driver);
+            });
+            
+            const eloResults = {};
+            drivers.forEach(driver => {
+                const teamName = driverTeams[driver];
+                const teamRank = teamName ? parseInt(teamRankings[teamName]) : null;
+                const raceResults = driverData[driver] || [];
+                
+                const teammate = (teamsToDrivers[teamName] || []).find(d => d !== driver);
+                const teammateRaceResults = teammate && driverData[teammate] ? driverData[teammate] : [];
+                
+                const teammateElos = raceResults.map((driverPos, i) => {
+                    if (!teammate || i >= teammateRaceResults.length) return 0;
+                    const teammatePos = teammateRaceResults[i];
+                    if (driverPos === 'DNF' && teammatePos !== 'DNF') return -4;
+                    if (driverPos !== 'DNF' && teammatePos !== 'DNF' && driverPos > teammatePos) return -4;
+                    return 0;
+                });
+
+                const positionElos = raceResults.map(calculatePositionElo);
+                const expectedElos = raceResults.map(pos => getExpectedElo(pos, teamRank));
+                const totalElos = positionElos.map((pe, i) => pe + expectedElos[i] + teammateElos[i]);
+
+                eloResults[driver] = {
+                    team: teamName,
+                    raceResults, positionElos, expectedElos, teammateElos, totalElos,
+                    totalPositionElo: positionElos.reduce((a, b) => a + b, 0),
+                    totalExpectedElo: expectedElos.reduce((a, b) => a + b, 0),
+                    totalTeammateElo: teammateElos.reduce((a, b) => a + b, 0),
+                    totalElo: totalElos.reduce((a, b) => a + b, 0)
+                };
+            });
+            return { eloResults, driverData };
+        }
+
+
+        // --- RENDERING LOGIC ---
+        function renderUI() {
+            const selectedYear = yearSelector.value;
+            const activeTab = document.querySelector('.tabs button.active').dataset.tab;
+
+            tablesContainer.innerHTML = '';
+            
+            if (activeTab === 'all-time-elo') {
+                yearControls.style.display = 'none';
+                renderAllTimeEloTable();
+            } else {
+                yearControls.style.display = 'flex';
+                renderCalculatorForYear(selectedYear);
+            }
+        }
+
+        function renderCalculatorForYear(year) {
+            const noDataMessage = document.getElementById('no-data-message');
+            const seasonResults = calculateSeasonElo(year);
+
+            if (!seasonResults) {
+                tablesContainer.innerHTML = '';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+            noDataMessage.style.display = 'none';
+            
+            const { eloResults, driverData } = seasonResults;
+            const drivers = Object.keys(driverData);
+            const numRaces = drivers.length > 0 ? (driverData[drivers[0]]?.length || 0) : 0;
+
+            const activeTab = document.querySelector('.tabs button.active').dataset.tab;
+            
+            const sortAndCreateTable = (eloKey, totalKey, title) => {
+                const sorted = drivers.map(d => ({ driver: d, total: eloResults[d][totalKey] })).sort((a, b) => b.total - a.total);
+                createSeasonTable(eloKey, title, sorted, eloKey, totalKey, eloResults, driverData, numRaces);
+            };
+
+            if (activeTab === 'total-elo') {
+                sortAndCreateTable('totalElos', 'totalElo', 'Total Elo');
+            } else if (activeTab === 'position-elo') {
+                sortAndCreateTable('positionElos', 'totalPositionElo', 'Position Elo');
+            } else if (activeTab === 'expected-elo') {
+                sortAndCreateTable('expectedElos', 'totalExpectedElo', "Driver's Expected Elo");
+            } else if (activeTab === 'teammate-elo') {
+                const sorted = drivers.map(d => ({ driver: d, total: eloResults[d].totalTeammateElo })).sort((a, b) => a.total - b.total);
+                createSeasonTable('teammateElos', 'Teammate Subtraction Elo', sorted, 'teammateElos', 'totalTeammateElo', eloResults, driverData, numRaces);
+            }
+        }
+        
+        function renderAllTimeEloTable() {
+            const allTimeEloScores = {};
+            const BASE_ELO = 1500;
+            
+            const allDrivers = new Set();
+            Object.values(f1Data).forEach(seasonData => {
+                if (seasonData.driverRankingsRaw) {
+                    Object.keys(parseDriverRankings(seasonData.driverRankingsRaw)).forEach(driver => allDrivers.add(driver));
+                }
+            });
+
+            allDrivers.forEach(driver => { allTimeEloScores[driver] = BASE_ELO; });
+            
+            const sortedYears = Object.keys(f1Data).sort((a, b) => a - b);
+            
+            sortedYears.forEach(year => {
+                const seasonResults = calculateSeasonElo(year);
+                if (seasonResults) {
+                    Object.keys(seasonResults.eloResults).forEach(driver => {
+                        if (allTimeEloScores[driver] === undefined) allTimeEloScores[driver] = BASE_ELO;
+                        allTimeEloScores[driver] += seasonResults.eloResults[driver].totalElo;
+                    });
+                }
+            });
+
+            const sortedDrivers = Object.entries(allTimeEloScores)
+                .map(([driver, elo]) => ({ driver, elo }))
+                .sort((a, b) => b.elo - a.elo);
+                
+            let tableHtml = `<div id="table-all-time-elo" class="table-wrapper my-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 text-center">All-Time Elo Rankings</h2>
+                <div class="table-container"><table><thead><tr>
+                <th>Rank</th><th>Driver</th><th class="total-elo">All-Time Elo</th>
+                </tr></thead><tbody>`;
+
+            sortedDrivers.forEach((item, index) => {
+                tableHtml += `<tr>
+                    <td>${index + 1}</td>
+                    <td class="font-medium cursor-pointer hover:text-fca311" data-driver="${item.driver}">${item.driver}</td>
+                    <td class="total-elo">${item.elo}</td>
+                </tr>`;
+            });
+
+            tableHtml += `</tbody></table></div></div>`;
+            tablesContainer.innerHTML = tableHtml;
+        }
+        
+        function showCareerSummary(driverName) {
+            document.getElementById('career-summary-title').textContent = `Career Summary for ${driverName}`;
+            const contentDiv = document.getElementById('career-summary-content');
+            
+            let tableHtml = `<table><thead><tr>
+                <th>Year</th><th>Team</th><th>Pos. Elo</th><th>Exp. Elo</th><th>Tmate Elo</th><th class="total-elo">Total Elo</th>
+            </tr></thead><tbody>`;
+            
+            const sortedYears = Object.keys(f1Data).sort((a,b) => a - b);
+            let totalCareerElo = 0;
+
+            sortedYears.forEach(year => {
+                const seasonResults = calculateSeasonElo(year);
+                if (seasonResults && seasonResults.eloResults[driverName]) {
+                    const driverSeasonData = seasonResults.eloResults[driverName];
+                    totalCareerElo += driverSeasonData.totalElo;
+                    tableHtml += `<tr>
+                        <td>${year}</td>
+                        <td>${driverSeasonData.team || 'N/A'}</td>
+                        <td>${formatElo(driverSeasonData.totalPositionElo)}</td>
+                        <td>${formatElo(driverSeasonData.totalExpectedElo)}</td>
+                        <td>${formatElo(driverSeasonData.totalTeammateElo)}</td>
+                        <td class="total-elo">${driverSeasonData.totalElo}</td>
+                    </tr>`;
+                }
+            });
+            
+            tableHtml += `<tr class="font-bold bg-gray-800"><td colspan="5" class="text-right">Career Total (excl. base)</td><td class="total-elo">${totalCareerElo}</td></tr>`;
+            tableHtml += `</tbody></table>`;
+            contentDiv.innerHTML = tableHtml;
+            careerModal.classList.remove('hidden');
+            careerModal.classList.add('flex');
+        }
+
+        function createSeasonTable(id, title, sortedDrivers, eloType, totalKey, eloResults, driverData, numRaces) {
+            let tableHtml = `<div id="table-${id}" class="table-wrapper my-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 text-center">${title} (${yearSelector.value})</h2>
+                <div class="table-container"><table><thead><tr><th>Driver</th>
+                ${Array.from({ length: numRaces }, (_, i) => `<th>R${i + 1}</th>`).join('')}
+                <th class="total-elo">Total</th></tr></thead><tbody>`;
+
+            sortedDrivers.forEach(({ driver }) => {
+                const results = eloResults[driver][eloType];
+                const total = eloResults[driver][totalKey];
+                const racePositions = driverData[driver];
+                tableHtml += `<tr><td class="font-medium cursor-pointer hover:text-fca311" data-driver="${driver}">${driver}</td>`;
+                results.forEach((elo, i) => {
+                    const isDNF = racePositions[i] === 'DNF' && eloType === 'positionElos';
+                    tableHtml += `<td>${formatElo(elo, isDNF)}</td>`;
+                });
+                tableHtml += `<td class="total-elo">${total}</td></tr>`;
+            });
+
+            tableHtml += `</tbody></table></div></div>`;
+            tablesContainer.innerHTML = tableHtml;
+        }
+
+        function formatElo(value, isDNF = false) {
+            if (isDNF) return `<span class="dnf">DNF (-5)</span>`;
+            if (value === 0) return '0';
+            const className = value > 0 ? 'positive-elo' : (value < 0 ? 'negative-elo' : '');
+            return `<span class="${className}">${value}</span>`;
+        }
+        
+        // --- TAB LOGIC ---
+        function switchTab(targetId) {
+            document.querySelectorAll('.tabs button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === targetId));
+            renderUI();
+        }
+        document.getElementById('tab-buttons').addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') switchTab(e.target.dataset.tab);
+        });
+
+        // --- YEAR MANAGEMENT AND LOCALSTORAGE ---
+        function populateYearSelector() {
+            const savedYear = yearSelector.value;
+            yearSelector.innerHTML = '';
+            Object.keys(f1Data).sort((a, b) => b - a).forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelector.appendChild(option);
+            });
+            if (savedYear && f1Data[savedYear]) {
+                yearSelector.value = savedYear;
+            } else if (yearSelector.options.length > 0) {
+                yearSelector.value = yearSelector.options[0].value;
+            }
+        }
+        function loadData() {
+             // Data is now hardcoded, so no localStorage loading is needed.
+            expectedEloTable = parseExpectedEloTable(f1Data['2024']?.expectedEloTableRaw);
+        }
+        
+        // --- EVENT LISTENERS ---
+        yearSelector.addEventListener('change', renderUI);
+
+        tablesContainer.addEventListener('click', (e) => {
+            const driverCell = e.target.closest('[data-driver]');
+            if (driverCell) {
+                const driverName = driverCell.dataset.driver;
+                showCareerSummary(driverName);
+            }
+        });
+        
+        closeCareerBtn.addEventListener('click', () => {
+            careerModal.classList.add('hidden');
+            careerModal.classList.remove('flex');
+        });
+        
+        // --- INITIALIZATION ---
+        loadData();
+        populateYearSelector();
+        // Set a default active tab and render
+        switchTab('total-elo');
+    });
+    </script>
+</body>
+</html>
