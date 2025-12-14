@@ -4,12 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Türkiye Seçim Simülasyonu</title>
+  <meta name="description" content="Türkiye için gelişmiş seçim simülasyonu: parlamento ve cumhurbaşkanlığı senaryolarını il bazında projekte edin.">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:title" content="Türkiye Seçim Simülasyonu">
+  <meta property="og:description" content="Parlamento ve Cumhurbaşkanlığı senaryolarını il bazında projekte eden analitik panel.">
+  <meta property="og:type" content="website">
+  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" as="script">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -26,7 +35,7 @@
   </script>
   <style>
     body {
-      background-color: #f1f5f9;
+      background-color: var(--bg-base);
       background-image: 
         radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
         radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
@@ -82,11 +91,58 @@
         box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
         transform: translateY(-1px);
     }
+
+    /* --- Enhancements --- */
+    :root{
+      --glass-bg: rgba(255,255,255,0.85);
+      --glass-border: rgba(255,255,255,0.5);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+      --glass-dark-bg: rgba(15, 23, 42, 0.85);
+      --glass-dark-border: rgba(255, 255, 255, 0.10);
+      --glass-dark-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.30);
+      --bg-base: #f1f5f9;
+    }
+    html[data-theme="midnight"]{
+      --glass-bg: rgba(15, 23, 42, 0.65);
+      --glass-border: rgba(255,255,255,0.14);
+      --glass-shadow: 0 10px 40px rgba(0,0,0,0.28);
+      --glass-dark-bg: rgba(2, 6, 23, 0.72);
+      --glass-dark-border: rgba(255, 255, 255, 0.12);
+      --glass-dark-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      --bg-base: #070b14;
+    }
+
+    html { scroll-behavior: smooth; }
+    .glass { background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+    .glass-dark { background: var(--glass-dark-bg); border: 1px solid var(--glass-dark-border); box-shadow: var(--glass-dark-shadow); }
+
+    @keyframes fade-in { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
+    @keyframes pulse-soft { 0%,100%{opacity:.65} 50%{opacity:1} }
+
+    /* Better focus rings for keyboard users */
+    :focus-visible { outline: 2px solid rgba(99,102,241,.75); outline-offset: 2px; border-radius: 10px; }
+    path:focus-visible { outline: none; filter: drop-shadow(0px 0px 10px rgba(255,255,255,.55)); stroke: rgba(255,255,255,.9); stroke-width: 1.6px; }
+
+    /* Motion safety */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+
   </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-brand-500 selection:text-white pb-20">
 
+  <a href="#kontrol-paneli" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[99999] focus:bg-white focus:text-slate-900 focus:px-4 focus:py-2 focus:rounded-xl focus:shadow-2xl">İçeriğe geç</a>
+
+
   <div class="container mx-auto p-4 lg:p-6 max-w-[1800px]">
+
+    <noscript>
+      <div class="glass p-4 rounded-2xl mb-6 border border-white/30 text-slate-800">
+        Bu sayfa JavaScript olmadan çalışmaz. Tarayıcı ayarlarından JavaScript’i açın.
+      </div>
+    </noscript>
+
     
     <header class="mb-8 pb-4 border-b border-white/20">
       <div>
@@ -94,6 +150,36 @@
           Seçim<span class="text-brand-500 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">Simülatörü</span>
         </h1>
         <p class="text-slate-400 mt-2 text-sm font-medium">Gelişmiş Analitik ve Projeksiyon Paneli</p>
+
+        <div class="mt-5 flex flex-col lg:flex-row gap-3 lg:items-center">
+          <div class="glass rounded-2xl shadow-lg ring-1 ring-white/20 px-3 py-2 flex items-center gap-2 w-full lg:max-w-md">
+            <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35"></path><circle cx="11" cy="11" r="7"></circle></svg>
+            <input id="provinceSearch" type="search" placeholder="İl ara: Ankara, İzmir, Diyarbakır…" class="w-full bg-transparent text-sm font-semibold text-slate-800 placeholder:text-slate-500 outline-none" autocomplete="off" />
+            <button id="btnClearSearch" class="p-1 rounded-lg hover:bg-slate-200/60 transition" aria-label="Aramayı temizle">
+              <svg class="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button id="btnAutoRun" class="glass px-4 py-2 rounded-2xl text-sm font-extrabold text-slate-800 shadow-lg ring-1 ring-white/20 hover:scale-[1.01] active:scale-95 transition" type="button">
+              Oto Çalıştır: <span class="font-mono">KAPALI</span>
+            </button>
+            <button id="btnTheme" class="glass px-4 py-2 rounded-2xl text-sm font-extrabold text-slate-800 shadow-lg ring-1 ring-white/20 hover:scale-[1.01] active:scale-95 transition" type="button">
+              Tema: <span class="font-mono" id="themeLabel">AURORA</span>
+            </button>
+            <button id="btnIO" class="glass px-4 py-2 rounded-2xl text-sm font-extrabold text-slate-800 shadow-lg ring-1 ring-white/20 hover:scale-[1.01] active:scale-95 transition" type="button">
+              İçe/Dışa Aktar
+            </button>
+            <button id="btnReset" class="glass px-4 py-2 rounded-2xl text-sm font-extrabold text-slate-800 shadow-lg ring-1 ring-white/20 hover:scale-[1.01] active:scale-95 transition" type="button">
+              Sıfırla
+            </button>
+          </div>
+
+          <div class="ml-auto hidden lg:flex items-center gap-2 text-xs text-slate-300">
+            <span id="saveBadge" class="px-3 py-1 rounded-full bg-white/10 border border-white/10 font-mono">AUTO-SAVE: READY</span>
+          </div>
+        </div>
+
       </div>
     </header>
 
@@ -289,6 +375,31 @@
                             </g>
                     </svg>
                 </div>
+
+                <div id="provinceInspector" class="mt-4 glass rounded-2xl shadow-lg ring-1 ring-white/20 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-[10px] font-black tracking-widest text-slate-500 uppercase">Seçili İl</div>
+                      <div id="provinceInspectorTitle" class="text-lg font-black text-slate-800 leading-tight">—</div>
+                      <div id="provinceInspectorHint" class="text-xs text-slate-500 mt-0.5">Haritada bir ile tıklayın (Enter/Space çalışır).</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button id="btnPinProvince" type="button" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold shadow hover:scale-[1.01] active:scale-95 transition">Sabitle</button>
+                      <button id="btnUnpinProvince" type="button" class="px-3 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-extrabold border border-slate-200 hover:bg-slate-200/70 active:scale-95 transition">Bırak</button>
+                    </div>
+                  </div>
+                  <div id="provinceInspectorBody" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-white/70 border border-slate-200/70 p-3">
+                      <div class="text-xs font-bold text-slate-700">İpucu</div>
+                      <div class="text-xs text-slate-600 mt-1">Sonuçlar için “Simülasyonu Çalıştır” butonuna basın. Sonrasında illere tıklayarak detayları burada sabitleyebilirsiniz.</div>
+                    </div>
+                    <div class="rounded-xl bg-white/70 border border-slate-200/70 p-3">
+                      <div class="text-xs font-bold text-slate-700">Kısayollar</div>
+                      <div class="text-xs text-slate-600 mt-1 font-mono">Enter/Space: seç • ESC: kapat • Ctrl/Cmd+S: dışa aktar</div>
+                    </div>
+                  </div>
+                </div>
+
             </div>
         </div>
 
@@ -312,7 +423,7 @@
         </div>
     </div>
 
-    <div class="glass p-6 lg:p-8 rounded-3xl mb-12 shadow-lg">
+    <div id="kontrol-paneli" class="glass p-6 lg:p-8 rounded-3xl mb-12 shadow-lg">
         <div class="flex items-center justify-between mb-6">
              <div>
                  <h2 class="text-2xl font-bold text-slate-800">Kontrol Paneli</h2>
@@ -397,6 +508,45 @@
       </div>
     </div>
   </div>
+
+  <!-- IO MODAL -->
+  <div id="ioModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[99990] hidden">
+    <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-black text-slate-900">İçe/Dışa Aktar</h3>
+          <p class="text-xs text-slate-500">Durumu JSON olarak kopyala/yapıştır. Gerekirse dosya olarak indir/yükle.</p>
+        </div>
+        <button id="btnCloseIO" class="p-2 rounded-xl hover:bg-slate-100 transition" aria-label="Pencereyi kapat">
+          <svg class="w-5 h-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <textarea id="ioText" class="w-full h-64 rounded-2xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500" spellcheck="false" placeholder="{ ... }"></textarea>
+
+        <div class="flex flex-wrap gap-2 justify-between items-center">
+          <div class="flex flex-wrap gap-2">
+            <button id="btnCopyJSON" class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm font-extrabold shadow active:scale-95 transition">Kopyala</button>
+            <button id="btnApplyJSON" class="px-4 py-2 rounded-2xl bg-indigo-600 text-white text-sm font-extrabold shadow active:scale-95 transition">Yapıştır & Uygula</button>
+            <button id="btnShareLink" class="px-4 py-2 rounded-2xl bg-slate-100 border border-slate-200 text-slate-900 text-sm font-extrabold shadow-sm hover:bg-slate-200/70 active:scale-95 transition">Paylaşım Linki</button>
+            <button id="btnDownloadJSON" class="px-4 py-2 rounded-2xl bg-slate-100 border border-slate-200 text-slate-900 text-sm font-extrabold shadow-sm hover:bg-slate-200/70 active:scale-95 transition">İndir</button>
+          </div>
+
+          <label class="px-4 py-2 rounded-2xl bg-slate-100 border border-slate-200 text-slate-900 text-sm font-extrabold shadow-sm hover:bg-slate-200/70 active:scale-95 transition cursor-pointer">
+            Dosya Yükle
+            <input id="fileImport" type="file" accept="application/json" class="hidden" />
+          </label>
+        </div>
+
+        <div class="text-[11px] text-slate-500">
+          Not: “Paylaşım Linki” yalnızca küçük bir özet durumu hash’e yazar. Çok büyük senaryoları JSON ile taşıyın.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toastHost" class="fixed bottom-4 right-4 z-[99999] space-y-2"></div>
 
   <div id="tooltip" class="fixed hidden z-[9999] bg-slate-900/95 backdrop-blur text-white text-xs rounded-xl shadow-2xl p-0 border border-white/10 min-w-[220px] overflow-hidden"></div>
 
@@ -1180,5 +1330,771 @@ function adjustColor(baseColor, voteShare) {
     return hslToHex(hsl);
 }
 </script>
+
+<script>
+/* ===========================
+   Enhancements Layer (non-breaking)
+   =========================== */
+(() => {
+  const STORAGE_KEY = "secim_sim_state_v3";
+  const STORAGE_THEME = "secim_sim_theme";
+  const STORAGE_AUTORUN = "secim_sim_autorun";
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  let autoRun = false;
+  let pinnedProvinceId = null;
+  let lastHoverProvinceId = null;
+
+  let saveTimer = null;
+  let runTimer = null;
+
+  let voteChart = null;
+  let seatChart = null;
+
+  const debounce = (fn, wait=250) => {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+  };
+
+  const showToast = (message, kind="info") => {
+    const host = $("#toastHost");
+    if (!host) return;
+    const el = document.createElement("div");
+    el.className = "glass px-4 py-3 rounded-2xl shadow-2xl border border-white/40 max-w-[380px]";
+    el.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="mt-0.5 w-2.5 h-2.5 rounded-full ${kind==="ok" ? "bg-emerald-500" : kind==="warn" ? "bg-amber-500" : kind==="bad" ? "bg-rose-500" : "bg-indigo-500"}"></div>
+        <div class="text-sm font-bold text-slate-900 leading-snug">${escapeHtml(message)}</div>
+      </div>`;
+    host.appendChild(el);
+    setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(6px)"; el.style.transition = "all .25s ease"; }, 2400);
+    setTimeout(() => el.remove(), 2900);
+  };
+
+  const setSaveBadge = (text, tone="ready") => {
+    const badge = $("#saveBadge");
+    if (!badge) return;
+    badge.textContent = text;
+    badge.classList.remove("bg-white/10", "bg-amber-500/20", "bg-emerald-500/20", "bg-rose-500/20");
+    badge.classList.add(tone==="saving" ? "bg-amber-500/20" : tone==="saved" ? "bg-emerald-500/20" : tone==="error" ? "bg-rose-500/20" : "bg-white/10");
+  };
+
+  function escapeHtml(str="") {
+    return String(str).replace(/[&<>"']/g, s => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" }[s]));
+  }
+
+  function getTheme() {
+    return localStorage.getItem(STORAGE_THEME) || "aurora";
+  }
+  function applyTheme(theme) {
+    const t = (theme === "midnight") ? "midnight" : "aurora";
+    document.documentElement.setAttribute("data-theme", t);
+    const lbl = $("#themeLabel");
+    if (lbl) lbl.textContent = t.toUpperCase();
+    localStorage.setItem(STORAGE_THEME, t);
+  }
+
+  function setAutoRun(enabled) {
+    autoRun = !!enabled;
+    localStorage.setItem(STORAGE_AUTORUN, autoRun ? "1" : "0");
+    const btn = $("#btnAutoRun");
+    if (btn) {
+      btn.innerHTML = `Oto Çalıştır: <span class="font-mono">${autoRun ? "AÇIK" : "KAPALI"}</span>`;
+      btn.classList.toggle("ring-2", autoRun);
+      btn.classList.toggle("ring-emerald-400/60", autoRun);
+    }
+    showToast(autoRun ? "Oto çalıştır aktif. Değişiklikler otomatik hesaplanacak." : "Oto çalıştır kapalı.", autoRun ? "ok" : "info");
+  }
+
+  function snapshotState(full=true) {
+    const national = {};
+    const qualify = {};
+    if (typeof parties !== "undefined") {
+      parties.forEach(p => {
+        const inp = document.getElementById(`input_${p}`);
+        national[p] = inp ? (parseFloat(inp.value) || 0) : 0;
+        const q = document.getElementById(`qualify_${p}`);
+        qualify[p] = q ? !!q.checked : false;
+      });
+    }
+
+    const readCandidateTable = (tableId) => {
+      const table = document.getElementById(tableId);
+      if (!table || !table.tBodies || !table.tBodies[0]) return null;
+      const rows = Array.from(table.tBodies[0].rows).filter(r => r.id !== "sandigaRow");
+      return rows.map(r => {
+        const name = r.querySelector('th input[type="text"]')?.value?.trim() || "";
+        const votes = Array.from(r.querySelectorAll('td input[type="number"]')).map(i => parseFloat(i.value) || 0);
+        return { name, votes };
+      });
+    };
+
+    const state = {
+      v: 3,
+      ts: Date.now(),
+      theme: document.documentElement.getAttribute("data-theme") || "aurora",
+      autoRun,
+      electionMode: (typeof electionMode !== "undefined") ? electionMode : "parliamentary",
+      parties: (typeof parties !== "undefined") ? Array.from(parties) : [],
+      partyColors: (typeof partyColors !== "undefined") ? Object.assign({}, partyColors) : {},
+      national,
+      qualify,
+      pres1: readCandidateTable("presidentialTable"),
+      pres2: readCandidateTable("secondRoundTable"),
+      runoffVisible: !!document.getElementById("secondRoundDiv") && !document.getElementById("secondRoundDiv").classList.contains("hidden"),
+      pinnedProvinceId
+    };
+
+    if (full && typeof provinces !== "undefined") {
+      // Persist province ratios so custom parties don't evaporate on refresh.
+      state.provinceRatios = provinces.map(p => ({
+        id: p.id,
+        defaultVotes: p.defaultVotes,
+        ratios: p.ratios
+      }));
+    }
+
+    return state;
+  }
+
+  function saveState() {
+    try {
+      setSaveBadge("AUTO-SAVE: SAVING…", "saving");
+      const state = snapshotState(true);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setSaveBadge("AUTO-SAVE: SAVED", "saved");
+    } catch (e) {
+      console.warn(e);
+      setSaveBadge("AUTO-SAVE: ERROR", "error");
+    }
+  }
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    setSaveBadge("AUTO-SAVE: PENDING…", "saving");
+    saveTimer = setTimeout(saveState, 450);
+  }
+
+  function scheduleRun() {
+    if (!autoRun) return;
+    clearTimeout(runTimer);
+    runTimer = setTimeout(() => {
+      try { 
+        if (typeof calculateWrapper === "function") calculateWrapper(); 
+      } catch {}
+    }, 550);
+  }
+
+  function applyState(state) {
+    if (!state || state.v !== 3) return false;
+
+    try {
+      applyTheme(state.theme || "aurora");
+      setAutoRun(!!state.autoRun);
+
+      if (Array.isArray(state.parties) && state.parties.length && typeof parties !== "undefined") {
+        // Restore parties and colors
+        parties = Array.from(state.parties);
+        if (state.partyColors && typeof partyColors !== "undefined") {
+          partyColors = Object.assign({}, state.partyColors);
+        }
+
+        // Restore province ratios (especially for custom parties)
+        if (Array.isArray(state.provinceRatios) && typeof provinces !== "undefined") {
+          state.provinceRatios.forEach(sp => {
+            const p = provinces.find(pp => pp.id === sp.id);
+            if (p && sp.ratios) p.ratios = sp.ratios;
+            if (p && typeof sp.defaultVotes === "number") p.defaultVotes = sp.defaultVotes;
+          });
+        }
+
+        // Re-render inputs with new party set
+        if (typeof renderParliamentaryInputs === "function") renderParliamentaryInputs();
+        const names = (state.pres1 || []).map(r => r.name).filter(Boolean);
+        if (typeof renderPresidentialInputs === "function") renderPresidentialInputs(names.length ? names : undefined);
+
+        // Restore national inputs / qualify toggles
+        parties.forEach(p => {
+          const inp = document.getElementById(`input_${p}`);
+          if (inp && state.national && state.national[p] != null) inp.value = state.national[p];
+          const q = document.getElementById(`qualify_${p}`);
+          if (q && state.qualify && state.qualify[p] != null) q.checked = !!state.qualify[p];
+        });
+
+        // Helper to fill candidate tables
+        const fillCandidateTable = (tableId, data) => {
+          const table = document.getElementById(tableId);
+          if (!table || !table.tBodies || !table.tBodies[0] || !Array.isArray(data)) return;
+          const rows = Array.from(table.tBodies[0].rows).filter(r => r.id !== "sandigaRow");
+          data.forEach((d, i) => {
+            if (!rows[i]) return;
+            const nameInp = rows[i].querySelector('th input[type="text"]');
+            if (nameInp && d.name != null) nameInp.value = d.name;
+            const ins = Array.from(rows[i].querySelectorAll('td input[type="number"]'));
+            ins.forEach((inp, j) => {
+              if (d.votes && d.votes[j] != null) inp.value = d.votes[j];
+            });
+          });
+        };
+
+        fillCandidateTable("presidentialTable", state.pres1);
+
+        // Restore runoff table visibility & values
+        const secondRoundDiv = document.getElementById("secondRoundDiv");
+        if (secondRoundDiv) {
+          if (state.runoffVisible && Array.isArray(state.pres2) && state.pres2.length) {
+            if (typeof renderSecondRoundInputs === "function") {
+              renderSecondRoundInputs(state.pres2.map(r => r.name));
+            }
+            secondRoundDiv.classList.remove("hidden");
+            fillCandidateTable("secondRoundTable", state.pres2);
+          } else {
+            secondRoundDiv.classList.add("hidden");
+          }
+        }
+
+        pinnedProvinceId = state.pinnedProvinceId || null;
+
+        // Restore mode
+        if (typeof switchElectionMode === "function") {
+          switchElectionMode(state.electionMode || "parliamentary");
+        }
+
+        // Recalculate if there is any input
+        const hasSomeInput = Object.values(state.national || {}).some(v => (parseFloat(v) || 0) > 0);
+        if (hasSomeInput && typeof calculateWrapper === "function") {
+          calculateWrapper();
+        }
+      }
+
+      showToast("Durum yüklendi.", "ok");
+      return true;
+    } catch (e) {
+      console.warn(e);
+      showToast("Durum yüklenemedi (bozuk JSON?).", "bad");
+      return false;
+    }
+  }
+
+  function loadState() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const state = JSON.parse(raw);
+      applyState(state);
+    } catch {}
+  }
+
+  // Charts (append to results after render)
+  function ensureChartsCard() {
+    const results = document.getElementById("results");
+    if (!results) return null;
+
+    let card = document.getElementById("chartsCard");
+    if (!card) {
+      card = document.createElement("div");
+      card.id = "chartsCard";
+      card.className = "bg-slate-800/50 rounded-xl border border-white/10 overflow-hidden";
+      card.innerHTML = `
+        <div class="px-4 py-3 border-b border-white/10 bg-slate-900/50 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-[pulse-soft_1.8s_ease-in-out_infinite]"></span>
+            <h3 class="font-black text-sm text-white tracking-wide">Grafikler</h3>
+          </div>
+          <button id="btnToggleCharts" class="text-xs font-bold text-slate-300 hover:text-white transition px-2 py-1 rounded-lg hover:bg-white/5">Göster/Gizle</button>
+        </div>
+        <div id="chartsBody" class="p-4 space-y-4">
+          <div class="grid grid-cols-1 gap-4">
+            <div class="bg-slate-900/30 border border-white/10 rounded-xl p-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-xs font-bold text-slate-200">Ulusal Oy Dağılımı</div>
+                <div class="text-[10px] font-mono text-slate-500">% (simülasyon)</div>
+              </div>
+              <canvas id="chartVotes" height="220"></canvas>
+            </div>
+            <div class="bg-slate-900/30 border border-white/10 rounded-xl p-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-xs font-bold text-slate-200">Sandalye Dağılımı</div>
+                <div class="text-[10px] font-mono text-slate-500">Toplam</div>
+              </div>
+              <canvas id="chartSeats" height="220"></canvas>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-500">Not: Grafikler sonuçlar hesaplandıktan sonra güncellenir.</div>
+        </div>
+      `;
+      results.appendChild(card);
+    }
+
+    const btn = $("#btnToggleCharts");
+    const body = $("#chartsBody");
+    if (btn && body && !btn.dataset.bound) {
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", () => {
+        body.classList.toggle("hidden");
+      });
+    }
+    return card;
+  }
+
+  function updateCharts() {
+    if (!window.Chart) return;
+    if (typeof provinceResultsStore === "undefined" || !Array.isArray(provinceResultsStore) || provinceResultsStore.length === 0) return;
+
+    ensureChartsCard();
+
+    // Compute vote % based on absolute votes across provinces (matches results table logic)
+    const totalAbsolutePartyVotes = Object.fromEntries(parties.map(p => [p, 0]));
+    provinceResultsStore.forEach(provRes => {
+      Object.entries(provRes.absoluteVotes || {}).forEach(([party, votes]) => {
+        if (totalAbsolutePartyVotes[party] == null) totalAbsolutePartyVotes[party] = 0;
+        totalAbsolutePartyVotes[party] += votes || 0;
+      });
+    });
+    const totalAllPartyVotes = Object.values(totalAbsolutePartyVotes).reduce((a, b) => a + b, 0);
+
+    const overallSeats = Object.fromEntries(parties.map(p => [p, 0]));
+    provinceResultsStore.forEach(provRes => {
+      Object.entries(provRes.seatsAllocated || {}).forEach(([party, seats]) => {
+        if (overallSeats[party] == null) overallSeats[party] = 0;
+        overallSeats[party] += seats || 0;
+      });
+    });
+
+    const labels = Object.keys(totalAbsolutePartyVotes)
+      .map(p => ({
+        p,
+        vote: totalAllPartyVotes > 0 ? (totalAbsolutePartyVotes[p] / totalAllPartyVotes * 100) : 0,
+        seats: overallSeats[p] || 0
+      }))
+      .filter(x => x.vote > 0.1 || x.seats > 0)
+      .sort((a, b) => b.seats - a.seats || b.vote - a.vote)
+      .map(x => x.p);
+
+    const voteData = labels.map(p => {
+      const v = totalAllPartyVotes > 0 ? (totalAbsolutePartyVotes[p] / totalAllPartyVotes * 100) : 0;
+      return Number(v.toFixed(2));
+    });
+    const seatData = labels.map(p => overallSeats[p] || 0);
+    const colors = labels.map(p => (partyColors && partyColors[p]) ? partyColors[p] : "#94a3b8");
+
+    const ctxVotes = $("#chartVotes");
+    const ctxSeats = $("#chartSeats");
+
+    try {
+      if (voteChart) voteChart.destroy();
+      if (seatChart) seatChart.destroy();
+
+      voteChart = new Chart(ctxVotes, {
+        type: "doughnut",
+        data: { labels, datasets: [{ data: voteData, backgroundColor: colors, borderColor: "rgba(255,255,255,0.12)", borderWidth: 1 }] },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: true, position: "bottom", labels: { color: "rgba(226,232,240,0.85)", boxWidth: 10, font: { size: 10, weight: "700" } } },
+            tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: %${ctx.formattedValue}` } }
+          }
+        }
+      });
+
+      seatChart = new Chart(ctxSeats, {
+        type: "bar",
+        data: { labels, datasets: [{ data: seatData, backgroundColor: colors, borderWidth: 0 }] },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.formattedValue} sandalye` } }
+          },
+          scales: {
+            x: { ticks: { color: "rgba(226,232,240,0.85)", font: { size: 10, weight: "700" } }, grid: { display: false } },
+            y: { ticks: { color: "rgba(226,232,240,0.7)", font: { size: 10 } }, grid: { color: "rgba(255,255,255,0.06)" } }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  function wireResultsHooks() {
+    // Monkeypatch renderAllResults to append/update charts without altering core logic.
+    if (typeof renderAllResults === "function" && !renderAllResults.__enhanced) {
+      const _render = renderAllResults;
+      renderAllResults = function() {
+        _render();
+        // append charts on next tick so canvases exist
+        requestAnimationFrame(() => updateCharts());
+      };
+      renderAllResults.__enhanced = true;
+    }
+  }
+
+  // Province inspector
+  function updateProvinceInspector(prov, reason="hover") {
+    if (!prov) return;
+    if (pinnedProvinceId && reason === "hover" && prov.id !== pinnedProvinceId) return;
+
+    const title = $("#provinceInspectorTitle");
+    const hint = $("#provinceInspectorHint");
+    const body = $("#provinceInspectorBody");
+    if (!title || !body) return;
+
+    title.textContent = prov.displayName || prov.name || prov.id;
+    if (hint) hint.textContent = pinnedProvinceId === prov.id ? "SABİT • başka iller artık üstüne yazmaz" : "Haritada bir ile tıklayın (Enter/Space çalışır).";
+
+    const provRes = (typeof provinceResultsStore !== "undefined") ? provinceResultsStore.find(r => r.province === prov.id) : null;
+
+    if (!provRes) {
+      body.innerHTML = `
+        <div class="sm:col-span-2 rounded-xl bg-white/70 border border-slate-200/70 p-4">
+          <div class="text-xs font-black text-slate-800">Henüz sonuç yok</div>
+          <div class="text-xs text-slate-600 mt-1">Ulusal oranları girin ve “Simülasyonu Çalıştır” ile hesaplayın.</div>
+          <div class="mt-2 text-[11px] text-slate-500 font-mono">ID: ${escapeHtml(prov.id)} • MV: ${escapeHtml(String(prov.mpCount ?? "—"))}</div>
+        </div>`;
+      return;
+    }
+
+    const entries = Object.entries(provRes.localPercentages || {})
+      .sort((a, b) => (b[1] || 0) - (a[1] || 0))
+      .slice(0, 8);
+
+    const cards = entries.map(([party, pct]) => {
+      const seats = (provRes.seatsAllocated || {})[party] || 0;
+      const color = (partyColors && partyColors[party]) ? partyColors[party] : "#94a3b8";
+      const width = Math.max(0, Math.min(100, pct || 0));
+      return `
+        <div class="rounded-xl bg-white/70 border border-slate-200/70 p-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full" style="background:${color}"></span>
+              <span class="text-xs font-black text-slate-800">${escapeHtml(party)}</span>
+            </div>
+            <div class="text-xs font-mono font-bold text-slate-700">%${Number(pct || 0).toFixed(1)}</div>
+          </div>
+          <div class="mt-2 h-2 rounded bg-slate-200 overflow-hidden">
+            <div class="h-full" style="width:${width}%; background:${color}"></div>
+          </div>
+          <div class="mt-2 flex items-center justify-between">
+            <div class="text-[11px] text-slate-500">Yerel</div>
+            ${seats ? `<div class="text-[11px] font-black text-white bg-slate-900 px-2 py-1 rounded-lg">MV ${seats}</div>` : `<div class="text-[11px] text-slate-400">—</div>`}
+          </div>
+        </div>`;
+    }).join("");
+
+    body.innerHTML = cards + `
+      <div class="sm:col-span-2 text-[11px] text-slate-500 font-mono mt-1">
+        ID: ${escapeHtml(prov.id)} • MV: ${escapeHtml(String(prov.mpCount ?? "—"))} ${pinnedProvinceId === prov.id ? " • PIN" : ""}
+      </div>`;
+  }
+
+  function setPinnedProvince(id) {
+    pinnedProvinceId = id;
+    scheduleSave();
+
+    // Visual accent
+    $$('#turkeyMapSVG path').forEach(p => {
+      p.dataset.pinned = "0";
+      p.style.strokeWidth = "0.5";
+      p.style.stroke = "rgba(255,255,255,0.2)";
+    });
+    if (id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.dataset.pinned = "1";
+        el.style.stroke = "rgba(255,255,255,0.95)";
+        el.style.strokeWidth = "1.8";
+      }
+    }
+  }
+
+  function focusProvince(id) {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    el.focus({ preventScroll: true });
+    el.style.filter = "drop-shadow(0px 0px 10px rgba(255,255,255,0.55))";
+    setTimeout(() => { el.style.filter = ""; }, 900);
+    return true;
+  }
+
+  function wireMapA11yAndClicks() {
+    const paths = $$('#turkeyMapSVG path');
+    if (!paths.length) return;
+
+    paths.forEach(path => {
+      path.setAttribute("tabindex", "0");
+      path.setAttribute("role", "button");
+      const prov = (typeof provinces !== "undefined") ? provinces.find(p => p.id === path.id) : null;
+      if (prov) path.setAttribute("aria-label", prov.displayName || prov.name || prov.id);
+
+      // Click to pin/unpin
+      path.addEventListener("click", () => {
+        if (!prov) return;
+        const next = (pinnedProvinceId === prov.id) ? null : prov.id;
+        setPinnedProvince(next);
+        updateProvinceInspector(prov, "pin");
+        showToast(next ? `${prov.displayName} sabitlendi.` : "Sabitleme kapatıldı.", next ? "ok" : "info");
+      });
+
+      // Focus updates inspector even without mouse
+      path.addEventListener("focus", () => {
+        if (!prov) return;
+        lastHoverProvinceId = prov.id;
+        updateProvinceInspector(prov, "hover");
+      });
+
+      path.addEventListener("mouseenter", () => {
+        if (!prov) return;
+        lastHoverProvinceId = prov.id;
+        updateProvinceInspector(prov, "hover");
+      });
+
+      path.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          path.click();
+        }
+      });
+    });
+  }
+
+  function wireProvinceSearch() {
+    const input = $("#provinceSearch");
+    const clear = $("#btnClearSearch");
+    if (!input) return;
+
+    const doSearch = () => {
+      const q = input.value.trim().toLowerCase();
+      if (!q) return;
+
+      const prov = (typeof provinces !== "undefined") ? provinces.find(p => {
+        const n = (p.displayName || p.name || "").toLowerCase();
+        return n === q || n.startsWith(q) || n.includes(q);
+      }) : null;
+
+      if (prov) {
+        focusProvince(prov.id);
+        updateProvinceInspector(prov, "hover");
+      }
+    };
+
+    input.addEventListener("input", debounce(doSearch, 180));
+    if (clear) clear.addEventListener("click", () => { input.value = ""; input.focus(); });
+  }
+
+  function wireIO() {
+    const modal = $("#ioModal");
+    const btn = $("#btnIO");
+    const close = $("#btnCloseIO");
+    const txt = $("#ioText");
+    const btnCopy = $("#btnCopyJSON");
+    const btnApply = $("#btnApplyJSON");
+    const btnDownload = $("#btnDownloadJSON");
+    const btnShare = $("#btnShareLink");
+    const fileImport = $("#fileImport");
+
+    const open = () => {
+      if (!modal || !txt) return;
+      txt.value = JSON.stringify(snapshotState(true), null, 2);
+      modal.classList.remove("hidden");
+      txt.focus();
+    };
+    const shut = () => {
+      if (!modal) return;
+      modal.classList.add("hidden");
+    };
+
+    btn?.addEventListener("click", open);
+    close?.addEventListener("click", shut);
+    modal?.addEventListener("click", (e) => { if (e.target === modal) shut(); });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (modal && !modal.classList.contains("hidden")) shut();
+      }
+      // Ctrl/Cmd+S => export modal
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        open();
+      }
+    });
+
+    btnCopy?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(txt.value || "");
+        showToast("JSON panoya kopyalandı.", "ok");
+      } catch {
+        showToast("Kopyalama başarısız (tarayıcı izin vermedi).", "warn");
+      }
+    });
+
+    btnApply?.addEventListener("click", () => {
+      try {
+        const obj = JSON.parse(txt.value);
+        const ok = applyState(obj);
+        if (ok) { saveState(); shut(); }
+      } catch {
+        showToast("Geçersiz JSON.", "bad");
+      }
+    });
+
+    btnDownload?.addEventListener("click", () => {
+      const blob = new Blob([txt.value || ""], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `secim-sim-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+      showToast("JSON indirildi.", "ok");
+    });
+
+    btnShare?.addEventListener("click", async () => {
+      // Keep the hash small: only mode + national inputs + qualifies (no provinceRatios)
+      const mini = snapshotState(false);
+      const payload = btoa(unescape(encodeURIComponent(JSON.stringify({
+        v: mini.v, electionMode: mini.electionMode, parties: mini.parties, partyColors: mini.partyColors,
+        national: mini.national, qualify: mini.qualify, pres1: mini.pres1, pres2: mini.pres2, runoffVisible: mini.runoffVisible, theme: mini.theme
+      }))));
+      const url = `${location.origin}${location.pathname}#s=${payload}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast("Paylaşım linki kopyalandı.", "ok");
+      } catch {
+        showToast("Link kopyalanamadı.", "warn");
+      }
+    });
+
+    fileImport?.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      txt.value = text;
+      showToast("Dosya yüklendi. “Yapıştır & Uygula” ile uygulayın.", "ok");
+    });
+  }
+
+  function wireReset() {
+    const btn = $("#btnReset");
+    btn?.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      // keep theme/autorun as user preference? We'll keep them.
+      showToast("Durum sıfırlandı. Sayfa yenileniyor…", "warn");
+      setTimeout(() => location.reload(), 350);
+    });
+  }
+
+  function wireTheme() {
+    $("#btnTheme")?.addEventListener("click", () => {
+      const next = (getTheme() === "midnight") ? "aurora" : "midnight";
+      applyTheme(next);
+      scheduleSave();
+      showToast(`Tema: ${next.toUpperCase()}`, "ok");
+    });
+  }
+
+  function wirePinButtons() {
+    const pin = $("#btnPinProvince");
+    const unpin = $("#btnUnpinProvince");
+    pin?.addEventListener("click", () => {
+      const id = pinnedProvinceId || lastHoverProvinceId;
+      if (!id) return showToast("Önce bir il seçin.", "warn");
+      setPinnedProvince(id);
+      const prov = (typeof provinces !== "undefined") ? provinces.find(p => p.id === id) : null;
+      if (prov) updateProvinceInspector(prov, "pin");
+      showToast("İl sabitlendi.", "ok");
+    });
+    unpin?.addEventListener("click", () => {
+      setPinnedProvince(null);
+      showToast("Sabitleme kapatıldı.", "info");
+    });
+  }
+
+  function wireAutosaveOnInput() {
+    // Use event delegation so dynamic inputs are covered.
+    const handler = (e) => {
+      const t = e.target;
+      if (!t) return;
+
+      // Inputs that should trigger save/run
+      const isRelevant =
+        (t.id && (t.id.startsWith("input_") || t.id.startsWith("qualify_"))) ||
+        t.closest?.("#presidentialTable") ||
+        t.closest?.("#secondRoundTable") ||
+        t.closest?.("#createPartyModal");
+
+      if (!isRelevant) return;
+
+      scheduleSave();
+      scheduleRun();
+    };
+
+    document.addEventListener("input", handler, { passive: true });
+    document.addEventListener("change", handler, { passive: true });
+
+    // Also patch a few core actions
+    if (typeof switchElectionMode === "function" && !switchElectionMode.__enhanced) {
+      const _sw = switchElectionMode;
+      switchElectionMode = (mode) => { _sw(mode); scheduleSave(); };
+      switchElectionMode.__enhanced = true;
+    }
+
+    if (typeof submitNewParty === "function" && !submitNewParty.__enhanced) {
+      const _sp = submitNewParty;
+      submitNewParty = () => { _sp(); scheduleSave(); scheduleRun(); };
+      submitNewParty.__enhanced = true;
+    }
+  }
+
+  function parseHashState() {
+    const h = location.hash || "";
+    const m = h.match(/#s=([^&]+)/);
+    if (!m) return null;
+    try {
+      const json = decodeURIComponent(escape(atob(m[1])));
+      const obj = JSON.parse(json);
+      return obj;
+    } catch {
+      return null;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Theme + autorun preferences
+    applyTheme(getTheme());
+    setAutoRun(localStorage.getItem(STORAGE_AUTORUN) === "1");
+
+    // Hooks + UI
+    wireResultsHooks();
+    wireTheme();
+    wireIO();
+    wireReset();
+    wirePinButtons();
+    wireProvinceSearch();
+    wireAutosaveOnInput();
+
+    // Map enhancements (keyboard + pin)
+    wireMapA11yAndClicks();
+
+    // Load from share hash first, then localStorage
+    const fromHash = parseHashState();
+    if (fromHash) {
+      // hash does not include provinceRatios; applyState expects v=3 though.
+      // We'll coerce it into v=3 and rely on existing default provinces.
+      const coerced = Object.assign({ v: 3, autoRun: autoRun, pinnedProvinceId: null }, fromHash);
+      applyState(coerced);
+      showToast("Paylaşım linki uygulandı.", "ok");
+    } else {
+      loadState();
+    }
+
+    // Save baseline
+    scheduleSave();
+  });
+})();
+</script>
+
 </body>
 </html>
